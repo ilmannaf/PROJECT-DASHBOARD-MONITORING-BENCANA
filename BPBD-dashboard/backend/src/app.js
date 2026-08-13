@@ -27,4 +27,7 @@ app.use('/api/inventory', inventoryRoutes);
 const vehicleRoutes = require('./routes/vehicleRoutes');
 app.use('/api/vehicles', vehicleRoutes);
 
+const activityRoutes = require('./routes/activityRoutes');
+app.use('/api/activities', activityRoutes);
+
 module.exports = app;
