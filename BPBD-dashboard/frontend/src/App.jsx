@@ -7,6 +7,8 @@ import VehicleManagement from './pages/admin/VehicleManagement';
 import PoskoManagement from './pages/admin/PoskoManagement';
 import ActivityManagement from './pages/admin/ActivityManagement';
 import ReportForm from './pages/public/ReportForm';
+import TrackStatus from './pages/public/TrackStatus';
+import PublicDashboard from './pages/public/PublicDashboard';
 import AdminLayout from './layouts/AdminLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -14,8 +16,10 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/lapor" />} />
+        <Route path="/" element={<Navigate to="/dashboard" />} />
+        <Route path="/dashboard" element={<PublicDashboard />} />
         <Route path="/lapor" element={<ReportForm />} />
+        <Route path="/lacak" element={<TrackStatus />} />
         <Route path="/admin/login" element={<Login />} />
 
         <Route

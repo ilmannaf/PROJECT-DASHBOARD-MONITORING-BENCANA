@@ -66,22 +66,52 @@ BPBD-dashboard/
 
 ### Frontend (React + Vite + Tailwind CSS v4)
 
+- ✅ **Public Dashboard** (NEW)
+  - Login/registrasi untuk pelapor
+  - List semua laporan personal
+  - Filter berdasarkan status
+  - Visualisasi statistik (total, baru, diverifikasi, selesai)
+  - Timeline update per laporan
+  - History pencarian tracking code
+  
 - ✅ **Public Report Form**
   - Form pelaporan bencana dari masyarakat
   - Upload foto
   - Geolocation (GPS)
   - Tracking code display
+  - Success page dengan tombol "Lacak Status Laporan" (brand orange)
+  - Tombol "Kirim laporan lain" (secondary grey)
   
 - ✅ **Admin Dashboard**
   - Statistik laporan (total, baru, diverifikasi, selesai)
+  - Chart distribusi status & jenis bencana
   - Tabel laporan terbaru
+  - Tombol "Lacak Status Laporan" (brand orange)
   
 - ✅ **Reports Management**
   - Filter berdasarkan status
   - Update status laporan
   
+- ✅ **Inventory Management**
+  - Tambah/update/hapus item
+  - Tracking kondisi (baik, rusak, perlu_maintenance)
+  - Link ke posko
+  
+- ✅ **Vehicle Management**
+  - Tambah/update/hapus kendaraan
+  - Status (siap, maintenance, rusak)
+  - Link ke posko
+  
+- ✅ **Posko Management**
+  - Tambah/daftar posko
+  
+- ✅ **Activity Management**
+  - Laporan kegiatan lapangan
+  - Upload dokumentasi foto
+  
 - ✅ **Login System**
   - Admin & petugas login
+  - Brand orange consistent theme
 
 ---
 
@@ -175,6 +205,38 @@ npm run dev
 
 Frontend jalan di: `http://localhost:5173`
 
+## 🔗 URL Mapping
+
+### Public
+- `/` → Redirect ke `/dashboard`
+- `/dashboard` - Public dashboard (login required)
+- `/lapor` - Form pelaporan bencana
+- `/lacak` - Cek status laporan
+
+### Admin
+- `/admin/login` - Login admin/petugas
+- `/admin/dashboard` - Dashboard admin
+- `/admin/reports` - Kelola laporan
+- `/admin/inventory` - Manajemen inventaris
+- `/admin/vehicles` - Manajemen kendaraan
+- `/admin/posko` - Manajemen posko
+- `/admin/activities` - Laporan kegiatan
+
+---
+
+## 🎨 Brand Colors
+
+Sistem menggunakan tema warna oranye konsisten untuk branding BPBD:
+
+- **Brand Primary**: `bg-brand-600` / `text-brand-600` (oranye utama)
+- **Brand Light**: `bg-brand-50` / `border-brand-100` (oranye muda)
+- **Brand Dark**: `bg-brand-700` (oranye gelap)
+
+Contoh penggunaan:
+- Tombol aksi utama: `bg-brand-600 hover:bg-brand-700`
+- Navbar accent strip: `bg-gradient-to-r from-brand-600 via-brand-500 to-brand-600`
+- Icon/logo gradient: `bg-gradient-to-br from-brand-500 to-brand-700`
+
 ---
 
 ## 📡 API Endpoints
@@ -186,6 +248,7 @@ Frontend jalan di: `http://localhost:5173`
 ### Reports
 - `POST /api/reports` - Submit laporan baru (publik)
 - `GET /api/reports` - List semua laporan (auth required)
+- `GET /api/reports/my-reports` - List laporan user yang login (auth required)
 - `GET /api/reports/track/:code` - Cek status via tracking code (publik)
 - `PATCH /api/reports/:id/status` - Update status laporan (admin/petugas)
 
@@ -229,8 +292,15 @@ Password: admin123
 
 ## 📱 Fitur Publik
 
+### Dashboard Public (Login Required)
+1. Akses `/dashboard` atau `/lacak`
+2. Login dengan akun yang sudah didaftarkan
+3. Lihat semua laporan personal
+4. Track status setiap laporan via timeline
+5. Search tracking code dengan history
+
 ### Lapor Bencana
-1. Akses halaman `/lapor`
+1. Akses halaman `/lapor` atau klik "Laporkan Bencana"
 2. Isi data pelapor, jenis bencana, lokasi
 3. Upload foto (opsional)
 4. Klik "Kirim Laporan"
@@ -239,6 +309,7 @@ Password: admin123
 ### Cek Status Laporan
 1. Masukkan tracking code (format: `BPBD-2026-XXX`)
 2. Lihat status dan history perubahan
+3. Gunakan history pencarian untuk kode lama
 
 ---
 
@@ -246,11 +317,17 @@ Password: admin123
 
 ### Admin Pages
 - `/admin/login` - Login admin/petugas
-- `/admin/dashboard` - Dashboard dengan statistik
+- `/admin/dashboard` - Dashboard dengan statistik & tombol lacak
 - `/admin/reports` - Kelola laporan bencana
+- `/admin/inventory` - Manajemen inventaris
+- `/admin/vehicles` - Manajemen kendaraan
+- `/admin/posko` - Manajemen posko
+- `/admin/activities` - Laporan kegiatan
 
 ### Public Pages
+- `/dashboard` - Dashboard pelapor (login required)
 - `/lapor` - Form pelaporan bencana
+- `/lacak` - Cek status laporan via tracking code
 
 ---
 

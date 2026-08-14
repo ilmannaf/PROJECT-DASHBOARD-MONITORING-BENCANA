@@ -65,6 +65,23 @@ exports.getReports = async (req, res) => {
   }
 };
 
+// READ - List laporan user yang login
+exports.getMyReports = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const [rows] = await pool.query(
+      'SELECT * FROM reports WHERE reporter_name = ? ORDER BY created_at DESC',
+      [req.user.name]
+    );
+
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Terjadi kesalahan server' });
+  }
+};
+
 // READ - Cek status via tracking code (publik)
 exports.getReportByTrackingCode = async (req, res) => {
   try {
