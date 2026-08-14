@@ -79,7 +79,7 @@ export default function VehicleManagement() {
         <h1 className="text-2xl font-bold">Manajemen Kendaraan</h1>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm"
+          className="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm"
         >
           {showForm ? "Batal" : "+ Tambah Kendaraan"}
         </button>

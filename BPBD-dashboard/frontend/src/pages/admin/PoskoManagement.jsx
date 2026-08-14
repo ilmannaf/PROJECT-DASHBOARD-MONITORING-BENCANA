@@ -32,7 +32,7 @@ export default function PoskoManagement() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Manajemen Posko</h1>
-        <button onClick={() => setShowForm(!showForm)} className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
+        <button onClick={() => setShowForm(!showForm)} className="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm">
           {showForm ? 'Batal' : '+ Tambah Posko'}
         </button>
       </div>

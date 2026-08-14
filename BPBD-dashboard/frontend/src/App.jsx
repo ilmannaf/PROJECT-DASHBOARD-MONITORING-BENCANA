@@ -4,8 +4,11 @@ import Dashboard from './pages/admin/Dashboard';
 import ReportsManagement from './pages/admin/ReportsManagement';
 import InventoryManagement from './pages/admin/InventoryManagement';
 import VehicleManagement from './pages/admin/VehicleManagement';
-import ReportForm from './pages/public/ReportForm';
 import PoskoManagement from './pages/admin/PoskoManagement';
+import ActivityManagement from './pages/admin/ActivityManagement';
+import ReportForm from './pages/public/ReportForm';
+import AdminLayout from './layouts/AdminLayout';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -14,11 +17,21 @@ function App() {
         <Route path="/" element={<Navigate to="/lapor" />} />
         <Route path="/lapor" element={<ReportForm />} />
         <Route path="/admin/login" element={<Login />} />
-        <Route path="/admin/dashboard" element={<Dashboard />} />
-        <Route path="/admin/reports" element={<ReportsManagement />} />
-        <Route path="/admin/inventory" element={<InventoryManagement />} />
-        <Route path="/admin/vehicles" element={<VehicleManagement />} />
-        <Route path="/admin/posko" element={<PoskoManagement />} />
+
+        <Route
+          element={
+            <ProtectedRoute>
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/admin/dashboard" element={<Dashboard />} />
+          <Route path="/admin/reports" element={<ReportsManagement />} />
+          <Route path="/admin/inventory" element={<InventoryManagement />} />
+          <Route path="/admin/vehicles" element={<VehicleManagement />} />
+          <Route path="/admin/posko" element={<PoskoManagement />} />
+          <Route path="/admin/activities" element={<ActivityManagement />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );
