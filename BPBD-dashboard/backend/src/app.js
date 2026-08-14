@@ -30,4 +30,7 @@ app.use('/api/vehicles', vehicleRoutes);
 const activityRoutes = require('./routes/activityRoutes');
 app.use('/api/activities', activityRoutes);
 
+const poskoRoutes = require('./routes/poskoRoutes');
+app.use('/api/posko', poskoRoutes);
+
 module.exports = app;
