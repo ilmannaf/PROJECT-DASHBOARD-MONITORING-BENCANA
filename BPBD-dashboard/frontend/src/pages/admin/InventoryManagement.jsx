@@ -67,7 +67,7 @@ export default function InventoryManagement() {
     try {
       await updateItem(id, { item_condition });
       loadItems();
-    } catch (err) {
+    } catch {
       alert("Gagal update kondisi");
     }
   };
@@ -77,7 +77,7 @@ export default function InventoryManagement() {
     try {
       await deleteItem(id);
       loadItems();
-    } catch (err) {
+    } catch {
       alert("Gagal menghapus item");
     }
   };

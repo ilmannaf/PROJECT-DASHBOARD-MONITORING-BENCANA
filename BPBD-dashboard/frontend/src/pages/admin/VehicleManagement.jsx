@@ -58,7 +58,7 @@ export default function VehicleManagement() {
     try {
       await updateVehicle(id, { status });
       loadVehicles();
-    } catch (err) {
+    } catch {
       alert("Gagal update status");
     }
   };
@@ -68,7 +68,7 @@ export default function VehicleManagement() {
     try {
       await deleteVehicle(id);
       loadVehicles();
-    } catch (err) {
+    } catch {
       alert("Gagal menghapus kendaraan");
     }
   };

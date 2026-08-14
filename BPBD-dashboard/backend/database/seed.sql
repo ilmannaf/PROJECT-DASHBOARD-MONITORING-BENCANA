@@ -5,12 +5,11 @@
 
 USE sistem_kebencanaan;
 
--- User default (password: "admin123" -> nanti di-hash pakai bcrypt di aplikasi,
--- untuk sementara isi manual dulu, ganti setelah endpoint auth jadi)
+-- User default (password: "admin123" sudah di-hash dengan bcrypt)
 INSERT INTO users (name, email, password, role, wilayah) VALUES
-('Admin BPBD', 'admin@bpbdsemarang.go.id', 'ganti_dengan_hash_bcrypt', 'admin', 'Semarang'),
-('Petugas Lapangan 1', 'petugas1@bpbdsemarang.go.id', 'ganti_dengan_hash_bcrypt', 'petugas', 'Semarang Utara'),
-('Petugas Lapangan 2', 'petugas2@bpbdsemarang.go.id', 'ganti_dengan_hash_bcrypt', 'petugas', 'Semarang Selatan');
+('Admin BPBD', 'admin@bpbdsemarang.go.id', '$2b$10$mpquimwluN21a/LByqXx/euVylhBz/IoKDLXdk5MnnT2dMJbNNOVm', 'admin', 'Semarang'),
+('Petugas Lapangan 1', 'petugas1@bpbdsemarang.go.id', '$2b$10$mpquimwluN21a/LByqXx/euVylhBz/IoKDLXdk5MnnT2dMJbNNOVm', 'petugas', 'Semarang Utara'),
+('Petugas Lapangan 2', 'petugas2@bpbdsemarang.go.id', '$2b$10$mpquimwluN21a/LByqXx/euVylhBz/IoKDLXdk5MnnT2dMJbNNOVm', 'petugas', 'Semarang Selatan');
 
 -- Posko
 INSERT INTO posko (name, address) VALUES
@@ -34,8 +33,8 @@ INSERT INTO vehicles (plate_number, type, status, last_service_date, posko_id) V
 
 -- Contoh laporan bencana (buat testing dashboard)
 INSERT INTO reports (tracking_code, reporter_name, reporter_phone, disaster_type, description, latitude, longitude, address, status) VALUES
-('BPBD-2026-001', 'Budi Santoso', '081234567890', 'Banjir', 'Air masuk ke pemukiman sekitar 50cm', -6.9932, 110.4203, 'Kaligawe, Semarang Utara', 'baru'),
-('BPBD-2026-002', 'Siti Aminah', '082345678901', 'Longsor', 'Tanah longsor menutup akses jalan', -7.0512, 110.4381, 'Gunungpati, Semarang', 'diverifikasi');
+('BPBD-2026-1234', 'Budi Santoso', '081234567890', 'Banjir', 'Air masuk ke pemukiman sekitar 50cm', -6.9932, 110.4203, 'Kaligawe, Semarang Utara', 'baru'),
+('BPBD-2026-5678', 'Siti Aminah', '082345678901', 'Longsor', 'Tanah longsor menutup akses jalan', -7.0512, 110.4381, 'Gunungpati, Semarang', 'diverifikasi');
 
 -- Contoh laporan kegiatan
 INSERT INTO activities (title, description, activity_date, location, created_by) VALUES

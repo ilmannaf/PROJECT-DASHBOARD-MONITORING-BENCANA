@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Login from './pages/admin/Login';
 import Dashboard from './pages/admin/Dashboard';
 import ReportsManagement from './pages/admin/ReportsManagement';
@@ -9,6 +9,7 @@ import ActivityManagement from './pages/admin/ActivityManagement';
 import ReportForm from './pages/public/ReportForm';
 import TrackStatus from './pages/public/TrackStatus';
 import PublicDashboard from './pages/public/PublicDashboard';
+import LandingPage from './pages/public/LandingPage';
 import AdminLayout from './layouts/AdminLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -16,7 +17,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" />} />
+        <Route path="/" element={<LandingPage />} />
         <Route path="/dashboard" element={<PublicDashboard />} />
         <Route path="/lapor" element={<ReportForm />} />
         <Route path="/lacak" element={<TrackStatus />} />

@@ -5,7 +5,7 @@ const pool = require('../config/db');
 // REGISTER
 exports.register = async (req, res) => {
   try {
-    const { name, email, password, role, wilayah } = req.body;
+    const { name, email, password, wilayah } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({ message: 'Nama, email, dan password wajib diisi' });
@@ -20,14 +20,17 @@ exports.register = async (req, res) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Registrasi publik selalu role 'petugas' (admin hanya dibuat via seed)
+    const role = 'petugas';
+
     const [result] = await pool.query(
       'INSERT INTO users (name, email, password, role, wilayah) VALUES (?, ?, ?, ?, ?)',
-      [name, email, hashedPassword, role || 'petugas', wilayah || null]
+      [name, email, hashedPassword, role, wilayah || null]
     );
 
     res.status(201).json({
       message: 'Registrasi berhasil',
-      user: { id: result.insertId, name, email, role: role || 'petugas' },
+      user: { id: result.insertId, name, email, role },
     });
   } catch (err) {
     console.error(err);

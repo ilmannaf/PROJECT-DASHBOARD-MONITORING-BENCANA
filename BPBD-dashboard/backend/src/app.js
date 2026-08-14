@@ -33,4 +33,17 @@ app.use('/api/activities', activityRoutes);
 const poskoRoutes = require('./routes/poskoRoutes');
 app.use('/api/posko', poskoRoutes);
 
+// 404 handler untuk route yang tidak ada
+app.use((req, res) => {
+  res.status(404).json({ message: 'Endpoint tidak ditemukan' });
+});
+
+// Global error handler (menangkap error dari multer dll)
+app.use((err, req, res, next) => {
+  console.error(err);
+  res.status(err.status || 500).json({
+    message: err.message || 'Terjadi kesalahan server',
+  });
+});
+
 module.exports = app;

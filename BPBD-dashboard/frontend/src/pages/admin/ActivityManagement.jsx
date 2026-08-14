@@ -39,7 +39,7 @@ export default function ActivityManagement() {
     try {
       await deleteActivity(id);
       loadActivities();
-    } catch (err) {
+    } catch {
       alert('Gagal menghapus kegiatan');
     }
   };

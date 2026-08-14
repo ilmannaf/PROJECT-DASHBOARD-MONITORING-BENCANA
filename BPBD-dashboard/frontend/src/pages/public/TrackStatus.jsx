@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { trackReport } from '../../services/reportService';
 
 const STATUS_STEPS = ['baru', 'diverifikasi', 'ditindaklanjuti', 'selesai'];
@@ -11,29 +11,37 @@ const STATUS_LABELS = {
 };
 
 export default function TrackStatus() {
-  const [code, setCode] = useState('');
+  const [searchParams] = useSearchParams();
+  const [code, setCode] = useState(searchParams.get('code') || '');
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [searchHistory, setSearchHistory] = useState([]);
+  const [showMap, setShowMap] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const history = JSON.parse(localStorage.getItem('trackHistory') || '[]');
     setSearchHistory(history);
+    
+    // Auto-search jika ada code di URL
+    const codeFromUrl = searchParams.get('code');
+    if (codeFromUrl) {
+      setCode(codeFromUrl);
+      performSearch(codeFromUrl);
+    }
   }, []);
 
-  const handleSearch = async (e) => {
-    e.preventDefault();
+  const performSearch = async (searchCode) => {
     setError('');
     setResult(null);
     setLoading(true);
     try {
-      const data = await trackReport(code.trim());
+      const data = await trackReport(searchCode.trim());
       setResult(data);
       
       const history = JSON.parse(localStorage.getItem('trackHistory') || '[]');
-      const newHistory = [code.trim(), ...history.filter(c => c !== code.trim())].slice(0, 5);
+      const newHistory = [searchCode.trim(), ...history.filter(c => c !== searchCode.trim())].slice(0, 5);
       localStorage.setItem('trackHistory', JSON.stringify(newHistory));
       setSearchHistory(newHistory);
     } catch (err) {
@@ -43,9 +51,14 @@ export default function TrackStatus() {
     }
   };
 
+  const handleSearch = async (e) => {
+    e.preventDefault();
+    await performSearch(code);
+  };
+
   const handleHistoryClick = (historyCode) => {
     setCode(historyCode);
-    handleSearch({ preventDefault: () => {} });
+    performSearch(historyCode);
   };
 
   const currentStepIndex = result ? STATUS_STEPS.indexOf(result.report.status) : -1;
@@ -115,6 +128,33 @@ export default function TrackStatus() {
               <p><span className="text-gray-400">Lokasi:</span> {result.report.address}</p>
               <p><span className="text-gray-400">Dilaporkan:</span> {new Date(result.report.created_at).toLocaleString('id-ID')}</p>
             </div>
+
+            {result.report.latitude && result.report.longitude && (
+              <div className="mb-5">
+                <button
+                  onClick={() => setShowMap(!showMap)}
+                  className="w-full flex items-center justify-center gap-2 bg-brand-50 hover:bg-brand-100 text-brand-700 font-semibold text-sm rounded-lg py-2 transition"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  {showMap ? 'Tutup Peta' : 'Lihat Lokasi di Peta'}
+                </button>
+                {showMap && (
+                  <div className="mt-3 rounded-xl overflow-hidden border border-gray-200">
+                    <iframe
+                      title="Peta Lokasi Bencana"
+                      width="100%"
+                      height="300"
+                      frameBorder="0"
+                      loading="lazy"
+                      src={`https://maps.google.com/maps?q=${result.report.latitude},${result.report.longitude}&z=15&output=embed`}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
 
             <div className="flex items-center mb-5">
               {STATUS_STEPS.map((step, i) => (
