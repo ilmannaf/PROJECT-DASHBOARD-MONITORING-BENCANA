@@ -8,8 +8,6 @@ USE sistem_kebencanaan;
 -- User default (password: "admin123" sudah di-hash dengan bcrypt)
 INSERT INTO users (name, email, password, role, wilayah) VALUES
 ('Admin BPBD', 'admin@bpbdsemarang.go.id', '$2b$10$mpquimwluN21a/LByqXx/euVylhBz/IoKDLXdk5MnnT2dMJbNNOVm', 'admin', 'Semarang'),
-('Petugas Lapangan 1', 'petugas1@bpbdsemarang.go.id', '$2b$10$mpquimwluN21a/LByqXx/euVylhBz/IoKDLXdk5MnnT2dMJbNNOVm', 'petugas', 'Semarang Utara'),
-('Petugas Lapangan 2', 'petugas2@bpbdsemarang.go.id', '$2b$10$mpquimwluN21a/LByqXx/euVylhBz/IoKDLXdk5MnnT2dMJbNNOVm', 'petugas', 'Semarang Selatan');
 
 -- Posko
 INSERT INTO posko (name, address) VALUES
