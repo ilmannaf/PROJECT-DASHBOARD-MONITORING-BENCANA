@@ -33,6 +33,9 @@ app.use('/api/activities', activityRoutes);
 const poskoRoutes = require('./routes/poskoRoutes');
 app.use('/api/posko', poskoRoutes);
 
+const disasterRoutes = require('./routes/disasterRoutes');
+app.use('/api/disaster-records', disasterRoutes);
+
 // 404 handler untuk route yang tidak ada
 app.use((req, res) => {
   res.status(404).json({ message: 'Endpoint tidak ditemukan' });

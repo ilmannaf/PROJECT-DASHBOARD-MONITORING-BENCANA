@@ -6,6 +6,7 @@ import InventoryManagement from './pages/admin/InventoryManagement';
 import VehicleManagement from './pages/admin/VehicleManagement';
 import PoskoManagement from './pages/admin/PoskoManagement';
 import ActivityManagement from './pages/admin/ActivityManagement';
+import DisasterRecordsManagement from './pages/admin/DisasterRecordsManagement';
 import ReportForm from './pages/public/ReportForm';
 import TrackStatus from './pages/public/TrackStatus';
 import PublicDashboard from './pages/public/PublicDashboard';
@@ -36,6 +37,7 @@ function App() {
           <Route path="/admin/vehicles" element={<VehicleManagement />} />
           <Route path="/admin/posko" element={<PoskoManagement />} />
           <Route path="/admin/activities" element={<ActivityManagement />} />
+          <Route path="/admin/disaster-records" element={<DisasterRecordsManagement />} />
         </Route>
       </Routes>
     </BrowserRouter>

@@ -1,15 +1,104 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
 @theme {
-  --font-sans: "Plus Jakarta Sans", sans-serif;
-  --color-brand-50: #fff4ec;
-  --color-brand-100: #ffe3ce;
-  --color-brand-500: #ff6b00;
-  --color-brand-600: #e85d04;
-  --color-brand-700: #c74e00;
+  --font-sans: "Inter", sans-serif;
+  --color-brand-50: #fff7ed;
+  --color-brand-100: #ffedd5;
+  --color-brand-500: #ff6f00;
+  --color-brand-600: #e65100;
+  --color-brand-700: #bf360c;
+  --color-brand-800: #8e2400;
+  --color-brand-900: #6d1c00;
+  --color-emerald-500: #00c853;
+  --color-red-500: #e53935;
+  --color-blue-500: #1e88e5;
+  --color-purple-500: #8e24aa;
+  --color-gray-50: #f5f5f5;
+  --color-gray-100: #eeeeee;
+  --color-gray-200: #e0e0e0;
+  --color-gray-300: #bdbdbd;
+  --color-gray-600: #757575;
+  --color-gray-700: #616161;
+  --color-gray-800: #424242;
+  --color-gray-900: #212121;
+}
+
+* {
+  scroll-behavior: smooth;
 }
 
 body {
   font-family: var(--font-sans);
+  background-color: var(--color-gray-50);
+}
+
+.card {
+  @apply bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100;
+}
+
+.btn {
+  @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 active:scale-95;
+}
+
+.btn-primary {
+  @apply bg-gradient-to-r from-brand-600 to-orange-600 text-white hover:shadow-lg hover:shadow-orange-500/30;
+}
+
+.btn-secondary {
+  @apply bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300;
+}
+
+.btn-danger {
+  @apply bg-red-500 text-white hover:bg-red-600 hover:shadow-lg hover:shadow-red-500/30;
+}
+
+.btn-success {
+  @apply bg-emerald-500 text-white hover:bg-emerald-600 hover:shadow-lg hover:shadow-emerald-500/30;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.4s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.progress-bar {
+  animation: progress 2s ease-in-out infinite;
+}
+
+@keyframes progress {
+  0% {
+    transform: scaleX(0);
+  }
+  50% {
+    transform: scaleX(0.5);
+  }
+  100% {
+    transform: scaleX(0);
+  }
 }

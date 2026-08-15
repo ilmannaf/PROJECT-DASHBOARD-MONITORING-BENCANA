@@ -106,7 +106,7 @@ function DashboardView({ reports, selectedReport, setSelectedReport, navigate })
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 shadow-sm">
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center text-white font-extrabold text-sm">
@@ -138,61 +138,111 @@ function DashboardView({ reports, selectedReport, setSelectedReport, navigate })
 
       <main className="max-w-7xl mx-auto px-6 py-8">
         <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Selamat datang, {user?.name}!</h2>
-          <p className="text-gray-500">Kelola dan lacak laporan bencana Anda di sini.</p>
+          <h2 className="text-3xl font-extrabold text-gray-900 mb-2 tracking-tight">Selamat datang, {user?.name}!</h2>
+          <p className="text-gray-600">Kelola dan lacak laporan bencana Anda di sini.</p>
         </div>
 
-        <div className="grid grid-cols-4 gap-4 mb-8">
-          <StatCard label="Total Laporan" value={total} color="text-gray-900" />
-          <StatCard label="Baru" value={baru} color="text-red-600" bg="bg-red-50" />
-          <StatCard label="Diverifikasi" value={diverifikasi} color="text-yellow-600" bg="bg-yellow-50" />
-          <StatCard label="Selesai" value={selesai} color="text-green-600" bg="bg-green-50" />
+        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
+          <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-lg transition-all group">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 text-white flex items-center justify-center shadow-lg shadow-blue-500/25 group-hover:scale-110 transition-transform">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Total Laporan</span>
+            </div>
+            <p className="text-3xl font-extrabold text-gray-900">{total}</p>
+          </div>
+          <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-lg transition-all group">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-red-500 to-rose-600 text-white flex items-center justify-center shadow-lg shadow-red-500/25 group-hover:scale-110 transition-transform">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+              </div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Baru</span>
+            </div>
+            <p className="text-3xl font-extrabold text-red-600">{baru}</p>
+          </div>
+          <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-lg transition-all group">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-400 to-yellow-500 text-white flex items-center justify-center shadow-lg shadow-amber-500/25 group-hover:scale-110 transition-transform">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Diverifikasi</span>
+            </div>
+            <p className="text-3xl font-extrabold text-yellow-600">{diverifikasi}</p>
+          </div>
+          <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-lg transition-all group">
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 text-white flex items-center justify-center shadow-lg shadow-emerald-500/25 group-hover:scale-110 transition-transform">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Selesai</span>
+            </div>
+            <p className="text-3xl font-extrabold text-green-600">{selesai}</p>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Laporan Saya</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
+              Laporan Saya
+            </h3>
             {reports.length === 0 ? (
-              <div className="bg-white border border-gray-200 rounded-xl p-8 text-center">
-                <p className="text-gray-500">Belum ada laporan.</p>
+              <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center shadow-sm">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <p className="text-gray-600 font-medium mb-1">Belum ada laporan</p>
+                <p className="text-sm text-gray-500 mb-4">Laporkan kejadian bencana untuk memulai</p>
                 <button
                   onClick={() => navigate('/lapor')}
-                  className="mt-2 bg-brand-600 hover:bg-brand-700 text-white px-4 py-2 rounded-lg text-sm font-semibold"
+                  className="bg-brand-600 hover:bg-brand-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold shadow-lg shadow-brand-500/25 transition-all"
                 >
-                  Buat Laporan Baru
+                  + Buat Laporan Baru
                 </button>
               </div>
             ) : (
-              <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+              <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
                 <table className="w-full text-sm text-left">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="py-3 px-4">Kode</th>
-                      <th className="py-3 px-4">Jenis</th>
-                      <th className="py-3 px-4">Status</th>
-                      <th className="py-3 px-4">Tanggal</th>
-                      <th className="py-3 px-4">Aksi</th>
+                  <thead>
+                    <tr className="bg-gray-50/80">
+                      <th className="py-3 px-6 text-xs font-bold uppercase tracking-wider text-gray-500">Kode</th>
+                      <th className="py-3 px-6 text-xs font-bold uppercase tracking-wider text-gray-500">Jenis</th>
+                      <th className="py-3 px-6 text-xs font-bold uppercase tracking-wider text-gray-500 text-center">Status</th>
+                      <th className="py-3 px-6 text-xs font-bold uppercase tracking-wider text-gray-500">Tanggal</th>
+                      <th className="py-3 px-6 text-xs font-bold uppercase tracking-wider text-gray-500">Aksi</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody className="divide-y divide-gray-50">
                     {reports.map((r) => (
-                      <tr key={r.id} className="border-b last:border-0">
-                        <td className="py-3 px-4 font-mono text-xs">{r.tracking_code}</td>
-                        <td className="py-3 px-4">{r.disaster_type}</td>
-                        <td className="py-3 px-4">
-                          <span className={`px-2 py-1 rounded-full text-xs ${STATUS_COLOR[r.status]}`}>
+                      <tr key={r.id} className="hover:bg-orange-50/40 transition-colors">
+                        <td className="py-3 px-6 font-mono text-xs text-gray-500">{r.tracking_code}</td>
+                        <td className="py-3 px-6 font-medium text-gray-900">{r.disaster_type}</td>
+                        <td className="py-3 px-6 text-center">
+                          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${STATUS_COLOR[r.status]}`}>
+                            <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></span>
                             {r.status}
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-gray-500">
+                        <td className="py-3 px-6 text-gray-500 text-sm">
                           {new Date(r.created_at).toLocaleDateString('id-ID')}
                         </td>
-                        <td className="py-3 px-4">
+                        <td className="py-3 px-6">
                           <button
                             onClick={() => setSelectedReport(r)}
-                            className="text-brand-600 hover:text-brand-700 text-sm font-semibold"
+                            className="text-brand-600 hover:text-brand-700 text-sm font-semibold transition"
                           >
-                            Lihat
+                            Lihat Detail
                           </button>
                         </td>
                       </tr>
@@ -203,23 +253,48 @@ function DashboardView({ reports, selectedReport, setSelectedReport, navigate })
             )}
           </div>
 
-          <div>
-            <div className="bg-white border border-gray-200 rounded-xl p-5 mb-6">
-              <h3 className="font-bold text-gray-900 mb-3">Info Bencana</h3>
-              <p className="text-sm text-gray-500 mb-3">
-                Jika terjadi bencana darurat, segera laporkan via aplikasi ini atau hubungi call center BPBD.
+          <div className="space-y-4">
+            <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center">
+                  <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h3 className="font-bold text-gray-900">Info Darurat</h3>
+              </div>
+              <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+                Jika terjadi bencana darurat, segera laporkan via aplikasi atau hubungi call center BPBD.
               </p>
-              <div className="bg-orange-50 border border-orange-100 rounded-lg p-3">
-                <p className="text-xs text-orange-700 font-semibold mb-1">Emergency Call:</p>
-                <p className="text-lg font-bold text-orange-600">112 / 0812-3456-7890</p>
+              <div className="bg-gradient-to-br from-orange-50 to-red-50 border border-orange-200 rounded-xl p-4">
+                <p className="text-xs text-orange-700 font-semibold mb-2 flex items-center gap-2">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                  </svg>
+                  Emergency Call Center:
+                </p>
+                <p className="text-xl font-bold text-orange-600">112 / 0812-3456-7890</p>
               </div>
             </div>
 
             <button
               onClick={() => navigate('/lapor')}
-              className="w-full bg-brand-600 hover:bg-brand-700 text-white px-4 py-3 rounded-xl font-semibold shadow-sm transition"
+              className="w-full bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-700 hover:to-brand-800 text-white px-4 py-3 rounded-xl font-semibold shadow-lg shadow-brand-500/25 transition-all flex items-center justify-center gap-2"
             >
-              + Laporkan Bencana
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Laporkan Bencana
+            </button>
+            
+            <button
+              onClick={() => navigate('/lacak')}
+              className="w-full bg-white hover:bg-gray-50 text-gray-700 px-4 py-3 rounded-xl font-semibold border-2 border-gray-200 hover:border-brand-300 transition-all flex items-center justify-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              Lacak Status Laporan
             </button>
           </div>
         </div>
@@ -228,15 +303,6 @@ function DashboardView({ reports, selectedReport, setSelectedReport, navigate })
       {selectedReport && (
         <ReportModal report={selectedReport} onClose={() => setSelectedReport(null)} />
       )}
-    </div>
-  );
-}
-
-function StatCard({ label, value, color, bg = 'bg-white' }) {
-  return (
-    <div className={`${bg} border border-gray-100 shadow-sm rounded-xl p-4`}>
-      <p className="text-sm text-gray-500">{label}</p>
-      <p className={`text-3xl font-extrabold ${color}`}>{value}</p>
     </div>
   );
 }
@@ -274,19 +340,43 @@ function AuthView({ tab, setTab, loading, error, onLogin, onRegister }) {
   );
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
-      <div className="max-w-md w-full bg-white shadow-xl rounded-2xl overflow-hidden">
-        <div className="bg-gradient-to-r from-brand-600 to-brand-700 p-6 text-white text-center">
-          <div className="w-16 h-16 mx-auto rounded-xl bg-white/20 flex items-center justify-center font-extrabold text-2xl mb-3 backdrop-blur-sm">
-            BPBD
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-orange-50/30 to-white">
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200 shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center text-white font-extrabold text-sm">
+              BPBD
+            </div>
+            <div>
+              <h1 className="font-bold text-gray-900">BPBD Kota Semarang</h1>
+              <p className="text-xs text-gray-500">Sistem Monitoring Kebencanaan</p>
+            </div>
           </div>
-          <h2 className="text-xl font-bold">
-            {tab === 'login' ? 'Masuk ke Akun' : 'Daftar Akun Baru'}
-          </h2>
-          <p className="text-sm opacity-90 mt-1">
-            {tab === 'login' ? 'Pelapor BPBD Kota Semarang' : 'Daftarkan diri untuk melapor'}
-          </p>
+          <a
+            href="/"
+            className="text-sm font-semibold text-gray-700 hover:text-brand-600 transition flex items-center gap-2"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Kembali ke Beranda
+          </a>
         </div>
+      </header>
+
+      <div className="flex items-center justify-center py-12 px-4">
+        <div className="max-w-md w-full bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100">
+          <div className="bg-gradient-to-r from-brand-600 to-brand-700 p-6 text-white text-center">
+            <div className="w-16 h-16 mx-auto rounded-xl bg-white/20 flex items-center justify-center font-extrabold text-2xl mb-3 backdrop-blur-sm">
+              BPBD
+            </div>
+            <h2 className="text-xl font-bold">
+              {tab === 'login' ? 'Masuk ke Akun' : 'Daftar Akun Baru'}
+            </h2>
+            <p className="text-sm opacity-90 mt-1">
+              {tab === 'login' ? 'Pelapor BPBD Kota Semarang' : 'Daftarkan diri untuk melapor'}
+            </p>
+          </div>
 
         <div className="p-6">
           <div className="flex gap-2 mb-6 border-b pb-2">
@@ -389,6 +479,7 @@ function AuthView({ tab, setTab, loading, error, onLogin, onRegister }) {
               </p>
             </form>
           )}
+        </div>
         </div>
       </div>
     </div>

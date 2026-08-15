@@ -3,16 +3,41 @@ import { getReports, updateReportStatus } from '../../services/reportService';
 
 const STATUS_OPTIONS = ['baru', 'diverifikasi', 'ditindaklanjuti', 'selesai'];
 const STATUS_COLOR = {
-  baru: 'bg-red-100 text-red-700',
-  diverifikasi: 'bg-yellow-100 text-yellow-700',
-  ditindaklanjuti: 'bg-blue-100 text-blue-700',
-  selesai: 'bg-green-100 text-green-700',
+  baru: 'from-red-500 to-rose-600',
+  diverifikasi: 'from-amber-400 to-yellow-500',
+  ditindaklanjuti: 'from-blue-500 to-indigo-600',
+  selesai: 'from-emerald-500 to-green-600',
+};
+
+const STATUS_ICON = {
+  baru: (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+    </svg>
+  ),
+  diverifikasi: (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+    </svg>
+  ),
+  ditindaklanjuti: (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+    </svg>
+  ),
+  selesai: (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+  ),
 };
 
 export default function ReportsManagement() {
   const [reports, setReports] = useState([]);
   const [filter, setFilter] = useState('');
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const loadReports = () => {
     setLoading(true);
@@ -33,52 +58,169 @@ export default function ReportsManagement() {
     }
   };
 
+  const filteredReports = reports.filter((r) => {
+    const q = searchTerm.toLowerCase();
+    return (
+      r.tracking_code.toLowerCase().includes(q) ||
+      r.reporter_name.toLowerCase().includes(q) ||
+      r.disaster_type.toLowerCase().includes(q) ||
+      r.address.toLowerCase().includes(q)
+    );
+  });
+
+  const countByStatus = (status) => reports.filter((r) => r.status === status).length;
+
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Kelola Laporan Bencana</h1>
-      <div className="mb-4 flex gap-2">
-        <button onClick={() => setFilter('')} className={`px-3 py-1 rounded-full text-sm ${filter === '' ? 'bg-gray-800 text-white' : 'bg-gray-200'}`}>Semua</button>
+    <div className="p-6 lg:p-8 animate-fade-in">
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+        <div>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 text-white flex items-center justify-center shadow-lg shadow-blue-500/30">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Kelola Laporan Bencana</h1>
+              <p className="text-gray-500 text-sm mt-0.5">Verifikasi dan tindak lanjuti laporan dari masyarakat</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+        <button
+          onClick={() => setFilter('')}
+          className={`rounded-2xl p-5 border transition-all ${filter === '' ? 'bg-gradient-to-br from-gray-900 to-gray-800 text-white border-gray-900 shadow-lg shadow-gray-900/25' : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'}`}
+        >
+          <p className="text-sm font-semibold mb-1">Semua</p>
+          <p className="text-2xl font-extrabold">{reports.length}</p>
+        </button>
         {STATUS_OPTIONS.map((s) => (
-          <button key={s} onClick={() => setFilter(s)} className={`px-3 py-1 rounded-full text-sm capitalize ${filter === s ? 'bg-gray-800 text-white' : 'bg-gray-200'}`}>{s}</button>
+          <button
+            key={s}
+            onClick={() => setFilter(s)}
+            className={`rounded-2xl p-5 border transition-all ${filter === s ? `bg-gradient-to-br ${STATUS_COLOR[s]} text-white border-transparent shadow-lg` : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'}`}
+          >
+            <div className="flex items-center gap-2 mb-1">
+              {filter === s ? STATUS_ICON[s] : <span className="text-gray-400">{STATUS_ICON[s]}</span>}
+              <p className="text-sm font-semibold capitalize">{s}</p>
+            </div>
+            <p className="text-2xl font-extrabold">{countByStatus(s)}</p>
+          </button>
         ))}
       </div>
-      {loading ? (
-        <p className="text-sm text-gray-500">Memuat data...</p>
-      ) : (
-        <div className="bg-white shadow rounded-xl overflow-hidden">
-          <table className="w-full text-sm text-left">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="py-2 px-4">Kode</th>
-                <th className="py-2 px-4">Pelapor</th>
-                <th className="py-2 px-4">Jenis</th>
-                <th className="py-2 px-4">Lokasi</th>
-                <th className="py-2 px-4">Status</th>
-                <th className="py-2 px-4">Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              {reports.map((r) => (
-                <tr key={r.id} className="border-t">
-                  <td className="py-2 px-4 font-mono text-xs">{r.tracking_code}</td>
-                  <td className="py-2 px-4">{r.reporter_name}</td>
-                  <td className="py-2 px-4">{r.disaster_type}</td>
-                  <td className="py-2 px-4">{r.address}</td>
-                  <td className="py-2 px-4">
-                    <span className={`px-2 py-1 rounded-full text-xs capitalize ${STATUS_COLOR[r.status]}`}>{r.status}</span>
-                  </td>
-                  <td className="py-2 px-4">
-                    <select value={r.status} onChange={(e) => handleStatusChange(r.id, e.target.value)} className="border rounded px-2 py-1 text-xs">
-                      {STATUS_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
-                    </select>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {reports.length === 0 && <p className="text-sm text-gray-500 p-4">Belum ada laporan.</p>}
+
+      <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/60 border border-gray-100 overflow-hidden">
+        <div className="p-6 border-b border-gray-100">
+          <div className="relative">
+            <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              type="text"
+              placeholder="Cari kode, nama pelapor, jenis, atau lokasi..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
+            />
+          </div>
         </div>
-      )}
+
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="w-14 h-14 rounded-full border-4 border-brand-100 border-t-brand-500 animate-spin mb-4"></div>
+            <p className="text-gray-500 font-medium">Memuat data...</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="bg-gray-50/80">
+                  <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-500">Kode Tracking</th>
+                  <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-500">Pelapor</th>
+                  <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-500">Jenis Bencana</th>
+                  <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-500">Lokasi</th>
+                  <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-500 text-center">Status</th>
+                  <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-500 text-center">Ubah Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {filteredReports.length > 0 ? (
+                  filteredReports.map((r) => (
+                    <tr key={r.id} className="hover:bg-orange-50/40 transition-colors group">
+                      <td className="py-4 px-6">
+                        <span className="font-mono text-xs bg-gray-50 text-gray-700 px-3 py-1.5 rounded-lg border border-gray-200 inline-block">
+                          {r.tracking_code}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6">
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 text-white flex items-center justify-center text-xs font-bold">
+                            {r.reporter_name.charAt(0).toUpperCase()}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-gray-900 text-sm">{r.reporter_name}</p>
+                            {r.reporter_phone && (
+                              <p className="text-xs text-gray-500">{r.reporter_phone}</p>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-4 px-6">
+                        <span className="inline-flex items-center gap-1.5 text-sm font-medium text-gray-700">
+                          <span className="w-2 h-2 rounded-full bg-orange-500"></span>
+                          {r.disaster_type}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6 max-w-xs">
+                        <p className="text-sm text-gray-600 line-clamp-2">{r.address}</p>
+                      </td>
+                      <td className="py-4 px-6 text-center">
+                        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r ${STATUS_COLOR[r.status]} text-white shadow-sm`}>
+                          {STATUS_ICON[r.status]}
+                          <span className="capitalize">{r.status}</span>
+                        </span>
+                      </td>
+                      <td className="py-4 px-6 text-center">
+                        <select
+                          value={r.status}
+                          onChange={(e) => handleStatusChange(r.id, e.target.value)}
+                          className="border border-gray-200 rounded-xl px-3 py-2 text-sm font-medium focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition bg-white capitalize cursor-pointer"
+                        >
+                          {STATUS_OPTIONS.map((s) => (
+                            <option key={s} value={s} className="capitalize">{s}</option>
+                          ))}
+                        </select>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="6" className="py-20 text-center">
+                      <div className="flex flex-col items-center gap-4">
+                        <div className="w-20 h-20 rounded-full bg-gray-50 flex items-center justify-center">
+                          <svg className="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="text-lg font-semibold text-gray-700">
+                            {searchTerm ? 'Tidak ada hasil pencarian' : 'Belum ada laporan'}
+                          </p>
+                          <p className="text-sm text-gray-400 mt-1">
+                            {searchTerm ? 'Coba ubah kata kunci pencarian Anda' : 'Laporan dari masyarakat akan muncul di sini'}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
