@@ -1,175 +1,100 @@
-# 🚨 Sistem Monitoring Kebencanaan BPBD Kota Semarang
+# BPBD Dashboard Monitoring Bencana
 
-Aplikasi web untuk pelaporan dan monitoring bencana yang menghubungkan masyarakat dengan BPBD Kota Semarang secara real-time.
+Sistem dashboard monitoring kebencanaan untuk BPBD Kota Semarang. Sistem ini memungkinkan pelaporan bencana dari masyarakat publik dan pengelolaan laporan oleh petugas BPBD.
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue)
-![Node](https://img.shields.io/badge/node-%3E%3D18.0.0-green)
-![React](https://img.shields.io/badge/react-19.2-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
-
----
-
-## 📖 Deskripsi
-
-Sistem Monitoring Kebencanaan BPBD adalah platform terpadu untuk:
-- 🚨 Pelaporan bencana oleh masyarakat dengan foto dan lokasi GPS
-- 📊 Dashboard monitoring untuk admin dan petugas BPBD
-- 🗺️ Tracking status laporan dengan peta interaktif
-- 📦 Manajemen inventaris, kendaraan, posko, dan kegiatan
-
----
-
-## ✨ Fitur Utama
-
-### 🌐 Untuk Masyarakat (Public)
-- **Landing Page Modern** - Hero section dengan informasi layanan
-- **Lapor Bencana** - Form pelaporan dengan GPS dan upload foto
-- **Lacak Status** - Tracking laporan real-time dengan kode unik + Google Maps
-- **Dashboard Pelapor** - Login untuk melihat riwayat laporan pribadi
-
-### 🔐 Untuk Admin/Petugas BPBD
-- **Dashboard Admin** - Statistik lengkap dengan charts (Pie & Bar)
-- **Kelola Laporan** - Update status, filter, dan assignment petugas
-- **Pendataan Bencana** - Record data bencana per wilayah dengan jumlah korban
-- **Inventaris** - Manajemen logistik dan peralatan darurat
-- **Kendaraan** - Fleet management dengan tracking status service
-- **Posko** - Kelola titik posko pengungsian dengan kapasitas
-- **Kegiatan** - Laporan kegiatan lapangan dengan dokumentasi foto
-- **Manajemen Akun** - Admin membuat akun petugas, reset password, hapus user
-
-### 🛡️ Keamanan & Hak Akses
-- **Role-based authorization** - Operasi tulis master data & hapus data hanya untuk admin; petugas boleh input pendataan bencana dan update status laporan
-- **Rate limiting** - Batas kirim laporan & percobaan login (10×/15 menit) untuk cegah spam/brute-force
-- **Helmet** - Header keamanan HTTP (CSP, X-Frame-Options, dsb.)
-- **CORS terbatas** - Origin dibatasi via `CLIENT_URL` (backend & Socket.IO)
-- **Sesi terpisah** - Login admin dashboard dan public dashboard disimpan di sesi berbeda, tidak saling menimpa
-- **JWT** - Token autentikasi dengan masa berlaku 1 hari
-
-### 🎨 UI/UX Features
-- ✅ Modern design dengan gradients dan animations
-- ✅ Responsive untuk mobile, tablet, dan desktop
-- ✅ Toggle show/hide password di semua form
-- ✅ Split-screen login admin dengan gambar sidebar
-- ✅ Inter font untuk readability optimal
-- ✅ Sticky headers dan smooth scrolling
-
----
-
-## 🛠️ Tech Stack
-
-### Backend
-- **Node.js + Express 5** - REST API server
-- **MySQL** - Relational database
-- **JWT + Bcrypt** - Authentication & security
-- **Socket.IO** - Real-time notifications
-- **Multer** - File upload handling
-- **Helmet + express-rate-limit** - Security hardening & rate limiting
-
-### Frontend
-- **React 19.2 + Vite 8.2** - Modern UI framework
-- **Tailwind CSS v4** - Utility-first styling
-- **React Router DOM 7** - Client-side routing
-- **Axios** - HTTP client
-- **Recharts** - Data visualization
-- **Google Maps API** - Location tracking
+![Landing Page](https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=400&fit=crop)
 
 ---
 
 ## 📁 Struktur Project
 
 ```
-PROJECT-DASHBOARD-MONITORING-BENCANA/
-├── BPBD-dashboard/
-│   ├── backend/              # Node.js REST API
-│   │   ├── src/
-│   │   │   ├── controllers/  # Business logic
-│   │   │   ├── routes/       # API endpoints
-│   │   │   ├── middleware/   # Auth & validation
-│   │   │   └── app.js        # Express app
-│   │   ├── database/
-│   │   │   ├── schema.sql    # DB structure
-│   │   │   └── seed.sql      # Sample data
-│   │   ├── uploads/          # Uploaded files
-│   │   └── package.json
-│   │
-│   ├── frontend/             # React dashboard
-│   │   ├── src/
-│   │   │   ├── pages/        # Page components
-│   │   │   │   ├── admin/    # Admin pages
-│   │   │   │   └── public/   # Public pages
-│   │   │   ├── layouts/      # Layout components
-│   │   │   ├── services/     # API services
-│   │   │   ├── components/   # Reusable components
-│   │   │   ├── App.jsx       # Main app
-│   │   │   └── main.jsx      # Entry point
-│   │   └── package.json
-│   │
-│   ├── mobile/               # React Native (planned)
-│   ├── README.md             # Detailed docs
-│   └── SETUP.md              # Setup guide
-│
-├── .gitignore
-└── README.md                 # This file
+BPBD-dashboard/
+├── backend/          # Node.js/Express REST API
+├── frontend/         # React + Vite Dashboard
+└── mobile/           # React Native (planned)
 ```
+
+---
+
+## ✨ Fitur Utama
+
+### 🌐 Public Features
+- **Landing Page Modern** - Hero section dengan gambar dan CTA buttons
+- **Laporan Bencana** - Form pelaporan dengan GPS dan upload foto
+- **Lacak Status** - Tracking laporan dengan kode unik + peta lokasi
+- **Dashboard Pelapor** - Login/register untuk melihat laporan pribadi
+
+### 🔐 Admin/Petugas Features
+- **Dashboard Admin** - Statistik dan charts (Recharts)
+- **Kelola Laporan** - Update status, filter, assign petugas
+- **Inventaris** - Manajemen logistik dan peralatan
+- **Kendaraan** - Fleet management dengan status service
+- **Posko** - Kelola titik posko pengungsian
+- **Kegiatan** - Laporan kegiatan lapangan dengan dokumentasi
+
+### 🔥 Highlight Features
+- ✅ Toggle show/hide password di semua form login
+- ✅ Split-screen login admin dengan gambar sidebar
+- ✅ Google Maps integration di halaman lacak
+- ✅ Real-time tracking dengan kode `BPBD-2026-XXXX`
+- ✅ Role-based authorization (admin/petugas)
+- ✅ Upload foto untuk laporan dan dokumentasi
+- ✅ Auto-search tracking code dari URL
+
+---
+
+## 🛠️ Tech Stack
+
+### Backend
+- Node.js + Express 5
+- MySQL (mysql2)
+- JWT Authentication + Bcrypt
+- Socket.IO (real-time)
+- Multer (file upload)
+
+### Frontend
+- React 19.2 + Vite 8.2
+- Tailwind CSS v4
+- React Router DOM 7.18
+- Axios + Socket.IO Client
+- Recharts (data visualization)
 
 ---
 
 ## 🚀 Quick Start
 
-### Prerequisites
-- Node.js >= 18.0.0
-- MySQL >= 8.0
-- npm atau yarn
+**Lihat panduan lengkap di [SETUP.md](./SETUP.md)**
 
-### 1️⃣ Clone Repository
-```bash
-git clone https://github.com/ilmannaf/PROJECT-DASHBOARD-MONITORING-BENCANA.git
-cd PROJECT-DASHBOARD-MONITORING-BENCANA
-```
-
-### 2️⃣ Setup Database
+### 1. Database Setup
 ```bash
 mysql -u root -p
 CREATE DATABASE sistem_kebencanaan;
 USE sistem_kebencanaan;
-SOURCE BPBD-dashboard/backend/database/schema.sql;
-SOURCE BPBD-dashboard/backend/database/seed.sql;
+SOURCE backend/database/schema.sql;
+SOURCE backend/database/seed.sql;
 ```
 
-### 3️⃣ Setup Backend
+### 2. Backend
 ```bash
-cd BPBD-dashboard/backend
+cd backend
 npm install
-
-# Buat file .env
-cat > .env << EOF
-PORT=5000
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=your_mysql_password
-DB_NAME=sistem_kebencanaan
-JWT_SECRET=your_jwt_secret_key_here
-CLIENT_URL=http://localhost:5173
-EOF
-
+cp .env.example .env
+# Edit .env sesuai konfigurasi
 npm run dev
 ```
-Backend running di: `http://localhost:5000`
 
-### 4️⃣ Setup Frontend
+### 3. Frontend
 ```bash
-cd BPBD-dashboard/frontend
+cd frontend
 npm install
-
-# Buat file .env
-echo "VITE_API_URL=http://localhost:5000/api" > .env
-
+cp .env.example .env
+# VITE_API_URL=http://localhost:5000/api
 npm run dev
 ```
-Frontend running di: `http://localhost:5173`
 
-### 5️⃣ Akses Aplikasi
-- **Landing Page**: http://localhost:5173/
+### 4. Akses Aplikasi
+- **Landing**: http://localhost:5173/
 - **Login Admin**: http://localhost:5173/admin/login
 - **Login Pelapor**: http://localhost:5173/dashboard
 - **Lapor Bencana**: http://localhost:5173/lapor
@@ -177,112 +102,39 @@ Frontend running di: `http://localhost:5173`
 
 ---
 
-## 🔑 Default Login
+## 🔑 Default Credentials
 
-### Admin
 | Email | Password | Role |
 |-------|----------|------|
 | admin@bpbdsemarang.go.id | admin123 | admin |
-
-### Public User / Petugas
-Register di: http://localhost:5173/dashboard (tab Registrasi) — akun dibuat dengan role **petugas**.
-Admin dapat membuat akun petugas langsung dari menu **Manajemen Akun** di dashboard admin.
-
-> **Catatan sesi:** Login di dashboard admin (`/admin`) dan public dashboard (`/dashboard`) menggunakan sesi terpisah, sehingga tidak saling menimpa meski dibuka bersamaan di browser yang sama.
-
-**Role & Hak Akses:**
-| Aksi | Admin | Petugas |
-|------|:-----:|:-------:|
-| Lihat semua data dashboard | ✅ | ✅ |
-| Tambah pendataan bencana | ✅ | ✅ |
-| Update status laporan | ✅ | ✅ |
-| Tambah/ubah/hapus master data (inventory, kendaraan, posko, kegiatan, edit/hapus pendataan) | ✅ | ❌ |
+| petugas1@bpbdsemarang.go.id | admin123 | petugas |
+| petugas2@bpbdsemarang.go.id | admin123 | petugas |
 
 ---
 
 ## 📊 Database Schema
 
-**8 Tables:**
-1. **users** - Admin & petugas BPBD (JWT auth)
-2. **reports** - Laporan bencana dari masyarakat
-3. **report_logs** - History perubahan status laporan
-4. **disaster_records** - Pendataan bencana per wilayah
-5. **posko** - Lokasi posko pengungsian
-6. **inventory_items** - Logistik & peralatan darurat
-7. **vehicles** - Kendaraan operasional BPBD
-8. **activities** - Laporan kegiatan lapangan
-
----
-
-## 🗺️ API Endpoints
-
-### Authentication
-- `POST /api/auth/register` - Register public user
-- `POST /api/auth/login` - Login (admin/petugas/public)
-
-### Reports
-- `GET /api/reports` - Get all reports
-- `GET /api/reports/:id` - Get report detail
-- `POST /api/reports` - Submit new report
-- `PUT /api/reports/:id` - Update report status
-- `GET /api/reports/track/:code` - Track by code
-
-### Disaster Records
-- `GET /api/disaster-records` - Get all records
-- `POST /api/disaster-records` - Create record
-- `PUT /api/disaster-records/:id` - Update record
-- `DELETE /api/disaster-records/:id` - Delete record
-
-### Inventory
-- `GET /api/inventory` - Get all items
-- `POST /api/inventory` - Add item
-- `PUT /api/inventory/:id` - Update item
-- `DELETE /api/inventory/:id` - Delete item
-
-### Vehicles
-- `GET /api/vehicles` - Get all vehicles
-- `POST /api/vehicles` - Add vehicle
-- `PUT /api/vehicles/:id` - Update vehicle
-- `DELETE /api/vehicles/:id` - Delete vehicle
-
-### Posko
-- `GET /api/posko` - Get all posko
-- `POST /api/posko` - Add posko
-- `PUT /api/posko/:id` - Update posko
-- `DELETE /api/posko/:id` - Delete posko
-
-### Activities
-- `GET /api/activities` - Get all activities
-- `POST /api/activities` - Add activity
-- `PUT /api/activities/:id` - Update activity
-- `DELETE /api/activities/:id` - Delete activity
-
-### Users (hanya admin)
-- `GET /api/users` - List semua pengguna
-- `POST /api/users` - Buat akun petugas baru
-- `PATCH /api/users/:id/password` - Reset password
-- `DELETE /api/users/:id` - Hapus pengguna
-
-**Full API documentation**: [backend/README.md](BPBD-dashboard/backend/README.md)
+**7 Tables:**
+- `users` - Admin & petugas BPBD
+- `reports` - Laporan bencana
+- `report_logs` - History status laporan
+- `posko` - Lokasi posko
+- `inventory_items` - Logistik & peralatan
+- `vehicles` - Kendaraan BPBD
+- `activities` - Laporan kegiatan
 
 ---
 
 ## 📸 Screenshots
 
 ### Landing Page
-Hero section modern dengan CTA buttons untuk lapor dan lacak bencana
+Modern hero section dengan gambar ilustrasi dan CTA buttons
 
 ### Admin Dashboard
-Dashboard dengan statistik cards, pie chart distribusi status, dan bar chart jenis bencana
-
-### Lapor Bencana
-Form pelaporan dengan GPS auto-detect dan upload foto kejadian
+Dashboard dengan statistik cards dan charts (pie + bar)
 
 ### Lacak Status
-Tracking laporan dengan timeline status dan Google Maps marker lokasi kejadian
-
-### Kelola Laporan
-Table management dengan filter status dan modal detail laporan lengkap
+Tracking laporan dengan status timeline dan Google Maps
 
 ---
 
@@ -291,19 +143,12 @@ Table management dengan filter status dan modal detail laporan lengkap
 - [x] Landing page dengan hero section
 - [x] Admin dashboard dengan charts
 - [x] Laporan bencana publik
-- [x] Tracking status dengan Google Maps
-- [x] Role-based authorization (admin/petugas/public)
-- [x] Upload foto dan GPS location
-- [x] Pendataan bencana per wilayah
-- [x] Modern UI dengan Inter font
-- [x] Manajemen akun petugas (admin)
-- [x] Keamanan API (rate limit, helmet, CORS, role-based access)
-- [x] Sesi login admin & public terpisah
-- [ ] Socket.IO live updates di frontend
-- [ ] Email/SMS notifications
-- [ ] Export reports to PDF/Excel
+- [x] Tracking status dengan peta
+- [x] Role-based authorization
+- [x] Upload foto dan GPS
+- [ ] Socket.IO live updates (backend ready)
+- [ ] Assignment petugas di UI
 - [ ] Mobile app (React Native)
-- [ ] PWA support
 
 ---
 
@@ -312,45 +157,208 @@ Table management dengan filter status dan modal detail laporan lengkap
 **BPBD Kota Semarang**
 - Call Center: **112**
 - WhatsApp: 0812-3456-7890
-- Website: https://bpbd.semarangkota.go.id
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
 
 ---
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License - Free to use for educational purposes.
 
 ---
 
-## 👨‍💻 Author
+**Developed with ❤️ for BPBD Kota Semarang**
 
-**Ilman Nafian**
-- GitHub: [@ilmannaf](https://github.com/ilmannaf)
-- Project: [PROJECT-DASHBOARD-MONITORING-BENCANA](https://github.com/ilmannaf/PROJECT-DASHBOARD-MONITORING-BENCANA)
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+```
+
+Frontend jalan di: `http://localhost:5173`
+
+## 🔗 URL Mapping
+
+### Public
+- `/` → Redirect ke `/dashboard`
+- `/dashboard` - Public dashboard (login required)
+- `/lapor` - Form pelaporan bencana
+- `/lacak` - Cek status laporan
+
+### Admin
+- `/admin/login` - Login admin/petugas
+- `/admin/dashboard` - Dashboard admin
+- `/admin/reports` - Kelola laporan
+- `/admin/inventory` - Manajemen inventaris
+- `/admin/vehicles` - Manajemen kendaraan
+- `/admin/posko` - Manajemen posko
+- `/admin/activities` - Laporan kegiatan
+
+---
+
+## 🎨 Brand Colors
+
+Sistem menggunakan tema warna oranye konsisten untuk branding BPBD:
+
+- **Brand Primary**: `bg-brand-600` / `text-brand-600` (oranye utama)
+- **Brand Light**: `bg-brand-50` / `border-brand-100` (oranye muda)
+- **Brand Dark**: `bg-brand-700` (oranye gelap)
+
+Contoh penggunaan:
+- Tombol aksi utama: `bg-brand-600 hover:bg-brand-700`
+- Navbar accent strip: `bg-gradient-to-r from-brand-600 via-brand-500 to-brand-600`
+- Icon/logo gradient: `bg-gradient-to-br from-brand-500 to-brand-700`
+
+---
+
+## 📡 API Endpoints
+
+### Auth
+- `POST /api/auth/register` - Register user baru
+- `POST /api/auth/login` - Login
+
+### Reports
+- `POST /api/reports` - Submit laporan baru (publik)
+- `GET /api/reports` - List semua laporan (auth required)
+- `GET /api/reports/my-reports` - List laporan user yang login (auth required)
+- `GET /api/reports/track/:code` - Cek status via tracking code (publik)
+- `PATCH /api/reports/:id/status` - Update status laporan (admin/petugas)
+
+### Inventory
+- `GET /api/inventory` - List inventory
+- `POST /api/inventory` - Tambah inventory (admin)
+- `PATCH /api/inventory/:id` - Update inventory
+- `DELETE /api/inventory/:id` - Hapus inventory
+
+### Vehicles
+- `GET /api/vehicles` - List kendaraan
+- `POST /api/vehicles` - Tambah kendaraan (admin)
+- `PATCH /api/vehicles/:id` - Update kendaraan
+- `DELETE /api/vehicles/:id` - Hapus kendaraan
+
+### Activities
+- `GET /api/activities` - List kegiatan
+- `POST /api/activities` - Tambah kegiatan (admin/petugas)
+- `PATCH /api/activities/:id` - Update kegiatan
+- `DELETE /api/activities/:id` - Hapus kegiatan
+
+---
+
+## 🔐 Default Credentials (Seed Data)
+
+```
+Admin:
+Email: admin@bpbdsemarang.go.id
+Password: admin123
+
+Petugas 1:
+Email: petugas1@bpbdsemarang.go.id
+Password: admin123
+
+Petugas 2:
+Email: petugas2@bpbdsemarang.go.id
+Password: admin123
+```
+
+---
+
+## 📱 Fitur Publik
+
+### Dashboard Public (Login Required)
+1. Akses `/dashboard` atau `/lacak`
+2. Login dengan akun yang sudah didaftarkan
+3. Lihat semua laporan personal
+4. Track status setiap laporan via timeline
+5. Search tracking code dengan history
+
+### Lapor Bencana
+1. Akses halaman `/lapor` atau klik "Laporkan Bencana"
+2. Isi data pelapor, jenis bencana, lokasi
+3. Upload foto (opsional)
+4. Klik "Kirim Laporan"
+5. Simpan tracking code untuk cek status
+
+### Cek Status Laporan
+1. Masukkan tracking code (format: `BPBD-2026-XXX`)
+2. Lihat status dan history perubahan
+3. Gunakan history pencarian untuk kode lama
+
+---
+
+## 🎨 UI Components
+
+### Admin Pages
+- `/admin/login` - Login admin/petugas
+- `/admin/dashboard` - Dashboard dengan statistik & tombol lacak
+- `/admin/reports` - Kelola laporan bencana
+- `/admin/inventory` - Manajemen inventaris
+- `/admin/vehicles` - Manajemen kendaraan
+- `/admin/posko` - Manajemen posko
+- `/admin/activities` - Laporan kegiatan
+
+### Public Pages
+- `/dashboard` - Dashboard pelapor (login required)
+- `/lapor` - Form pelaporan bencana
+- `/lacak` - Cek status laporan via tracking code
+
+---
+
+## 📝 Commit History
+
+1. `fb0ac54` - Initial commit
+2. `606390a` - files and folders
+3. `619ab09` - setup backend struktur, koneksi DB, schema & seed SQL
+4. `ff2099f` - nglanjutin backend
+5. `6e7a210` - ganti nama folder
+6. `0cbb693` - Perbaiki lokasi instalasi Tailwind, tambah .gitignore root, setup ulang frontend
+7. `3448af9` - Setup frontend lengkap: install dependencies, buat pages & services
+8. `74f11b8` - Rebuild backend node_modules setelah cleanup dependencies
+
+---
+
+## 📚 Development Status
+
+### ✅ Selesai
+- Backend API (Express + MySQL)
+- Frontend Pages (Login, Dashboard, Reports, ReportForm)
+- Authentication System
+- Real-time via Socket.IO
+- File upload (Multer)
+- Database schema & seed data
+
+### 🚧 Dalam Pengembangan
+- Mobile app (React Native)
+- Inventory management UI
+- Vehicle management UI
+- Activity management UI
+- Deployment configuration
+
+---
+
+## 🤝 Contributing
+
+1. Fork project
+2. Buat branch fitur (`git checkout -b feature/AmazingFeature`)
+3. Commit perubahan (`git commit -m 'Add some AmazingFeature'`)
+4. Push ke branch (`git push origin feature/AmazingFeature`)
+5. Buat Pull Request
+
+---
+
+## 📄 License
+
+ISC License
+
+---
+
+## 👥 Author
+
+**Ilman Nafidia** - BPBD Monitoring System Project
 
 ---
 
 ## 🙏 Acknowledgments
 
 - BPBD Kota Semarang
-- React & Vite teams
-- Tailwind CSS team
-- All contributors and testers
-
----
-
-**Developed with ❤️ for Disaster Management System**
-
-*Last updated: August 2026*
+- Tech stack providers
+- All contributors

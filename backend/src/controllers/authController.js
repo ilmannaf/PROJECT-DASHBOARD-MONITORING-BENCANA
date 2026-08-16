@@ -20,8 +20,7 @@ exports.register = async (req, res) => {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Registrasi publik selalu role 'petugas' (admin hanya dibuat via seed)
-    const role = 'petugas';
+    const role = 'pelapor';
 
     const [result] = await pool.query(
       'INSERT INTO users (name, email, password, role, wilayah) VALUES (?, ?, ?, ?, ?)',

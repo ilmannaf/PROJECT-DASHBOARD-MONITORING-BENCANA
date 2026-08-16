@@ -13,10 +13,12 @@ exports.createReport = async (req, res) => {
     const tracking_code = generateTrackingCode();
     const photo_url = req.file ? `/uploads/${req.file.filename}` : null;
 
+    const reporter_user_id = req.user?.role === 'pelapor' ? req.user.id : null;
+
     const [result] = await pool.query(
-      `INSERT INTO reports (tracking_code, reporter_name, reporter_phone, disaster_type, description, photo_url, latitude, longitude, address, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'baru')`,
-      [tracking_code, reporter_name, reporter_phone || null, disaster_type, description || null, photo_url, latitude || null, longitude || null, address]
+      `INSERT INTO reports (tracking_code, reporter_user_id, reporter_name, reporter_phone, disaster_type, description, photo_url, latitude, longitude, address, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'baru')`,
+      [tracking_code, reporter_user_id, reporter_name, reporter_phone || null, disaster_type, description || null, photo_url, latitude || null, longitude || null, address]
     );
 
     // Kirim notifikasi real-time ke dashboard admin
@@ -71,8 +73,8 @@ exports.getMyReports = async (req, res) => {
     const userId = req.user.id;
 
     const [rows] = await pool.query(
-      'SELECT * FROM reports WHERE reporter_name = ? ORDER BY created_at DESC',
-      [req.user.name]
+      'SELECT * FROM reports WHERE reporter_user_id = ? ORDER BY created_at DESC',
+      [userId]
     );
 
     res.json(rows);
@@ -106,6 +108,8 @@ exports.getReportByTrackingCode = async (req, res) => {
 
 // UPDATE - Ubah status laporan (admin/petugas)
 exports.updateReportStatus = async (req, res) => {
+  const conn = await pool.getConnection();
+
   try {
     const { id } = req.params;
     const { status, note, assigned_to } = req.body;
@@ -115,30 +119,51 @@ exports.updateReportStatus = async (req, res) => {
       return res.status(400).json({ message: 'Status tidak valid' });
     }
 
-    const [existing] = await pool.query('SELECT * FROM reports WHERE id = ?', [id]);
+    let assignedToValue = null;
+    if (assigned_to !== undefined && assigned_to !== null && assigned_to !== '') {
+      const [assignees] = await conn.query(
+        'SELECT id FROM users WHERE id = ? AND role IN (?, ?)',
+        [assigned_to, 'admin', 'petugas']
+      );
+
+      if (assignees.length === 0) {
+        return res.status(400).json({ message: 'Petugas tujuan tidak valid' });
+      }
+
+      assignedToValue = assigned_to;
+    }
+
+    await conn.beginTransaction();
+
+    const [existing] = await conn.query('SELECT * FROM reports WHERE id = ? FOR UPDATE', [id]);
     if (existing.length === 0) {
+      await conn.rollback();
       return res.status(404).json({ message: 'Laporan tidak ditemukan' });
     }
 
     const statusFrom = existing[0].status;
 
-    await pool.query(
+    await conn.query(
       'UPDATE reports SET status = ?, assigned_to = COALESCE(?, assigned_to) WHERE id = ?',
-      [status, assigned_to || null, id]
+      [status, assignedToValue, id]
     );
 
-    await pool.query(
+    await conn.query(
       'INSERT INTO report_logs (report_id, status_from, status_to, note, updated_by) VALUES (?, ?, ?, ?, ?)',
       [id, statusFrom, status, note || null, req.user.id]
     );
 
-    // Notifikasi real-time perubahan status
+    await conn.commit();
+
     const io = req.app.get('io');
     io.emit('report_status_updated', { id, status, tracking_code: existing[0].tracking_code });
 
     res.json({ message: 'Status laporan berhasil diperbarui', status });
   } catch (err) {
+    await conn.rollback();
     console.error(err);
     res.status(500).json({ message: 'Terjadi kesalahan server' });
+  } finally {
+    conn.release();
   }
 };

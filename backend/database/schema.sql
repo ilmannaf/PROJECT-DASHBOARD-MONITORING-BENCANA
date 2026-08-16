@@ -10,7 +10,7 @@ CREATE TABLE users (
   name VARCHAR(100) NOT NULL,
   email VARCHAR(100) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
-  role ENUM('admin', 'petugas') NOT NULL DEFAULT 'petugas',
+  role ENUM('admin', 'petugas', 'pelapor') NOT NULL DEFAULT 'pelapor',
   wilayah VARCHAR(100),
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -19,6 +19,7 @@ CREATE TABLE users (
 CREATE TABLE reports (
   id INT AUTO_INCREMENT PRIMARY KEY,
   tracking_code VARCHAR(20) NOT NULL UNIQUE,
+  reporter_user_id INT,
   reporter_name VARCHAR(100) NOT NULL,
   reporter_phone VARCHAR(20),
   disaster_type VARCHAR(50) NOT NULL,
@@ -31,6 +32,7 @@ CREATE TABLE reports (
   assigned_to INT,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (reporter_user_id) REFERENCES users(id) ON DELETE SET NULL,
   FOREIGN KEY (assigned_to) REFERENCES users(id) ON DELETE SET NULL
 );
 
