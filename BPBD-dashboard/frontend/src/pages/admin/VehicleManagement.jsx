@@ -6,6 +6,7 @@ import {
   deleteVehicle,
 } from "../../services/vehicleService";
 import { getPosko } from "../../services/poskoService";
+import { isAdmin } from "../../services/authService";
 
 const STATUS_OPTIONS = ["siap", "maintenance", "rusak"];
 const STATUS_BG = {
@@ -15,6 +16,7 @@ const STATUS_BG = {
 };
 
 export default function VehicleManagement() {
+  const adminUser = isAdmin();
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -101,31 +103,33 @@ export default function VehicleManagement() {
             </div>
           </div>
         </div>
-        <button
-          onClick={() => {
-            if (showForm) {
-              setShowForm(false);
-              setForm({ plate_number: "", type: "", status: "siap", posko_id: "" });
-            } else {
-              setShowForm(true);
-            }
-          }}
-          className="btn btn-primary flex items-center gap-2 px-5 py-3 shadow-lg shadow-purple-500/25"
-        >
-          {showForm ? (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          ) : (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-          )}
-          {showForm ? 'Tutup Form' : '+ Tambah Kendaraan'}
-        </button>
+        {adminUser && (
+          <button
+            onClick={() => {
+              if (showForm) {
+                setShowForm(false);
+                setForm({ plate_number: "", type: "", status: "siap", posko_id: "" });
+              } else {
+                setShowForm(true);
+              }
+            }}
+            className="btn btn-primary flex items-center gap-2 px-5 py-3 shadow-lg shadow-purple-500/25"
+          >
+            {showForm ? (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+            )}
+            {showForm ? 'Tutup Form' : '+ Tambah Kendaraan'}
+          </button>
+        )}
       </div>
 
-      {showForm && (
+      {showForm && adminUser && (
         <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/60 border border-gray-100 p-6 mb-8 animate-slide-in">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-purple-700 text-white flex items-center justify-center">
@@ -284,26 +288,30 @@ export default function VehicleManagement() {
                         </span>
                       </td>
                       <td className="py-4 px-6 text-center">
-                        <div className="flex justify-center gap-2">
-                          <select
-                            value={v.status}
-                            onChange={(e) => handleStatusChange(v.id, e.target.value)}
-                            className="border border-gray-200 rounded-xl px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition bg-white capitalize cursor-pointer"
-                          >
-                            {STATUS_OPTIONS.map((s) => (
-                              <option key={s} value={s}>{s}</option>
-                            ))}
-                          </select>
-                          <button
-                            onClick={() => handleDelete(v.id)}
-                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"
-                            title="Hapus"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
-                        </div>
+                        {adminUser ? (
+                          <div className="flex justify-center gap-2">
+                            <select
+                              value={v.status}
+                              onChange={(e) => handleStatusChange(v.id, e.target.value)}
+                              className="border border-gray-200 rounded-xl px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition bg-white capitalize cursor-pointer"
+                            >
+                              {STATUS_OPTIONS.map((s) => (
+                                <option key={s} value={s}>{s}</option>
+                              ))}
+                            </select>
+                            <button
+                              onClick={() => handleDelete(v.id)}
+                              className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"
+                              title="Hapus"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-gray-400">-</span>
+                        )}
                       </td>
                     </tr>
                   ))

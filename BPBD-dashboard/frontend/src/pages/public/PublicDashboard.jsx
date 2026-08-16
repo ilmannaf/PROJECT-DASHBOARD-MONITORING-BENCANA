@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login, register, isAuthenticated } from '../../services/authService';
+import { login, register, isAuthenticated, getCurrentUser, logout } from '../../services/authService';
 import { getReports } from '../../services/reportService';
 
 const STATUS_COLOR = {
@@ -22,7 +22,7 @@ export default function PublicDashboard() {
   const loadReports = async () => {
     try {
       const data = await getReports();
-      const user = JSON.parse(localStorage.getItem('user'));
+      const user = getCurrentUser('public');
       const myReports = data.filter(r => r.reporter_name === user?.name);
       setReports(myReports);
     } catch (err) {
@@ -42,7 +42,7 @@ export default function PublicDashboard() {
     setLoading(true);
     try {
       const form = new FormData(e.target);
-      await login(form.get('email'), form.get('password'));
+      await login(form.get('email'), form.get('password'), 'public');
       setTab('dashboard');
       loadReports();
     } catch (err) {
@@ -63,7 +63,7 @@ export default function PublicDashboard() {
         email: form.get('email'),
         password: form.get('password'),
       });
-      await login(form.get('email'), form.get('password'));
+      await login(form.get('email'), form.get('password'), 'public');
       setTab('dashboard');
       loadReports();
     } catch (err) {
@@ -97,7 +97,7 @@ export default function PublicDashboard() {
 }
 
 function DashboardView({ reports, selectedReport, setSelectedReport, navigate }) {
-  const user = JSON.parse(localStorage.getItem('user'));
+  const user = getCurrentUser('public');
 
   const total = reports.length;
   const baru = reports.filter((r) => r.status === 'baru').length;
@@ -124,8 +124,7 @@ function DashboardView({ reports, selectedReport, setSelectedReport, navigate })
             </div>
             <button
               onClick={() => {
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
+                logout('public');
                 window.location.reload();
               }}
               className="text-xs font-semibold text-red-600 hover:text-red-700 px-3 py-2"

@@ -6,7 +6,12 @@ require('./config/db'); // Jalankan test koneksi DB
 
 const server = http.createServer(app);
 const io = new Server(server, {
-  cors: { origin: '*' },
+  cors: {
+    origin: (process.env.CLIENT_URL || 'http://localhost:5173')
+      .split(',')
+      .map((o) => o.trim())
+      .filter(Boolean),
+  },
 });
 
 io.on('connection', (socket) => {

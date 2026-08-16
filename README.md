@@ -35,6 +35,15 @@ Sistem Monitoring Kebencanaan BPBD adalah platform terpadu untuk:
 - **Kendaraan** - Fleet management dengan tracking status service
 - **Posko** - Kelola titik posko pengungsian dengan kapasitas
 - **Kegiatan** - Laporan kegiatan lapangan dengan dokumentasi foto
+- **Manajemen Akun** - Admin membuat akun petugas, reset password, hapus user
+
+### 🛡️ Keamanan & Hak Akses
+- **Role-based authorization** - Operasi tulis master data & hapus data hanya untuk admin; petugas boleh input pendataan bencana dan update status laporan
+- **Rate limiting** - Batas kirim laporan & percobaan login (10×/15 menit) untuk cegah spam/brute-force
+- **Helmet** - Header keamanan HTTP (CSP, X-Frame-Options, dsb.)
+- **CORS terbatas** - Origin dibatasi via `CLIENT_URL` (backend & Socket.IO)
+- **Sesi terpisah** - Login admin dashboard dan public dashboard disimpan di sesi berbeda, tidak saling menimpa
+- **JWT** - Token autentikasi dengan masa berlaku 1 hari
 
 ### 🎨 UI/UX Features
 - ✅ Modern design dengan gradients dan animations
@@ -54,6 +63,7 @@ Sistem Monitoring Kebencanaan BPBD adalah platform terpadu untuk:
 - **JWT + Bcrypt** - Authentication & security
 - **Socket.IO** - Real-time notifications
 - **Multer** - File upload handling
+- **Helmet + express-rate-limit** - Security hardening & rate limiting
 
 ### Frontend
 - **React 19.2 + Vite 8.2** - Modern UI framework
@@ -124,7 +134,6 @@ CREATE DATABASE sistem_kebencanaan;
 USE sistem_kebencanaan;
 SOURCE BPBD-dashboard/backend/database/schema.sql;
 SOURCE BPBD-dashboard/backend/database/seed.sql;
-SOURCE BPBD-dashboard/backend/database/add_disaster_records.sql;
 ```
 
 ### 3️⃣ Setup Backend
@@ -140,6 +149,7 @@ DB_USER=root
 DB_PASSWORD=your_mysql_password
 DB_NAME=sistem_kebencanaan
 JWT_SECRET=your_jwt_secret_key_here
+CLIENT_URL=http://localhost:5173
 EOF
 
 npm run dev
@@ -169,15 +179,24 @@ Frontend running di: `http://localhost:5173`
 
 ## 🔑 Default Login
 
-### Admin & Petugas
+### Admin
 | Email | Password | Role |
 |-------|----------|------|
 | admin@bpbdsemarang.go.id | admin123 | admin |
-| petugas1@bpbdsemarang.go.id | admin123 | petugas |
-| petugas2@bpbdsemarang.go.id | admin123 | petugas |
 
-### Public User
-Register di: http://localhost:5173/dashboard (tab Registrasi)
+### Public User / Petugas
+Register di: http://localhost:5173/dashboard (tab Registrasi) — akun dibuat dengan role **petugas**.
+Admin dapat membuat akun petugas langsung dari menu **Manajemen Akun** di dashboard admin.
+
+> **Catatan sesi:** Login di dashboard admin (`/admin`) dan public dashboard (`/dashboard`) menggunakan sesi terpisah, sehingga tidak saling menimpa meski dibuka bersamaan di browser yang sama.
+
+**Role & Hak Akses:**
+| Aksi | Admin | Petugas |
+|------|:-----:|:-------:|
+| Lihat semua data dashboard | ✅ | ✅ |
+| Tambah pendataan bencana | ✅ | ✅ |
+| Update status laporan | ✅ | ✅ |
+| Tambah/ubah/hapus master data (inventory, kendaraan, posko, kegiatan, edit/hapus pendataan) | ✅ | ❌ |
 
 ---
 
@@ -238,6 +257,12 @@ Register di: http://localhost:5173/dashboard (tab Registrasi)
 - `PUT /api/activities/:id` - Update activity
 - `DELETE /api/activities/:id` - Delete activity
 
+### Users (hanya admin)
+- `GET /api/users` - List semua pengguna
+- `POST /api/users` - Buat akun petugas baru
+- `PATCH /api/users/:id/password` - Reset password
+- `DELETE /api/users/:id` - Hapus pengguna
+
 **Full API documentation**: [backend/README.md](BPBD-dashboard/backend/README.md)
 
 ---
@@ -271,6 +296,9 @@ Table management dengan filter status dan modal detail laporan lengkap
 - [x] Upload foto dan GPS location
 - [x] Pendataan bencana per wilayah
 - [x] Modern UI dengan Inter font
+- [x] Manajemen akun petugas (admin)
+- [x] Keamanan API (rate limit, helmet, CORS, role-based access)
+- [x] Sesi login admin & public terpisah
 - [ ] Socket.IO live updates di frontend
 - [ ] Email/SMS notifications
 - [ ] Export reports to PDF/Excel

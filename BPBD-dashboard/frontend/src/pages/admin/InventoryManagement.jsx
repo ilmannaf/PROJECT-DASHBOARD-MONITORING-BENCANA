@@ -6,6 +6,7 @@ import {
   deleteItem,
 } from "../../services/inventoryService";
 import { getPosko } from "../../services/poskoService";
+import { isAdmin } from "../../services/authService";
 
 const CATEGORIES = ["logistik", "peralatan", "p3k"];
 const CONDITIONS = ["baik", "rusak", "perlu_maintenance"];
@@ -16,6 +17,7 @@ const CONDITION_COLOR = {
 };
 
 export default function InventoryManagement() {
+  const adminUser = isAdmin();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -86,15 +88,17 @@ export default function InventoryManagement() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Manajemen Inventaris</h1>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm"
-        >
-          {showForm ? "Batal" : "+ Tambah Item"}
-        </button>
+        {adminUser && (
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm"
+          >
+            {showForm ? "Batal" : "+ Tambah Item"}
+          </button>
+        )}
       </div>
 
-      {showForm && (
+      {showForm && adminUser && (
         <form
           onSubmit={handleSubmit}
           className="bg-white shadow rounded-xl p-4 mb-6 grid grid-cols-2 gap-4"
@@ -205,25 +209,31 @@ export default function InventoryManagement() {
                     </span>
                   </td>
                   <td className="py-2 px-4 flex gap-2 items-center">
-                    <select
-                      value={item.item_condition}
-                      onChange={(e) =>
-                        handleConditionChange(item.id, e.target.value)
-                      }
-                      className="border rounded px-2 py-1 text-xs"
-                    >
-                      {CONDITIONS.map((c) => (
-                        <option key={c} value={c}>
-                          {c}
-                        </option>
-                      ))}
-                    </select>
-                    <button
-                      onClick={() => handleDelete(item.id)}
-                      className="text-red-500 text-xs underline"
-                    >
-                      Hapus
-                    </button>
+                    {adminUser ? (
+                      <>
+                        <select
+                          value={item.item_condition}
+                          onChange={(e) =>
+                            handleConditionChange(item.id, e.target.value)
+                          }
+                          className="border rounded px-2 py-1 text-xs"
+                        >
+                          {CONDITIONS.map((c) => (
+                            <option key={c} value={c}>
+                              {c}
+                            </option>
+                          ))}
+                        </select>
+                        <button
+                          onClick={() => handleDelete(item.id)}
+                          className="text-red-500 text-xs underline"
+                        >
+                          Hapus
+                        </button>
+                      </>
+                    ) : (
+                      <span className="text-xs text-gray-400">-</span>
+                    )}
                   </td>
                 </tr>
               ))}

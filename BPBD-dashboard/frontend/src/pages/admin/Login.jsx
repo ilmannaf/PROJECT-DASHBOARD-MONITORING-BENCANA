@@ -16,7 +16,7 @@ export default function Login() {
     setError("");
     setLoading(true);
     try {
-      await login(email, password);
+      await login(email, password, 'admin');
       navigate("/admin/dashboard");
     } catch (err) {
       setError(err.response?.data?.message || "Login gagal");

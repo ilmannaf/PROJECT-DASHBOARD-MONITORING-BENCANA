@@ -1,13 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const { createItem, getItems, updateItem, deleteItem } = require('../controllers/inventoryController');
-const { verifyToken } = require('../middlewares/authMiddleware');
+const { verifyToken, requireRole } = require('../middlewares/authMiddleware');
 
 router.use(verifyToken); // semua endpoint inventory butuh login
 
-router.post('/', createItem);
+router.post('/', requireRole('admin'), createItem);
 router.get('/', getItems);
-router.patch('/:id', updateItem);
-router.delete('/:id', deleteItem);
+router.patch('/:id', requireRole('admin'), updateItem);
+router.delete('/:id', requireRole('admin'), deleteItem);
 
 module.exports = router;

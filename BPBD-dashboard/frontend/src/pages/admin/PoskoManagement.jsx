@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { getPosko, createPosko } from '../../services/poskoService';
+import { isAdmin } from '../../services/authService';
 
 export default function PoskoManagement() {
+  const adminUser = isAdmin();
   const [poskoList, setPoskoList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -32,12 +34,14 @@ export default function PoskoManagement() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Manajemen Posko</h1>
-        <button onClick={() => setShowForm(!showForm)} className="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm">
-          {showForm ? 'Batal' : '+ Tambah Posko'}
-        </button>
+        {adminUser && (
+          <button onClick={() => setShowForm(!showForm)} className="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm">
+            {showForm ? 'Batal' : '+ Tambah Posko'}
+          </button>
+        )}
       </div>
 
-      {showForm && (
+      {showForm && adminUser && (
         <form onSubmit={handleSubmit} className="bg-white shadow rounded-xl p-4 mb-6 grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium mb-1">Nama Posko</label>

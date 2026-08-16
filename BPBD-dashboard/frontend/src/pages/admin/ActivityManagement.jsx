@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { getActivities, createActivity, deleteActivity } from '../../services/activityService';
+import { isAdmin } from '../../services/authService';
 
 export default function ActivityManagement() {
+  const adminUser = isAdmin();
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -48,12 +50,14 @@ export default function ActivityManagement() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Laporan Kegiatan</h1>
-        <button onClick={() => setShowForm(!showForm)} className="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm">
-          {showForm ? 'Batal' : '+ Tambah Kegiatan'}
-        </button>
+        {adminUser && (
+          <button onClick={() => setShowForm(!showForm)} className="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm">
+            {showForm ? 'Batal' : '+ Tambah Kegiatan'}
+          </button>
+        )}
       </div>
 
-      {showForm && (
+      {showForm && adminUser && (
         <form onSubmit={handleSubmit} className="bg-white shadow rounded-xl p-4 mb-6 grid grid-cols-2 gap-4">
           <div className="col-span-2">
             <label className="block text-sm font-medium mb-1">Judul Kegiatan</label>
@@ -89,7 +93,7 @@ export default function ActivityManagement() {
             <div key={a.id} className="bg-white shadow rounded-xl p-4">
               <div className="flex justify-between items-start">
                 <h3 className="font-semibold">{a.title}</h3>
-                <button onClick={() => handleDelete(a.id)} className="text-red-500 text-xs underline">Hapus</button>
+                {adminUser && <button onClick={() => handleDelete(a.id)} className="text-red-500 text-xs underline">Hapus</button>}
               </div>
               <p className="text-xs text-gray-500 mb-2">{new Date(a.activity_date).toLocaleDateString('id-ID')} · {a.location || '-'}</p>
               <p className="text-sm text-gray-700 mb-2">{a.description}</p>

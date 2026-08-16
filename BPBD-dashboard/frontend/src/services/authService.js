@@ -1,9 +1,17 @@
 import api from './api';
 
-export const login = async (email, password) => {
+const getScope = () => {
+  const isAdminPath = window.location.pathname.startsWith('/admin');
+  return isAdminPath ? 'admin' : 'public';
+};
+
+const tokenKey = (scope) => `${scope}Token`;
+const userKey = (scope) => `${scope}User`;
+
+export const login = async (email, password, scope = getScope()) => {
   const { data } = await api.post('/auth/login', { email, password });
-  localStorage.setItem('token', data.token);
-  localStorage.setItem('user', JSON.stringify(data.user));
+  localStorage.setItem(tokenKey(scope), data.token);
+  localStorage.setItem(userKey(scope), JSON.stringify(data.user));
   return data;
 };
 
@@ -12,24 +20,28 @@ export const register = async (userData) => {
   return data;
 };
 
-export const logout = () => {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
+export const logout = (scope = getScope()) => {
+  localStorage.removeItem(tokenKey(scope));
+  localStorage.removeItem(userKey(scope));
 };
 
-export const getCurrentUser = () => {
-  const user = localStorage.getItem('user');
+export const getCurrentUser = (scope = getScope()) => {
+  const user = localStorage.getItem(userKey(scope));
   return user ? JSON.parse(user) : null;
 };
 
-export const isAuthenticated = () => {
-  return !!localStorage.getItem('token');
+export const isAuthenticated = (scope = getScope()) => {
+  return !!localStorage.getItem(tokenKey(scope));
+};
+
+export const isAdmin = () => {
+  return getCurrentUser('admin')?.role === 'admin';
 };
 
 export const getMyReports = async () => {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem(tokenKey(getScope()));
   const { data } = await api.get('/reports/my-reports', {
-    headers: { Authorization: `Bearer ${token}` }
+    headers: { Authorization: `Bearer ${token}` },
   });
   return data;
 };
