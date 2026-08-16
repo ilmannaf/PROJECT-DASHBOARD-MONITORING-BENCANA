@@ -9,7 +9,7 @@ Sistem dashboard monitoring kebencanaan untuk BPBD Kota Semarang. Sistem ini mem
 ## 📁 Struktur Project
 
 ```
-BPBD-dashboard/
+PROJECT-DASHBOARD-MONITORING-BENCANA/
 ├── backend/          # Node.js/Express REST API
 ├── frontend/         # React + Vite Dashboard
 └── mobile/           # React Native (planned)
@@ -107,14 +107,14 @@ npm run dev
 | Email | Password | Role |
 |-------|----------|------|
 | admin@bpbdsemarang.go.id | admin123 | admin |
-| petugas1@bpbdsemarang.go.id | admin123 | petugas |
-| petugas2@bpbdsemarang.go.id | admin123 | petugas |
+| petugas@bpbdsemarang.go.id | admin123 | petugas |
+| pelapor@example.com | admin123 | pelapor |
 
 ---
 
 ## 📊 Database Schema
 
-**7 Tables:**
+**8 Tables:**
 - `users` - Admin & petugas BPBD
 - `reports` - Laporan bencana
 - `report_logs` - History status laporan

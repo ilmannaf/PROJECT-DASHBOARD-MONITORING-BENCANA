@@ -24,13 +24,19 @@ USE sistem_kebencanaan;
 ### 2. Import Schema & Seed Data
 
 ```bash
-cd BPBD-dashboard/backend
-
 # Import schema
-mysql -u root -p sistem_kebencanaan < database/schema.sql
+mysql -u root -p sistem_kebencanaan < backend/database/schema.sql
 
 # Import seed data (user default dengan password yang sudah di-hash)
-mysql -u root -p sistem_kebencanaan < database/seed.sql
+mysql -u root -p sistem_kebencanaan < backend/database/seed.sql
+```
+
+### 2b. Jika Database Sudah Ada (Migration)
+
+Jika database sudah pernah dibuat sebelumnya, jalankan migration:
+
+```bash
+mysql -u root -p sistem_kebencanaan < backend/database/migration_role_pelapor_reporter_user.sql
 ```
 
 ### 3. User Default (Seed Data)
@@ -38,8 +44,8 @@ mysql -u root -p sistem_kebencanaan < database/seed.sql
 | Email | Password | Role |
 |-------|----------|------|
 | `admin@bpbdsemarang.go.id` | `admin123` | admin |
-| `petugas1@bpbdsemarang.go.id` | `admin123` | petugas |
-| `petugas2@bpbdsemarang.go.id` | `admin123` | petugas |
+| `petugas@bpbdsemarang.go.id` | `admin123` | petugas |
+| `pelapor@example.com` | `admin123` | pelapor |
 
 ---
 
@@ -48,7 +54,7 @@ mysql -u root -p sistem_kebencanaan < database/seed.sql
 ### 1. Install Dependencies
 
 ```bash
-cd BPBD-dashboard/backend
+cd backend
 npm install
 ```
 
@@ -90,7 +96,7 @@ curl http://localhost:5000/api/health
 ### 1. Install Dependencies
 
 ```bash
-cd BPBD-dashboard/frontend
+cd frontend
 npm install
 ```
 
