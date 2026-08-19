@@ -33,6 +33,14 @@ body {
   background-color: var(--color-gray-50);
 }
 
+button:not(:disabled) {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
 .card {
   @apply bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100;
 }

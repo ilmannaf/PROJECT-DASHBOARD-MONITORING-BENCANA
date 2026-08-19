@@ -24,3 +24,13 @@ export const deleteDisasterRecord = async (id) => {
   const { data } = await api.delete(`/disaster-records/${id}`);
   return data;
 };
+
+export const downloadDisasterPdf = async (id) => {
+  const res = await api.get(`/disaster-records/${id}/pdf`, { responseType: 'blob' });
+  const url = window.URL.createObjectURL(new Blob([res.data]));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `pendataan-bencana-${id}.pdf`;
+  link.click();
+  window.URL.revokeObjectURL(url);
+};

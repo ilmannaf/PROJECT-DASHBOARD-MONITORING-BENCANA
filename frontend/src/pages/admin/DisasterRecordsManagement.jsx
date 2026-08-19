@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getDisasterRecords, createDisasterRecord, updateDisasterRecord, deleteDisasterRecord } from '../../services/disasterService';
+import { getDisasterRecords, createDisasterRecord, updateDisasterRecord, deleteDisasterRecord, downloadDisasterPdf } from '../../services/disasterService';
 import { isAdmin } from '../../services/authService';
 
 const inputClass =
@@ -20,9 +20,19 @@ export default function DisasterRecordsManagement() {
     kelurahan: '',
     kecamatan: '',
     pemilik: '',
+    pemilik_phone: '',
     kronologi: '',
-    korban: '',
     kerugian: '',
+    korban_ps: '',
+    korban_md: '',
+    korban_lb: '',
+    korban_lr: '',
+    terdampak_laki: '',
+    terdampak_perempuan: '',
+    terdampak_anak: '',
+    terdampak_diffable: '',
+    terdampak_lansia: '',
+    terdampak_kk: '',
     sumber_info_nama: '',
     sumber_info_phone: ''
   });
@@ -47,9 +57,19 @@ export default function DisasterRecordsManagement() {
       kelurahan: '',
       kecamatan: '',
       pemilik: '',
+      pemilik_phone: '',
       kronologi: '',
-      korban: '',
       kerugian: '',
+      korban_ps: '',
+      korban_md: '',
+      korban_lb: '',
+      korban_lr: '',
+      terdampak_laki: '',
+      terdampak_perempuan: '',
+      terdampak_anak: '',
+      terdampak_diffable: '',
+      terdampak_lansia: '',
+      terdampak_kk: '',
       sumber_info_nama: '',
       sumber_info_phone: ''
     });
@@ -80,11 +100,21 @@ export default function DisasterRecordsManagement() {
       kelurahan: record.kelurahan,
       kecamatan: record.kecamatan,
       pemilik: record.pemilik || '',
+      pemilik_phone: record.pemilik_phone || '',
       kronologi: record.kronologi,
-      korban: record.korban || '',
       kerugian: record.kerugian || '',
-      sumber_info_nama: record.sumber_info_nama,
-      sumber_info_phone: record.sumber_info_phone
+      korban_ps: record.korban_ps ?? '',
+      korban_md: record.korban_md ?? '',
+      korban_lb: record.korban_lb ?? '',
+      korban_lr: record.korban_lr ?? '',
+      terdampak_laki: record.terdampak_laki ?? '',
+      terdampak_perempuan: record.terdampak_perempuan ?? '',
+      terdampak_anak: record.terdampak_anak ?? '',
+      terdampak_diffable: record.terdampak_diffable ?? '',
+      terdampak_lansia: record.terdampak_lansia ?? '',
+      terdampak_kk: record.terdampak_kk ?? '',
+      sumber_info_nama: record.sumber_info_nama || '',
+      sumber_info_phone: record.sumber_info_phone || ''
     });
     setEditingId(record.id);
     setShowForm(true);
@@ -115,7 +145,7 @@ export default function DisasterRecordsManagement() {
         r.kelurahan.toLowerCase().includes(q) ||
         r.kecamatan.toLowerCase().includes(q) ||
         (r.pemilik && r.pemilik.toLowerCase().includes(q)) ||
-        r.sumber_info_nama.toLowerCase().includes(q)
+        (r.sumber_info_nama || '').toLowerCase().includes(q)
       );
   }
 
@@ -129,6 +159,22 @@ export default function DisasterRecordsManagement() {
     const match = r.korban ? r.korban.match(/\d+/g) : null;
     return sum + (match ? match.reduce((a, b) => a + parseInt(b), 0) : 0);
   }, 0);
+
+  const korbanFields = [
+    { name: 'korban_ps', label: 'Pengungsi (PS)' },
+    { name: 'korban_md', label: 'Meninggal Dunia (MD)' },
+    { name: 'korban_lb', label: 'Luka Berat (LB)' },
+    { name: 'korban_lr', label: 'Luka Ringan (LR)' },
+  ];
+
+  const terdampakFields = [
+    { name: 'terdampak_laki', label: 'Laki-laki' },
+    { name: 'terdampak_perempuan', label: 'Perempuan' },
+    { name: 'terdampak_anak', label: 'Anak-anak' },
+    { name: 'terdampak_diffable', label: 'Diffable' },
+    { name: 'terdampak_lansia', label: 'Lansia' },
+    { name: 'terdampak_kk', label: 'KK/Jiwa' },
+  ];
 
   return (
     <div className="p-6 lg:p-8 animate-fade-in">
@@ -219,6 +265,11 @@ export default function DisasterRecordsManagement() {
                 <label className="block text-sm font-semibold text-gray-700 mb-2">Nama Pemilik / Korban</label>
                 <input name="pemilik" value={form.pemilik} onChange={handleChange} placeholder="Opsional: nama pemilik lokasi" className={inputClass} />
               </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Nomor HP Pemilik / Korban</label>
+                <input name="pemilik_phone" value={form.pemilik_phone} onChange={handleChange} placeholder="Opsional: 0812-XXXX-XXXX" className={inputClass} />
+              </div>
             </div>
 
             <div className="space-y-6">
@@ -227,15 +278,47 @@ export default function DisasterRecordsManagement() {
                 <textarea name="kronologi" value={form.kronologi} onChange={handleChange} required rows={4} placeholder="Deskripsikan secara singkat dan jelas apa yang terjadi..." className={`${inputClass} resize-none`} />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Korban</label>
-                  <textarea name="korban" value={form.korban} onChange={handleChange} rows={3} placeholder="Contoh: 2 luka ringan, 1 meninggal" className={`${inputClass} resize-none`} />
+              <div className="bg-gradient-to-br from-red-50 to-rose-50 rounded-2xl p-5 border border-red-100">
+                <label className="block text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                  <span className="w-7 h-7 rounded-lg bg-white border border-red-200 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </span>
+                  Data Korban
+                </label>
+                <div className="grid grid-cols-2 gap-3">
+                  {korbanFields.map((f) => (
+                    <div key={f.name}>
+                      <label className="block text-xs text-gray-500 mb-1">{f.label}</label>
+                      <input type="number" min="0" name={f.name} value={form[f.name]} onChange={handleChange} placeholder="0" className="w-full border border-red-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none bg-white" />
+                    </div>
+                  ))}
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Kerugian</label>
-                  <textarea name="kerugian" value={form.kerugian} onChange={handleChange} rows={3} placeholder="Contoh: Rp 5.000.000 / 3 rumah rusak" className={`${inputClass} resize-none`} />
+              </div>
+
+              <div className="bg-gradient-to-br from-sky-50 to-blue-50 rounded-2xl p-5 border border-blue-100">
+                <label className="block text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                  <span className="w-7 h-7 rounded-lg bg-white border border-blue-200 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                  </span>
+                  Jumlah Terdampak
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  {terdampakFields.map((f) => (
+                    <div key={f.name}>
+                      <label className="block text-xs text-gray-500 mb-1">{f.label}</label>
+                      <input type="number" min="0" name={f.name} value={form[f.name]} onChange={handleChange} placeholder="0" className="w-full border border-blue-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none bg-white" />
+                    </div>
+                  ))}
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Kerugian</label>
+                <textarea name="kerugian" value={form.kerugian} onChange={handleChange} rows={3} placeholder="Contoh: Rp 5.000.000 / 3 rumah rusak" className={`${inputClass} resize-none`} />
               </div>
 
               <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-2xl p-5 border border-orange-100">
@@ -248,9 +331,10 @@ export default function DisasterRecordsManagement() {
                   Sumber Informasi
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <input name="sumber_info_nama" value={form.sumber_info_nama} onChange={handleChange} required placeholder="Nama sumber" className="w-full border border-orange-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none bg-white" />
-                  <input name="sumber_info_phone" value={form.sumber_info_phone} onChange={handleChange} required placeholder="0812-XXXX-XXXX" className="w-full border border-orange-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none bg-white" />
+                  <input name="sumber_info_nama" value={form.sumber_info_nama} onChange={handleChange} placeholder="Opsional: nama sumber" className="w-full border border-orange-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none bg-white" />
+                  <input name="sumber_info_phone" value={form.sumber_info_phone} onChange={handleChange} placeholder="Opsional: 0812-XXXX-XXXX" className="w-full border border-orange-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none bg-white" />
                 </div>
+                <p className="text-[11px] text-gray-400 mt-2">Kosongkan jika sumber info tidak ingin dicantumkan (privasi)</p>
               </div>
             </div>
 
@@ -422,32 +506,43 @@ export default function DisasterRecordsManagement() {
                       </td>
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center text-xs font-bold">
-                            {r.sumber_info_nama.charAt(0).toUpperCase()}
-                          </div>
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">{r.sumber_info_nama}</div>
-                            <div className="text-xs text-gray-500">{r.sumber_info_phone}</div>
-                          </div>
+                          {r.sumber_info_nama ? (
+                            <>
+                              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 text-white flex items-center justify-center text-xs font-bold">
+                                {r.sumber_info_nama.charAt(0).toUpperCase()}
+                              </div>
+                              <div>
+                                <div className="text-sm font-medium text-gray-900">{r.sumber_info_nama}</div>
+                                <div className="text-xs text-gray-500">{r.sumber_info_phone || '-'}</div>
+                              </div>
+                            </>
+                          ) : (
+                            <span className="text-xs text-gray-400 italic">Tidak dicantumkan</span>
+                          )}
                         </div>
                       </td>
                       <td className="py-4 px-6">
-                        {adminUser ? (
-                          <div className="flex justify-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
-                            <button onClick={() => handleEdit(r)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Edit">
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                              </svg>
-                            </button>
-                            <button onClick={() => handleDelete(r.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition" title="Hapus">
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                              </svg>
-                            </button>
-                          </div>
-                        ) : (
-                          <span className="text-xs text-gray-400">-</span>
-                        )}
+                        <div className="flex justify-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
+                          <button onClick={() => downloadDisasterPdf(r.id).catch(() => alert('Gagal mengunduh PDF'))} className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition" title="Download PDF">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                          </button>
+                          {adminUser && (
+                            <>
+                              <button onClick={() => handleEdit(r)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Edit">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                </svg>
+                              </button>
+                              <button onClick={() => handleDelete(r.id)} className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition" title="Hapus">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                              </button>
+                            </>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))
