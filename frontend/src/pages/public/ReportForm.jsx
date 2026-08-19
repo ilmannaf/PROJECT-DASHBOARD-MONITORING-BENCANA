@@ -483,9 +483,11 @@ function ReportHeader() {
           onClick={() => navigate("/")}
           className="flex items-center gap-3 cursor-pointer"
         >
-          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center text-white font-extrabold text-xs">
-            BPBD
-          </div>
+          <img
+            src="/assets/logo-bpbd.jpg"
+            alt="Logo BPBD Kota Semarang"
+            className="h-9 w-9 rounded-lg object-cover"
+          />
           <div className="leading-tight text-left">
             <p className="font-extrabold text-gray-900 text-sm">BPBD Kota Semarang</p>
             <p className="text-[11px] text-gray-500">Sistem Monitoring Kebencanaan</p>

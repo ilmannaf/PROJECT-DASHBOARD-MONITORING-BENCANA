@@ -34,9 +34,11 @@ export default function Login() {
       <div className="flex-1 bg-white flex items-center justify-center px-4 sm:px-8 py-12">
         <div className="w-full max-w-md animate-fade-in">
           {/* Logo */}
-          <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center text-white font-extrabold text-sm mb-6 shadow-lg shadow-brand-500/30">
-            BPBD
-          </div>
+          <img
+            src="/assets/logo-bpbd.jpg"
+            alt="Logo BPBD Kota Semarang"
+            className="w-14 h-14 rounded-xl object-cover mb-6 shadow-lg shadow-brand-500/30"
+          />
 
           <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">
             Masuk ke Dashboard
@@ -190,9 +192,11 @@ export default function Login() {
         <div className="absolute top-1/3 left-10 w-40 h-40 rounded-full bg-yellow-300/20 blur-2xl"></div>
 
         <div className="relative z-10 flex flex-col justify-center px-12 lg:px-16 py-16 w-full max-w-2xl">
-          <div className="w-16 h-16 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center font-extrabold text-lg mb-10 border border-white/20 text-white">
-            BPBD
-          </div>
+          <img
+            src="/assets/logo-bpbd.jpg"
+            alt="Logo BPBD Kota Semarang"
+            className="w-16 h-16 rounded-2xl object-cover mb-10 border border-white/20"
+          />
 
           <h1 className="text-4xl font-extrabold leading-tight text-white mb-5 max-w-lg">
             Selamat datang kembali di Sistem BPBD Kota Semarang

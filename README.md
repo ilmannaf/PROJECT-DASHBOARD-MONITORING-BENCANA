@@ -18,7 +18,8 @@ PROJECT-DASHBOARD-MONITORING-BENCANA/
 ## ✨ Fitur Utama
 
 ### 🌐 Public Features
-- **Landing Page Modern** - Hero section dengan CTA buttons
+- **Landing Page Modern** - Full-bleed hero foto kantor (≈90vh) dengan overlay gradient, navbar transparan, dan judul besar "BPBD KOTA SEMARANG"
+- **Login Publik** - Split-screen seperti admin dengan penanda badge "PORTAL PUBLIK" (aksen biru) pembeda dari admin
 - **Laporan Bencana** - Form pelaporan dengan GPS dan upload foto
 - **Lacak Status** - Tracking laporan dengan kode unik + peta lokasi
 - **Dashboard Pelapor** - Login/register untuk melihat laporan pribadi
@@ -34,7 +35,10 @@ PROJECT-DASHBOARD-MONITORING-BENCANA/
 - **Kegiatan** - Laporan kegiatan lapangan dengan dokumentasi
 
 ### 🔥 Highlight Features
+- ✅ Logo resmi BPBD (gambar) menggantikan teks logo di seluruh halaman
+- ✅ Landasan hero & login publik pakai foto/logo dari `frontend/public/assets/`
 - ✅ Split-screen login admin (form kiri + panel branding kanan)
+- ✅ Split-screen login publik dengan penanda "PORTAL PUBLIK" + akses terpisah ke login admin
 - ✅ Toggle show/hide password + kursor pointer di semua tombol
 - ✅ Tombol "Masuk dengan Google" (UI siap; butuh konfigurasi OAuth backend)
 - ✅ Formulir pendataan bencana dengan field korban/terdampak terpisah
@@ -220,6 +224,7 @@ Sistem menggunakan tema warna oranye konsisten untuk branding BPBD:
 - **Brand Primary**: `bg-brand-600` / `text-brand-600` (oranye utama)
 - **Brand Light**: `bg-brand-50` / `border-brand-100` (oranye muda)
 - **Brand Dark**: `bg-brand-700` (oranye gelap)
+- **Public Accent**: `sky-*` (biru) dipakai sebagai penanda khusus portal publik vs admin
 
 ---
 
@@ -231,7 +236,8 @@ Sistem menggunakan tema warna oranye konsisten untuk branding BPBD:
 - [x] Tracking status dengan peta
 - [x] Role-based authorization
 - [x] Pendataan bencana + export PDF
-- [x] Redesign login split-screen
+- [x] Redesign login split-screen (admin & portal publik)
+- [x] Landing page polish (hero, fitur, CTA, footer) + logo gambar BPBD
 - [ ] Google OAuth login (backend)
 - [ ] Socket.IO live updates (backend ready)
 - [ ] Mobile app (React Native)

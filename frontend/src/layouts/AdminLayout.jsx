@@ -80,9 +80,11 @@ export default function AdminLayout() {
       <aside className="hidden lg:flex flex-col w-64 bg-gradient-to-b from-gray-900 via-gray-900 to-gray-800 text-white sticky top-0 h-screen shrink-0">
         <div className="p-6 border-b border-white/10">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-brand-500 to-orange-600 flex items-center justify-center text-white font-extrabold text-sm shadow-lg shadow-brand-500/30">
-              BPBD
-            </div>
+            <img
+              src="/assets/logo-bpbd.jpg"
+              alt="Logo BPBD Kota Semarang"
+              className="h-11 w-11 rounded-xl object-cover shadow-lg shadow-brand-500/30"
+            />
             <div className="leading-tight">
               <p className="font-extrabold text-white text-sm tracking-tight">
                 BPBD Kota Semarang
@@ -143,9 +145,11 @@ export default function AdminLayout() {
         <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-lg border-b border-gray-200 lg:hidden">
           <div className="px-4 flex items-center justify-between h-16">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center text-white font-extrabold text-sm">
-                BPBD
-              </div>
+              <img
+                src="/assets/logo-bpbd.jpg"
+                alt="Logo BPBD Kota Semarang"
+                className="h-9 w-9 rounded-lg object-cover"
+              />
               <div className="leading-tight">
                 <p className="font-extrabold text-gray-900 text-sm tracking-tight">BPBD Kota Semarang</p>
                 <p className="text-[11px] text-gray-500">Sistem Manajemen Kebencanaan</p>

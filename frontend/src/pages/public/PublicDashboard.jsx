@@ -90,6 +90,7 @@ export default function PublicDashboard() {
           error={error}
           onLogin={handleLogin}
           onRegister={handleRegister}
+          navigate={navigate}
         />
       )}
     </div>
@@ -109,9 +110,11 @@ function DashboardView({ reports, selectedReport, setSelectedReport, navigate })
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center text-white font-extrabold text-sm">
-              BPBD
-            </div>
+            <img
+              src="/assets/logo-bpbd.jpg"
+              alt="Logo BPBD Kota Semarang"
+              className="h-10 w-10 rounded-lg object-cover"
+            />
             <div>
               <h1 className="font-bold text-gray-900">Dashboard Public</h1>
               <p className="text-xs text-gray-500">Lapor & lacak bencana</p>
@@ -306,7 +309,19 @@ function DashboardView({ reports, selectedReport, setSelectedReport, navigate })
   );
 }
 
-function AuthView({ tab, setTab, loading, error, onLogin, onRegister }) {
+const PUBLIC_BADGE = (
+  <span className="inline-flex items-center gap-1.5 bg-sky-50 border border-sky-200 text-sky-700 text-[11px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full">
+    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+      <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+    </svg>
+    Portal Publik
+  </span>
+);
+
+const AUTH_INPUT_CLASS =
+  "w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent transition";
+
+function AuthView({ tab, setTab, loading, error, onLogin, onRegister, navigate }) {
   const [showPassword, setShowPassword] = useState(false);
 
   const renderPasswordInput = (minLength, placeholder) => (
@@ -316,13 +331,14 @@ function AuthView({ tab, setTab, loading, error, onLogin, onRegister }) {
         type={showPassword ? "text" : "password"}
         required
         minLength={minLength}
-        className="w-full border rounded-lg px-3 py-2 pr-10 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+        className={`${AUTH_INPUT_CLASS} pr-11`}
         placeholder={placeholder}
       />
       <button
         type="button"
         onClick={() => setShowPassword(!showPassword)}
         className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+        aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
       >
         {showPassword ? (
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -339,45 +355,26 @@ function AuthView({ tab, setTab, loading, error, onLogin, onRegister }) {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-orange-50/30 to-white">
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-brand-500 to-brand-700 flex items-center justify-center text-white font-extrabold text-sm">
-              BPBD
-            </div>
-            <div>
-              <h1 className="font-bold text-gray-900">BPBD Kota Semarang</h1>
-              <p className="text-xs text-gray-500">Sistem Monitoring Kebencanaan</p>
-            </div>
-          </div>
-          <a
-            href="/"
-            className="text-sm font-semibold text-gray-700 hover:text-brand-600 transition flex items-center gap-2"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Kembali ke Beranda
-          </a>
-        </div>
-      </header>
-
-      <div className="flex items-center justify-center py-12 px-4">
-        <div className="max-w-md w-full bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-100">
-          <div className="bg-gradient-to-r from-brand-600 to-brand-700 p-6 text-white text-center">
-            <div className="w-16 h-16 mx-auto rounded-xl bg-white/20 flex items-center justify-center font-extrabold text-2xl mb-3 backdrop-blur-sm">
-              BPBD
-            </div>
-            <h2 className="text-xl font-bold">
-              {tab === 'login' ? 'Masuk ke Akun' : 'Daftar Akun Baru'}
-            </h2>
-            <p className="text-sm opacity-90 mt-1">
-              {tab === 'login' ? 'Pelapor BPBD Kota Semarang' : 'Daftarkan diri untuk melapor'}
-            </p>
+    <div className="min-h-screen flex bg-white font-sans">
+      {/* KOLOM KIRI — Form Login Publik (45%) */}
+      <div className="flex-1 bg-white flex items-center justify-center px-4 sm:px-8 py-12">
+        <div className="w-full max-w-md animate-fade-in">
+          <div className="flex items-start justify-between mb-6">
+            <img
+              src="/assets/logo-bpbd.jpg"
+              alt="Logo BPBD Kota Semarang"
+              className="h-14 w-14 rounded-xl object-cover shadow-lg shadow-brand-500/30"
+            />
+            {PUBLIC_BADGE}
           </div>
 
-        <div className="p-6">
+          <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">
+            {tab === 'login' ? 'Masuk ke Akun Publik' : 'Daftar Akun Baru'}
+          </h1>
+          <p className="text-sm text-gray-500 mt-1.5 mb-6">
+            BPBD Kota Semarang - Portal Pelaporan Masyarakat
+          </p>
+
           <div className="flex gap-2 mb-6 border-b pb-2">
             <button
               onClick={() => setTab('login')}
@@ -402,35 +399,39 @@ function AuthView({ tab, setTab, loading, error, onLogin, onRegister }) {
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-lg text-sm mb-4">
+            <div className="mb-5 bg-red-50 border border-red-100 text-red-600 text-sm rounded-lg px-4 py-3">
               {error}
             </div>
           )}
 
           {tab === 'login' ? (
-            <form onSubmit={onLogin} className="space-y-4">
+            <form onSubmit={onLogin} className="space-y-5">
               <div>
-                <label className="block text-sm font-medium mb-1">Email</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Email
+                </label>
                 <input
                   name="email"
                   type="email"
                   required
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                  className={AUTH_INPUT_CLASS}
                   placeholder="email@example.com"
                 />
               </div>
-               <div>
-                 <label className="block text-sm font-medium mb-1">Password</label>
-                 {renderPasswordInput(6, '••••••••')}
-               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Password
+                </label>
+                {renderPasswordInput(6, 'Masukkan password')}
+              </div>
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-brand-600 hover:bg-brand-700 text-white rounded-lg py-2.5 text-sm font-semibold transition disabled:opacity-50"
+                className="w-full bg-brand-600 hover:bg-brand-700 text-white rounded-lg py-2.5 text-sm font-bold transition disabled:opacity-50 shadow-md shadow-brand-500/20"
               >
                 {loading ? 'Memproses...' : 'Masuk'}
               </button>
-              <p className="text-center text-xs text-gray-500 mt-3">
+              <p className="text-center text-xs text-gray-500">
                 Belum punya akun?{' '}
                 <button type="button" onClick={() => setTab('register')} className="text-brand-600 font-semibold">
                   Daftar sekarang
@@ -438,39 +439,45 @@ function AuthView({ tab, setTab, loading, error, onLogin, onRegister }) {
               </p>
             </form>
           ) : (
-            <form onSubmit={onRegister} className="space-y-4">
+            <form onSubmit={onRegister} className="space-y-5">
               <div>
-                <label className="block text-sm font-medium mb-1">Nama Lengkap</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Nama Lengkap
+                </label>
                 <input
                   name="name"
                   type="text"
                   required
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                  className={AUTH_INPUT_CLASS}
                   placeholder="John Doe"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Email</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Email
+                </label>
                 <input
                   name="email"
                   type="email"
                   required
-                  className="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                  className={AUTH_INPUT_CLASS}
                   placeholder="email@example.com"
                 />
               </div>
-<div>
-                 <label className="block text-sm font-medium mb-1">Password</label>
-                 {renderPasswordInput(6, 'Minimal 6 karakter')}
-               </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Password
+                </label>
+                {renderPasswordInput(6, 'Minimal 6 karakter')}
+              </div>
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-brand-600 hover:bg-brand-700 text-white rounded-lg py-2.5 text-sm font-semibold transition disabled:opacity-50"
+                className="w-full bg-brand-600 hover:bg-brand-700 text-white rounded-lg py-2.5 text-sm font-bold transition disabled:opacity-50 shadow-md shadow-brand-500/20"
               >
                 {loading ? 'Memproses...' : 'Daftar'}
               </button>
-              <p className="text-center text-xs text-gray-500 mt-3">
+              <p className="text-center text-xs text-gray-500">
                 Sudah punya akun?{' '}
                 <button type="button" onClick={() => setTab('login')} className="text-brand-600 font-semibold">
                   Masuk sekarang
@@ -478,7 +485,99 @@ function AuthView({ tab, setTab, loading, error, onLogin, onRegister }) {
               </p>
             </form>
           )}
+
+          {/* Penanda pembeda: akses admin terpisah */}
+          <div className="mt-6 rounded-xl border border-sky-200 bg-sky-50/60 p-4 flex items-center justify-between gap-3">
+            <div>
+              <p className="text-sm font-semibold text-gray-800">Petugas / Admin BPBD?</p>
+              <p className="text-xs text-gray-500 mt-0.5">Gunakan portal login admin terpisah.</p>
+            </div>
+            <button
+              onClick={() => navigate('/admin/login')}
+              className="shrink-0 text-xs font-bold text-sky-700 bg-white border border-sky-300 hover:bg-sky-100 rounded-lg px-3 py-2 transition"
+            >
+              Login Admin →
+            </button>
+          </div>
+
+          <a
+            href="/"
+            className="block text-center text-sm text-gray-500 hover:text-brand-600 font-medium mt-6"
+          >
+            ← Kembali ke Beranda
+          </a>
         </div>
+      </div>
+
+      {/* KOLOM KANAN — Panel Branding Publik (55%) */}
+      <div className="hidden lg:flex lg:w-[55%] relative overflow-hidden bg-gradient-to-br from-sky-900 via-sky-700 to-brand-700 items-center justify-center">
+        <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-white/10"></div>
+        <div className="absolute -bottom-32 -left-24 w-[28rem] h-[28rem] rounded-full bg-white/10"></div>
+        <div className="absolute top-1/3 left-10 w-40 h-40 rounded-full bg-yellow-300/20 blur-2xl"></div>
+
+        <div className="relative z-10 flex flex-col justify-center px-12 lg:px-16 py-16 w-full max-w-2xl">
+          <div className="flex items-center gap-4 mb-10">
+            <img
+              src="/assets/logo-bpbd.jpg"
+              alt="Logo BPBD Kota Semarang"
+              className="h-16 w-16 rounded-2xl object-cover border border-white/20"
+            />
+            {PUBLIC_BADGE}
+          </div>
+
+          <h1 className="text-4xl font-extrabold leading-tight text-white mb-5 max-w-lg">
+            Laporkan & Pantau Bencana di Wilayah Anda
+          </h1>
+          <p className="text-lg text-orange-100 leading-relaxed max-w-md">
+            Warga Kota Semarang dapat melaporkan kejadian bencana dan memantau
+            penanganannya secara real-time melalui portal publik BPBD.
+          </p>
+
+          {/* Preview alur pelaporan */}
+          <div className="mt-14 bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md">
+            <div className="flex items-center justify-between mb-5">
+              <p className="text-sm font-bold text-gray-900">Alur Pelaporan</p>
+              <span className="flex items-center gap-1.5 text-[11px] font-medium text-emerald-600 bg-emerald-50 rounded-full px-2.5 py-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                24/7
+              </span>
+            </div>
+            <ol className="space-y-4">
+              <li className="flex items-start gap-3">
+                <span className="w-8 h-8 rounded-full bg-orange-100 text-brand-700 text-sm font-bold flex items-center justify-center shrink-0">1</span>
+                <div>
+                  <p className="text-sm font-bold text-gray-900">Lapor Kejadian</p>
+                  <p className="text-xs text-gray-500 mt-0.5">Isi form dengan detail lengkap + foto & lokasi GPS.</p>
+                </div>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="w-8 h-8 rounded-full bg-sky-100 text-sky-700 text-sm font-bold flex items-center justify-center shrink-0">2</span>
+                <div>
+                  <p className="text-sm font-bold text-gray-900">Diverifikasi BPBD</p>
+                  <p className="text-xs text-gray-500 mt-0.5">Petugas memvalidasi dan memprioritaskan laporan.</p>
+                </div>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-700 text-sm font-bold flex items-center justify-center shrink-0">3</span>
+                <div>
+                  <p className="text-sm font-bold text-gray-900">Pantau Real-time</p>
+                  <p className="text-xs text-gray-500 mt-0.5">Lacak status penanganan lewat kode laporan unik.</p>
+                </div>
+              </li>
+            </ol>
+          </div>
+
+          <div className="mt-8 flex items-center justify-between gap-4 border-t border-white/20 pt-6">
+            <p className="text-sm text-orange-100">
+              Petugas BPBD? Silakan masuk lewat portal internal.
+            </p>
+            <button
+              onClick={() => navigate('/admin/login')}
+              className="shrink-0 bg-white text-sky-800 hover:bg-sky-50 rounded-lg px-4 py-2 text-sm font-semibold shadow-lg transition"
+            >
+              Login Admin →
+            </button>
+          </div>
         </div>
       </div>
     </div>
