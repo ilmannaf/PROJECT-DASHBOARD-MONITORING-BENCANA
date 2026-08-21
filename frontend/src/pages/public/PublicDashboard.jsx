@@ -630,7 +630,7 @@ function ReportModal({ report, onClose }) {
             <div className="mb-4">
               <p className="text-gray-400 text-xs mb-1">Foto</p>
               <img
-                src={`http://localhost:5000${report.photo_url}`}
+                src={`${import.meta.env.VITE_API_URL.replace('/api', '')}${report.photo_url}`}
                 alt="Bencana"
                 className="w-full h-48 object-cover rounded-lg border border-gray-200"
               />
