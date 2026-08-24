@@ -9,8 +9,8 @@ export const katanaData = [
     pembentukan: 2017,
     ancaman_bencana: "BANJIR ROB",
     sumber_dana: "APBD Kota",
-    latitude: -7.0125,
-    longitude: 110.4850,
+    latitude: -6.9630198,
+    longitude: 110.4422179,
   },
   {
     id: 2,
