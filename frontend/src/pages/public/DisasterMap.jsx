@@ -5,6 +5,8 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import api from "../../services/api";
 import semarangGeojson from "../../assets/kota_semarang.json";
+import { smabData } from "../../data/smabData";
+import { katanaData } from "../../data/katanaData";
 
 // Kota Semarang - center agar seluruh kota terlihat
 const SEMARANG_CENTER = [-7.005, 110.4381];
@@ -133,6 +135,7 @@ export default function DisasterMap() {
   const [selectedStatus, setSelectedStatus] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [legendOpen, setLegendOpen] = useState(true);
+  const [mapMode, setMapMode] = useState("bencana"); // bencana | smab | katana
 
   useEffect(() => {
     let mounted = true;
@@ -206,14 +209,57 @@ export default function DisasterMap() {
             </button>
             <img src="/assets/logo-bpbd.jpg" alt="Logo BPBD" className="h-9 w-9 rounded-lg object-cover hidden sm:block" />
             <div>
-              <h1 className="text-sm sm:text-base font-extrabold text-gray-900 leading-tight">Peta Sebaran Bencana - BPBD Kota Semarang</h1>
-              <p className="text-[11px] text-gray-500 hidden sm:block">Monitoring lokasi kejadian bencana secara real-time</p>
+              <h1 className="text-sm sm:text-base font-extrabold text-gray-900 leading-tight">
+                {mapMode === "bencana" && "Peta Sebaran Bencana"}
+                {mapMode === "smab" && "Peta SMAB (Satuan Pendidikan Aman Bencana)"}
+                {mapMode === "katana" && "Peta KATANA (FPRB Kelurahan)"}
+                {" "}- BPBD Kota Semarang
+              </h1>
+              <p className="text-[11px] text-gray-500 hidden sm:block">
+                {mapMode === "bencana" && "Monitoring lokasi kejadian bencana secara real-time"}
+                {mapMode === "smab" && "Peta sekolah/madrasah aman bencana di Kota Semarang"}
+                {mapMode === "katana" && "Peta forum penanggulangan risiko bencana kelurahan"}
+              </p>
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <div className="hidden md:flex items-center gap-2 bg-white border border-gray-200 rounded-lg p-1">
+              <button
+                onClick={() => setMapMode("bencana")}
+                className={`px-3 py-1.5 text-xs font-semibold rounded transition ${
+                  mapMode === "bencana"
+                    ? "bg-brand-100 text-brand-700"
+                    : "text-gray-600 hover:bg-gray-50"
+                }`}
+              >
+                Bencana
+              </button>
+              <button
+                onClick={() => setMapMode("smab")}
+                className={`px-3 py-1.5 text-xs font-semibold rounded transition ${
+                  mapMode === "smab"
+                    ? "bg-brand-100 text-brand-700"
+                    : "text-gray-600 hover:bg-gray-50"
+                }`}
+              >
+                SMAB
+              </button>
+              <button
+                onClick={() => setMapMode("katana")}
+                className={`px-3 py-1.5 text-xs font-semibold rounded transition ${
+                  mapMode === "katana"
+                    ? "bg-brand-100 text-brand-700"
+                    : "text-gray-600 hover:bg-gray-50"
+                }`}
+              >
+                KATANA
+              </button>
+            </div>
             <span className="hidden md:inline-flex items-center gap-1.5 text-xs font-semibold text-gray-600 bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              {loading ? "Memuat..." : `${filteredReports.length} titik`}
+              {mapMode === "bencana" && (loading ? "Memuat..." : `${filteredReports.length} titik`)}
+              {mapMode === "smab" && `${smabData.length} lokasi`}
+              {mapMode === "katana" && `${katanaData.length} lokasi`}
             </span>
             <button
               onClick={() => navigate("/")}
@@ -237,7 +283,7 @@ export default function DisasterMap() {
           <div className="fixed inset-0 bg-black/30 z-[900] lg:hidden" onClick={() => setSidebarOpen(false)}></div>
         )}
         <aside
-          className={`
+           className={`
             fixed lg:static inset-y-0 left-0 z-[901] w-[300px] lg:w-[300px] shrink-0 bg-white border-r lg:border border-gray-200 lg:rounded-2xl shadow-xl lg:shadow-sm overflow-y-auto
             transform transition-transform duration-300
             ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
@@ -250,7 +296,7 @@ export default function DisasterMap() {
                 <svg className="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                 </svg>
-                Filter Peta
+                {mapMode === "bencana" ? "Filter Peta" : "Informasi"}
               </h2>
               <button onClick={() => setSidebarOpen(false)} className="lg:hidden p-1 rounded hover:bg-gray-100">
                 <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -259,71 +305,137 @@ export default function DisasterMap() {
               </button>
             </div>
 
-            <div>
-              <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3">Jenis Bencana</h3>
-              <div className="space-y-2">
-                {ALL_TYPES.map((type) => {
-                  const checked = selectedTypes.includes(type);
-                  const meta = DISASTER_META[type];
-                  return (
-                    <label key={type} className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 cursor-pointer transition ${checked ? "border-brand-300 bg-brand-50" : "border-gray-200 hover:border-gray-300 bg-white"}`}>
-                      <input
-                        type="checkbox"
-                        checked={checked}
-                        onChange={() => toggleType(type)}
-                        className="w-4 h-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
-                      />
-                      <span className="w-3 h-3 rounded-full shrink-0" style={{ background: meta.color }}></span>
-                      <span className="text-sm font-medium text-gray-700 flex-1">{type}</span>
-                      <span className="text-xs text-gray-400">{stats.perType[type] ?? 0}</span>
-                    </label>
-                  );
-                })}
+            {/* Mode Selector */}
+            <div className="lg:hidden space-y-2">
+              <p className="text-xs font-bold uppercase tracking-wider text-gray-500">Mode Peta</p>
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  onClick={() => setMapMode("bencana")}
+                  className={`py-2 px-3 text-xs font-semibold rounded-lg transition ${
+                    mapMode === "bencana"
+                      ? "bg-brand-100 text-brand-700 border border-brand-300"
+                      : "bg-white text-gray-600 border border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  Bencana
+                </button>
+                <button
+                  onClick={() => setMapMode("smab")}
+                  className={`py-2 px-3 text-xs font-semibold rounded-lg transition ${
+                    mapMode === "smab"
+                      ? "bg-brand-100 text-brand-700 border border-brand-300"
+                      : "bg-white text-gray-600 border border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  SMAB
+                </button>
+                <button
+                  onClick={() => setMapMode("katana")}
+                  className={`py-2 px-3 text-xs font-semibold rounded-lg transition ${
+                    mapMode === "katana"
+                      ? "bg-brand-100 text-brand-700 border border-brand-300"
+                      : "bg-white text-gray-600 border border-gray-200 hover:border-gray-300"
+                  }`}
+                >
+                  KATANA
+                </button>
               </div>
             </div>
 
-            <div>
-              <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3">Status Penanganan</h3>
-              <div className="space-y-2">
-                {ALL_STATUS.map((status) => {
-                  const checked = selectedStatus.includes(status);
-                  const meta = STATUS_META[status];
-                  return (
-                    <label key={status} className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 cursor-pointer transition ${checked ? "border-brand-300 bg-brand-50" : "border-gray-200 hover:border-gray-300 bg-white"}`}>
-                      <input
-                        type="checkbox"
-                        checked={checked}
-                        onChange={() => toggleStatus(status)}
-                        className="w-4 h-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
-                      />
-                      <span className="w-3 h-3 rounded-full shrink-0" style={{ background: meta.color }}></span>
-                      <span className="text-sm font-medium text-gray-700 flex-1 capitalize">{meta.label}</span>
-                      <span className="text-xs text-gray-400">{stats.perStatus[status] ?? 0}</span>
-                    </label>
-                  );
-                })}
+            {/* Bencana Filters */}
+            {mapMode === "bencana" && (
+              <>
+                <div>
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3">Jenis Bencana</h3>
+                  <div className="space-y-2">
+                    {ALL_TYPES.map((type) => {
+                      const checked = selectedTypes.includes(type);
+                      const meta = DISASTER_META[type];
+                      return (
+                        <label key={type} className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 cursor-pointer transition ${checked ? "border-brand-300 bg-brand-50" : "border-gray-200 hover:border-gray-300 bg-white"}`}>
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={() => toggleType(type)}
+                            className="w-4 h-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
+                          />
+                          <span className="w-3 h-3 rounded-full shrink-0" style={{ background: meta.color }}></span>
+                          <span className="text-sm font-medium text-gray-700 flex-1">{type}</span>
+                          <span className="text-xs text-gray-400">{stats.perType[type] ?? 0}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3">Status Penanganan</h3>
+                  <div className="space-y-2">
+                    {ALL_STATUS.map((status) => {
+                      const checked = selectedStatus.includes(status);
+                      const meta = STATUS_META[status];
+                      return (
+                        <label key={status} className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 cursor-pointer transition ${checked ? "border-brand-300 bg-brand-50" : "border-gray-200 hover:border-gray-300 bg-white"}`}>
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={() => toggleStatus(status)}
+                            className="w-4 h-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500"
+                          />
+                          <span className="w-3 h-3 rounded-full shrink-0" style={{ background: meta.color }}></span>
+                          <span className="text-sm font-medium text-gray-700 flex-1 capitalize">{meta.label}</span>
+                          <span className="text-xs text-gray-400">{stats.perStatus[status] ?? 0}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <button
+                  onClick={resetFilter}
+                  className="w-full flex items-center justify-center gap-2 text-sm font-semibold text-gray-600 hover:text-brand-700 bg-gray-50 hover:bg-brand-50 border border-gray-200 hover:border-brand-200 rounded-xl py-3 transition"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                  Reset Filter
+                </button>
+
+                <div className="rounded-xl bg-gradient-to-br from-brand-50 to-orange-50 border border-brand-100 p-4">
+                  <p className="text-xs font-bold text-brand-700 flex items-center gap-1.5 mb-1">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Privasi Terjaga
+                  </p>
+                  <p className="text-xs text-gray-600 leading-relaxed">Data pelapor (nama & no. HP) tidak ditampilkan di peta publik untuk menjaga privasi warga.</p>
+                </div>
+              </>
+            )}
+
+            {/* SMAB Info */}
+            {mapMode === "smab" && (
+              <div className="rounded-xl bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-100 p-4">
+                <p className="text-xs font-bold text-blue-700 mb-2">SMAB - Satuan Pendidikan Aman Bencana</p>
+                <p className="text-xs text-gray-600 leading-relaxed mb-3">Peta menampilkan lokasi sekolah/madrasah yang telah terlatih dan tersertifikasi dalam penanggulangan bencana.</p>
+                <div className="text-xs space-y-1 text-gray-600">
+                  <p>✓ Total SMAB: <span className="font-bold">{smabData.length}</span></p>
+                  <p>✓ Klik marker untuk detail</p>
+                </div>
               </div>
-            </div>
+            )}
 
-            <button
-              onClick={resetFilter}
-              className="w-full flex items-center justify-center gap-2 text-sm font-semibold text-gray-600 hover:text-brand-700 bg-gray-50 hover:bg-brand-50 border border-gray-200 hover:border-brand-200 rounded-xl py-3 transition"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              Reset Filter
-            </button>
-
-            <div className="rounded-xl bg-gradient-to-br from-brand-50 to-orange-50 border border-brand-100 p-4">
-              <p className="text-xs font-bold text-brand-700 flex items-center gap-1.5 mb-1">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Privasi Terjaga
-              </p>
-              <p className="text-xs text-gray-600 leading-relaxed">Data pelapor (nama & no. HP) tidak ditampilkan di peta publik untuk menjaga privasi warga.</p>
-            </div>
+            {/* KATANA Info */}
+            {mapMode === "katana" && (
+              <div className="rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 p-4">
+                <p className="text-xs font-bold text-emerald-700 mb-2">KATANA - FPRB Kelurahan</p>
+                <p className="text-xs text-gray-600 leading-relaxed mb-3">Peta menampilkan lokasi Forum Penanggulangan Risiko Bencana (FPRB) di tingkat kelurahan Kota Semarang.</p>
+                <div className="text-xs space-y-1 text-gray-600">
+                  <p>✓ Total KATANA: <span className="font-bold">{katanaData.length}</span></p>
+                  <p>✓ Klik marker untuk detail</p>
+                </div>
+              </div>
+            )}
           </div>
         </aside>
 
@@ -343,7 +455,7 @@ export default function DisasterMap() {
                   <p className="text-sm text-red-600 mb-2">{error}</p>
                   <button onClick={() => window.location.reload()} className="text-sm font-semibold text-brand-600 hover:text-brand-700">Coba lagi</button>
                 </div>
-              ) : (
+               ) : (
                 <MapContainer
                   center={SEMARANG_CENTER}
                   zoom={SEMARANG_ZOOM}
@@ -369,7 +481,9 @@ export default function DisasterMap() {
                     data={KOTA_SEMARANG_GEOJSON}
                     style={{ color: "#f97316", weight: 3, opacity: 0.9, fill: false }}
                   />
-                  {filteredReports.map((report) => {
+                  
+                  {/* Markers Bencana */}
+                  {mapMode === "bencana" && filteredReports.map((report) => {
                     const lat = parseFloat(report.latitude);
                     const lng = parseFloat(report.longitude);
                     if (isNaN(lat) || isNaN(lng)) return null;
@@ -427,6 +541,140 @@ export default function DisasterMap() {
                       </Marker>
                     );
                   })}
+
+                  {/* Markers SMAB */}
+                  {mapMode === "smab" && smabData.map((smab) => {
+                    const lat = parseFloat(smab.latitude);
+                    const lng = parseFloat(smab.longitude);
+                    if (isNaN(lat) || isNaN(lng)) return null;
+                    const icon = L.divIcon({
+                      html: `
+                        <div style="
+                          width:36px;height:36px;
+                          background:#3b82f6;
+                          border:3px solid white;
+                          border-radius:50% 50% 50% 0;
+                          transform: rotate(-45deg);
+                          box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+                          display:flex;align-items:center;justify-content:center;
+                        ">
+                          <span style="
+                            transform: rotate(45deg);
+                            color:white;
+                            font-size:16px;
+                            line-height:1;
+                            display:flex;
+                          ">🏫</span>
+                        </div>
+                      `,
+                      className: "custom-div-icon",
+                      iconSize: [36, 36],
+                      iconAnchor: [18, 36],
+                      popupAnchor: [0, -36],
+                    });
+                    return (
+                      <Marker key={`smab-${smab.id}`} position={[lat, lng]} icon={icon}>
+                        <Popup maxWidth={300} minWidth={240}>
+                          <div className="space-y-3 text-sm">
+                            <div>
+                              <p className="text-xs text-gray-400 font-medium">Nama Sekolah</p>
+                              <p className="font-bold text-gray-900">{smab.nama_sekolah}</p>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                              <div>
+                                <p className="text-xs text-gray-400">Kecamatan</p>
+                                <p className="font-medium text-gray-700">{smab.kecamatan}</p>
+                              </div>
+                              <div>
+                                <p className="text-xs text-gray-400">Tahun</p>
+                                <p className="font-medium text-gray-700">{smab.tahun_pembentukan}</p>
+                              </div>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-400">Ancaman Bencana</p>
+                              <p className="font-medium text-gray-700">{smab.ancaman_bencana}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-400">Koordinat</p>
+                              <p className="font-mono text-xs text-gray-600">{lat.toFixed(4)}, {lng.toFixed(4)}</p>
+                            </div>
+                            <div className="bg-blue-50 rounded-lg p-3 border border-blue-100">
+                              <p className="text-xs font-semibold text-blue-700">✓ Status: Sekolah Aman Bencana (SMAB)</p>
+                            </div>
+                          </div>
+                        </Popup>
+                      </Marker>
+                    );
+                  })}
+
+                  {/* Markers KATANA */}
+                  {mapMode === "katana" && katanaData.map((katana) => {
+                    const lat = parseFloat(katana.latitude);
+                    const lng = parseFloat(katana.longitude);
+                    if (isNaN(lat) || isNaN(lng)) return null;
+                    const icon = L.divIcon({
+                      html: `
+                        <div style="
+                          width:36px;height:36px;
+                          background:#10b981;
+                          border:3px solid white;
+                          border-radius:50% 50% 50% 0;
+                          transform: rotate(-45deg);
+                          box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+                          display:flex;align-items:center;justify-content:center;
+                        ">
+                          <span style="
+                            transform: rotate(45deg);
+                            color:white;
+                            font-size:16px;
+                            line-height:1;
+                            display:flex;
+                          ">🛡️</span>
+                        </div>
+                      `,
+                      className: "custom-div-icon",
+                      iconSize: [36, 36],
+                      iconAnchor: [18, 36],
+                      popupAnchor: [0, -36],
+                    });
+                    return (
+                      <Marker key={`katana-${katana.id}`} position={[lat, lng]} icon={icon}>
+                        <Popup maxWidth={300} minWidth={240}>
+                          <div className="space-y-3 text-sm">
+                            <div>
+                              <p className="text-xs text-gray-400 font-medium">Kelurahan</p>
+                              <p className="font-bold text-gray-900">{katana.kelurahan}</p>
+                            </div>
+                            <div className="grid grid-cols-2 gap-2">
+                              <div>
+                                <p className="text-xs text-gray-400">Kecamatan</p>
+                                <p className="font-medium text-gray-700">{katana.kecamatan}</p>
+                              </div>
+                              <div>
+                                <p className="text-xs text-gray-400">Pembentukan</p>
+                                <p className="font-medium text-gray-700">{katana.pembentukan}</p>
+                              </div>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-400">Ancaman Bencana</p>
+                              <p className="font-medium text-gray-700">{katana.ancaman_bencana}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-400">Sumber Dana</p>
+                              <p className="font-medium text-gray-700">{katana.sumber_dana}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-400">Koordinat</p>
+                              <p className="font-mono text-xs text-gray-600">{lat.toFixed(4)}, {lng.toFixed(4)}</p>
+                            </div>
+                            <div className="bg-emerald-50 rounded-lg p-3 border border-emerald-100">
+                              <p className="text-xs font-semibold text-emerald-700">✓ Forum Penanggulangan Risiko Bencana Kelurahan</p>
+                            </div>
+                          </div>
+                        </Popup>
+                      </Marker>
+                    );
+                  })}
                 </MapContainer>
               )}
 
@@ -446,13 +694,35 @@ export default function DisasterMap() {
                     </svg>
                   </button>
                   {legendOpen && (
-                    <div className="px-4 pb-3 grid grid-cols-2 sm:grid-cols-1 gap-2 border-t border-gray-100 pt-3">
-                      {ALL_TYPES.map((t) => (
-                        <div key={t} className="flex items-center gap-2">
-                          <span className="w-3.5 h-3.5 rounded-full border-2 border-white shadow-sm shrink-0" style={{ background: getColorForType(t) }}></span>
-                          <span className="text-xs font-medium text-gray-700">{t}</span>
+                    <div className="px-4 pb-3 border-t border-gray-100 pt-3">
+                      {mapMode === "bencana" && (
+                        <div className="grid grid-cols-2 sm:grid-cols-1 gap-2">
+                          {ALL_TYPES.map((t) => (
+                            <div key={t} className="flex items-center gap-2">
+                              <span className="w-3.5 h-3.5 rounded-full border-2 border-white shadow-sm shrink-0" style={{ background: getColorForType(t) }}></span>
+                              <span className="text-xs font-medium text-gray-700">{t}</span>
+                            </div>
+                          ))}
                         </div>
-                      ))}
+                      )}
+                      {mapMode === "smab" && (
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <span className="w-6 h-6 flex items-center justify-center text-lg">🏫</span>
+                            <span className="text-xs font-medium text-gray-700">Sekolah/Madrasah Aman Bencana</span>
+                          </div>
+                          <p className="text-xs text-gray-500 mt-2">Warna biru menunjukkan lokasi SMAB yang telah tersertifikasi dalam penanggulangan bencana.</p>
+                        </div>
+                      )}
+                      {mapMode === "katana" && (
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <span className="w-6 h-6 flex items-center justify-center text-lg">🛡️</span>
+                            <span className="text-xs font-medium text-gray-700">Forum Penanggulangan Risiko Bencana</span>
+                          </div>
+                          <p className="text-xs text-gray-500 mt-2">Warna hijau menunjukkan lokasi KATANA (FPRB Kelurahan) di Kota Semarang.</p>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -467,89 +737,183 @@ export default function DisasterMap() {
             </div>
           </div>
 
-          {/* Statistik Ringkas */}
-          <div className="px-4 lg:px-0">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-              <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition flex flex-col">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-orange-600 text-white flex items-center justify-center shadow">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                  </div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Total</span>
-                </div>
-                <p className="text-2xl font-extrabold text-gray-900">{stats.total}</p>
-                <p className="text-xs text-gray-500">Laporan tampil</p>
-              </div>
-
-              {ALL_TYPES.slice(0, 3).map((type) => (
-                <div key={type} className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="w-9 h-9 rounded-xl flex items-center justify-center text-white shadow text-sm" style={{ background: getColorForType(type) }}>
-                      {getEmojiForType(type)}
-                    </span>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 truncate max-w-[70px]">{type}</span>
-                  </div>
-                  <p className="text-2xl font-extrabold" style={{ color: getColorForType(type) }}>{stats.perType[type] || 0}</p>
-                  <p className="text-xs text-gray-500">Laporan {type}</p>
-                </div>
-              ))}
-            </div>
-
-            {/* Breakdown full */}
-            <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-brand-500"></span>
-                  Breakdown per Jenis Bencana
-                </h3>
-                <div className="space-y-2">
-                  {ALL_TYPES.map((type) => {
-                    const count = stats.perType[type] || 0;
-                    const pct = stats.total > 0 ? Math.round((count / stats.total) * 100) : 0;
-                    return (
-                      <div key={type} className="flex items-center gap-3">
-                        <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: getColorForType(type) }}></span>
-                        <span className="text-sm text-gray-700 flex-1 truncate">{type}</span>
-                        <div className="w-20 h-1.5 bg-gray-100 rounded-full overflow-hidden hidden sm:block">
-                          <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: getColorForType(type) }}></div>
-                        </div>
-                        <span className="text-sm font-bold text-gray-900 w-6 text-right">{count}</span>
+           {/* Statistik Ringkas */}
+           <div className="px-4 lg:px-0">
+            {mapMode === "bencana" && (
+              <>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                  <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition flex flex-col">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-orange-600 text-white flex items-center justify-center shadow">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
                       </div>
-                    );
-                  })}
-                </div>
-              </div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Total</span>
+                    </div>
+                    <p className="text-2xl font-extrabold text-gray-900">{stats.total}</p>
+                    <p className="text-xs text-gray-500">Laporan tampil</p>
+                  </div>
 
-              <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                  Breakdown per Status
-                </h3>
-                <div className="space-y-2">
-                  {ALL_STATUS.map((status) => {
-                    const count = stats.perStatus[status] || 0;
-                    const pct = stats.total > 0 ? Math.round((count / stats.total) * 100) : 0;
-                    const meta = STATUS_META[status];
-                    return (
-                      <div key={status} className="flex items-center gap-3">
-                        <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: meta.color }}></span>
-                        <span className="text-sm text-gray-700 flex-1 capitalize">{meta.label}</span>
-                        <div className="w-20 h-1.5 bg-gray-100 rounded-full overflow-hidden hidden sm:block">
-                          <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: meta.color }}></div>
-                        </div>
-                        <span className="text-sm font-bold text-gray-900 w-6 text-right">{count}</span>
+                  {ALL_TYPES.slice(0, 3).map((type) => (
+                    <div key={type} className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="w-9 h-9 rounded-xl flex items-center justify-center text-white shadow text-sm" style={{ background: getColorForType(type) }}>
+                          {getEmojiForType(type)}
+                        </span>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 truncate max-w-[70px]">{type}</span>
                       </div>
-                    );
-                  })}
+                      <p className="text-2xl font-extrabold" style={{ color: getColorForType(type) }}>{stats.perType[type] || 0}</p>
+                      <p className="text-xs text-gray-500">Laporan {type}</p>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            </div>
 
-            <p className="text-center text-xs text-gray-400 mt-4 px-4">
-              Data bersumber dari laporan masyarakat terverifikasi • Klik marker untuk detail • Privasi pelapor dilindungi
-            </p>
+                {/* Breakdown full */}
+                <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-brand-500"></span>
+                      Breakdown per Jenis Bencana
+                    </h3>
+                    <div className="space-y-2">
+                      {ALL_TYPES.map((type) => {
+                        const count = stats.perType[type] || 0;
+                        const pct = stats.total > 0 ? Math.round((count / stats.total) * 100) : 0;
+                        return (
+                          <div key={type} className="flex items-center gap-3">
+                            <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: getColorForType(type) }}></span>
+                            <span className="text-sm text-gray-700 flex-1 truncate">{type}</span>
+                            <div className="w-20 h-1.5 bg-gray-100 rounded-full overflow-hidden hidden sm:block">
+                              <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: getColorForType(type) }}></div>
+                            </div>
+                            <span className="text-sm font-bold text-gray-900 w-6 text-right">{count}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                      Breakdown per Status
+                    </h3>
+                    <div className="space-y-2">
+                      {ALL_STATUS.map((status) => {
+                        const count = stats.perStatus[status] || 0;
+                        const pct = stats.total > 0 ? Math.round((count / stats.total) * 100) : 0;
+                        const meta = STATUS_META[status];
+                        return (
+                          <div key={status} className="flex items-center gap-3">
+                            <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: meta.color }}></span>
+                            <span className="text-sm text-gray-700 flex-1 capitalize">{meta.label}</span>
+                            <div className="w-20 h-1.5 bg-gray-100 rounded-full overflow-hidden hidden sm:block">
+                              <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: meta.color }}></div>
+                            </div>
+                            <span className="text-sm font-bold text-gray-900 w-6 text-right">{count}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                <p className="text-center text-xs text-gray-400 mt-4 px-4">
+                  Data bersumber dari laporan masyarakat terverifikasi • Klik marker untuk detail • Privasi pelapor dilindungi
+                </p>
+              </>
+            )}
+
+            {mapMode === "smab" && (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                      Statistik SMAB
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-700">Total SMAB</span>
+                        <span className="text-2xl font-bold text-blue-600">{smabData.length}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-700">Kecamatan</span>
+                        <span className="text-lg font-bold text-gray-900">{new Set(smabData.map(s => s.kecamatan)).size}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                      Tahun Pembentukan
+                    </h3>
+                    <div className="space-y-2">
+                      {[...new Set(smabData.map(s => s.tahun_pembentukan))].sort((a, b) => a - b).map((year) => {
+                        const count = smabData.filter(s => s.tahun_pembentukan === year).length;
+                        return (
+                          <div key={year} className="flex items-center justify-between">
+                            <span className="text-sm text-gray-700">{year}</span>
+                            <span className="text-sm font-bold text-gray-900">{count}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                <p className="text-center text-xs text-gray-400 mt-4 px-4">
+                  SMAB = Satuan Pendidikan Aman Bencana • Klik marker untuk detail lokasi
+                </p>
+              </>
+            )}
+
+            {mapMode === "katana" && (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                      Statistik KATANA
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-700">Total KATANA</span>
+                        <span className="text-2xl font-bold text-emerald-600">{katanaData.length}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-700">Kecamatan</span>
+                        <span className="text-lg font-bold text-gray-900">{new Set(katanaData.map(k => k.kecamatan)).size}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-3 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                      Tahun Pembentukan
+                    </h3>
+                    <div className="space-y-2">
+                      {[...new Set(katanaData.map(k => k.pembentukan))].sort((a, b) => a - b).map((year) => {
+                        const count = katanaData.filter(k => k.pembentukan === year).length;
+                        return (
+                          <div key={year} className="flex items-center justify-between">
+                            <span className="text-sm text-gray-700">{year}</span>
+                            <span className="text-sm font-bold text-gray-900">{count}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                <p className="text-center text-xs text-gray-400 mt-4 px-4">
+                  KATANA = Forum Penanggulangan Risiko Bencana Kelurahan • Klik marker untuk detail lokasi
+                </p>
+              </>
+            )}
           </div>
         </div>
       </div>
