@@ -66,6 +66,13 @@ app.use((req, res) => {
 // Global error handler (menangkap error dari multer dll)
 app.use((err, req, res, next) => {
   console.error(err);
+  // handle multer file limit errors dengan pesan user-friendly
+  if (err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(400).json({ message: 'Ukuran foto maksimal 5MB per file' });
+  }
+  if (err.code === 'LIMIT_FILE_COUNT' || err.code === 'LIMIT_UNEXPECTED_FILE') {
+    return res.status(400).json({ message: 'Maksimal 5 foto' });
+  }
   res.status(err.status || 500).json({
     message: err.message || 'Terjadi kesalahan server',
   });

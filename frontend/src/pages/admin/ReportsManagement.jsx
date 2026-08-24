@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getReports, updateReportStatus } from '../../services/reportService';
+import { getReports, updateReportStatus, deleteReport } from '../../services/reportService';
 
 const STATUS_OPTIONS = ['baru', 'diverifikasi', 'ditindaklanjuti', 'selesai'];
 const STATUS_COLOR = {
@@ -55,6 +55,16 @@ export default function ReportsManagement() {
       loadReports();
     } catch (err) {
       alert(err.response?.data?.message || 'Gagal update status');
+    }
+  };
+
+  const handleDelete = async (id, code) => {
+    if (!confirm(`Hapus laporan ${code}? Tindakan tidak bisa dibatalkan.`)) return;
+    try {
+      await deleteReport(id);
+      loadReports();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Gagal hapus laporan');
     }
   };
 
@@ -143,6 +153,7 @@ export default function ReportsManagement() {
                   <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-500">Lokasi</th>
                   <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-500 text-center">Status</th>
                   <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-500 text-center">Ubah Status</th>
+                  <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-500 text-center">Aksi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -175,6 +186,17 @@ export default function ReportsManagement() {
                       </td>
                       <td className="py-4 px-6 max-w-xs">
                         <p className="text-sm text-gray-600 line-clamp-2">{r.address}</p>
+                        <div className="flex gap-1 mt-1 flex-wrap">
+                          {r.latitude && r.longitude ? <span className="text-[11px] bg-emerald-50 text-emerald-700 rounded-full px-2 py-0.5">📍 {parseFloat(r.latitude).toFixed(3)}, {parseFloat(r.longitude).toFixed(3)}</span> : <span className="text-[11px] bg-amber-50 text-amber-700 rounded-full px-2 py-0.5">tanpa koordinat</span>}
+                          {(r.photos?.length > 0 || r.photo_url) && <span className="text-[11px] bg-gray-100 rounded-full px-2 py-0.5">📷 {(r.photos || [r.photo_url]).filter(Boolean).length}/5</span>}
+                        </div>
+                        {(r.photos?.length > 0 || r.photo_url) && (
+                          <div className="flex gap-1 mt-2">
+                            {(r.photos || [r.photo_url]).filter(Boolean).slice(0,5).map((url, idx) => (
+                              <img key={idx} src={`${import.meta.env.VITE_API_URL.replace('/api','')}${url}`} alt="" className="w-10 h-10 object-cover rounded border" />
+                            ))}
+                          </div>
+                        )}
                       </td>
                       <td className="py-4 px-6 text-center">
                         <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r ${STATUS_COLOR[r.status]} text-white shadow-sm`}>
@@ -193,11 +215,22 @@ export default function ReportsManagement() {
                           ))}
                         </select>
                       </td>
+                      <td className="py-4 px-6 text-center">
+                        <button
+                          onClick={() => handleDelete(r.id, r.tracking_code)}
+                          className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-xl transition"
+                          title="Hapus laporan"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="6" className="py-20 text-center">
+                    <td colSpan="7" className="py-20 text-center">
                       <div className="flex flex-col items-center gap-4">
                         <div className="w-20 h-20 rounded-full bg-gray-50 flex items-center justify-center">
                           <svg className="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">

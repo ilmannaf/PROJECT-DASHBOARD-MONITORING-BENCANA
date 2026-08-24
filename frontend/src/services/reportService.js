@@ -26,3 +26,8 @@ export const getMyReports = async () => {
   const { data } = await api.get('/reports/my-reports');
   return data;
 };
+
+export const deleteReport = async (id) => {
+  const { data } = await api.delete(`/reports/${id}`);
+  return data;
+};

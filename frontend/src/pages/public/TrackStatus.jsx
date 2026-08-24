@@ -127,7 +127,15 @@ export default function TrackStatus() {
               <p><span className="text-gray-400">Jenis:</span> {result.report.disaster_type}</p>
               <p><span className="text-gray-400">Lokasi:</span> {result.report.address}</p>
               <p><span className="text-gray-400">Dilaporkan:</span> {new Date(result.report.created_at).toLocaleString('id-ID')}</p>
+              {(result.report.photos?.length > 0 || result.report.photo_url) && <p className="text-gray-400">Foto: {(result.report.photos || [result.report.photo_url]).filter(Boolean).length}/5</p>}
             </div>
+            {(result.report.photos?.length > 0 || result.report.photo_url) && (
+              <div className="grid grid-cols-3 gap-2 mb-5">
+                {(result.report.photos || [result.report.photo_url]).filter(Boolean).slice(0,5).map((url, idx) => (
+                  <img key={idx} src={`${(import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace('/api','')}${url}`} alt={`foto ${idx}`} className="w-full h-24 object-cover rounded-lg border" />
+                ))}
+              </div>
+            )}
 
             {result.report.latitude && result.report.longitude && (
               <div className="mb-5">

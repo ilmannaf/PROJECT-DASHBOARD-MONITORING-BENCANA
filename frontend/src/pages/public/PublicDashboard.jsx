@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login, register, isAuthenticated, getCurrentUser, logout } from '../../services/authService';
-import { getMyReports } from '../../services/reportService';
+import { getMyReports, trackReport } from '../../services/reportService';
 
 const STATUS_COLOR = {
   baru: 'bg-red-100 text-red-700',
@@ -19,21 +19,72 @@ export default function PublicDashboard() {
 
   const navigate = useNavigate();
 
+  const [refreshing, setRefreshing] = useState(false);
   const loadReports = async () => {
     try {
-      const data = await getMyReports();
-      setReports(data);
+      setRefreshing(true);
+      let merged = [];
+      // 1. laporan ter-link ke akun pelapor (via reporter_user_id)
+      if (isAuthenticated()) {
+        try {
+          const data = await getMyReports();
+          if (Array.isArray(data)) merged = [...data];
+        } catch (e) {
+          if (e.response?.status === 401 || e.response?.status === 403) {
+            setError('Sesi habis, silakan login ulang');
+            setTab('login');
+          }
+          console.error(e);
+        }
+      }
+      // 2. laporan anonim dari localStorage (tracking codes) -> fetch via /track
+      try {
+        const codes = JSON.parse(localStorage.getItem('myReportCodes') || '[]');
+        const anonToFetch = codes.filter(c => !merged.some(r => r.tracking_code === c));
+        if (anonToFetch.length > 0) {
+          const fetched = await Promise.all(
+            anonToFetch.map(async (code) => {
+              try {
+                const { report } = await trackReport(code);
+                return report;
+              } catch { return null; }
+            })
+          );
+          merged = [...merged, ...fetched.filter(Boolean)];
+          // sort by created_at desc
+          merged.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+        }
+      } catch {}
+      setReports(merged);
     } catch (err) {
       console.error(err);
+    } finally {
+      setRefreshing(false);
     }
   };
 
   useEffect(() => {
     if (isAuthenticated()) {
       setTab('dashboard');
-      loadReports();
     }
   }, []);
+
+  // load whenever tab becomes dashboard + polling + focus refresh
+  useEffect(() => {
+    if (tab === 'dashboard' && isAuthenticated()) {
+      loadReports();
+      const interval = setInterval(loadReports, 15000); // auto refresh every 15s
+      const onFocus = () => loadReports();
+      const onVisibility = () => { if (document.visibilityState === 'visible') loadReports(); };
+      window.addEventListener('focus', onFocus);
+      document.addEventListener('visibilitychange', onVisibility);
+      return () => {
+        clearInterval(interval);
+        window.removeEventListener('focus', onFocus);
+        document.removeEventListener('visibilitychange', onVisibility);
+      };
+    }
+  }, [tab]);
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
@@ -79,6 +130,8 @@ export default function PublicDashboard() {
           selectedReport={selectedReport}
           setSelectedReport={setSelectedReport}
           navigate={navigate}
+          onRefresh={loadReports}
+          refreshing={refreshing}
         />
       ) : (
         <AuthView
@@ -95,7 +148,7 @@ export default function PublicDashboard() {
   );
 }
 
-function DashboardView({ reports, selectedReport, setSelectedReport, navigate }) {
+function DashboardView({ reports, selectedReport, setSelectedReport, navigate, onRefresh, refreshing }) {
   const user = getCurrentUser('public');
 
   const total = reports.length;
@@ -191,10 +244,22 @@ function DashboardView({ reports, selectedReport, setSelectedReport, navigate })
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
               Laporan Saya
             </h3>
+            <button
+              onClick={onRefresh}
+              disabled={refreshing}
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 hover:text-brand-700 bg-brand-50 hover:bg-brand-100 border border-brand-100 rounded-full px-3 py-1.5 transition disabled:opacity-50"
+            >
+              <svg className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              {refreshing ? 'Memuat...' : 'Refresh'}
+            </button>
+          </div>
             {reports.length === 0 ? (
               <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center shadow-sm">
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
@@ -236,6 +301,8 @@ function DashboardView({ reports, selectedReport, setSelectedReport, navigate })
                         </td>
                         <td className="py-3 px-6 text-gray-500 text-sm">
                           {new Date(r.created_at).toLocaleDateString('id-ID')}
+                          {(r.photos?.length > 0 || r.photo_url) && <span className="ml-2 text-[11px] bg-gray-100 rounded-full px-2 py-0.5">📷 {(r.photos || [r.photo_url]).filter(Boolean).length}</span>}
+                          {r.latitude && r.longitude ? <span className="ml-1 text-[11px] bg-emerald-50 text-emerald-700 rounded-full px-2 py-0.5">📍</span> : <span className="ml-1 text-[11px] bg-amber-50 text-amber-700 rounded-full px-2 py-0.5">tanpa titik</span>}
                         </td>
                         <td className="py-3 px-6">
                           <button
@@ -624,14 +691,19 @@ function ReportModal({ report, onClose }) {
             </div>
           </div>
 
-          {report.photo_url && (
+          {(report.photos?.length > 0 || report.photo_url) && (
             <div className="mb-4">
-              <p className="text-gray-400 text-xs mb-1">Foto</p>
-              <img
-                src={`${import.meta.env.VITE_API_URL.replace('/api', '')}${report.photo_url}`}
-                alt="Bencana"
-                className="w-full h-48 object-cover rounded-lg border border-gray-200"
-              />
+              <p className="text-gray-400 text-xs mb-1">Foto ({(report.photos || [report.photo_url]).length}/{5})</p>
+              <div className="grid grid-cols-2 gap-2">
+                {(report.photos || [report.photo_url]).filter(Boolean).slice(0,5).map((url, idx) => (
+                  <img
+                    key={idx}
+                    src={`${import.meta.env.VITE_API_URL.replace('/api', '')}${url}`}
+                    alt={`Bencana ${idx+1}`}
+                    className="w-full h-32 object-cover rounded-lg border border-gray-200"
+                  />
+                ))}
+              </div>
             </div>
           )}
         </div>

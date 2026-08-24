@@ -1,8 +1,24 @@
 const pool = require('../config/db');
 const generateTrackingCode = require('../utils/generateTrackingCode');
 
+// Helper untuk ambil daftar foto dari request (support photo single + photos array max 5)
+function extractUploadedFiles(req) {
+  const files = [];
+  if (req.files) {
+    if (Array.isArray(req.files)) {
+      files.push(...req.files);
+    } else {
+      if (req.files.photos) files.push(...req.files.photos);
+      if (req.files.photo) files.push(...req.files.photo);
+    }
+  }
+  if (req.file) files.push(req.file);
+  return files;
+}
+
 // CREATE - Submit laporan baru (publik, tanpa login)
 exports.createReport = async (req, res) => {
+  const conn = await pool.getConnection();
   try {
     const { reporter_name, reporter_phone, disaster_type, description, latitude, longitude, address } = req.body;
 
@@ -10,31 +26,70 @@ exports.createReport = async (req, res) => {
       return res.status(400).json({ message: 'Nama pelapor, jenis bencana, dan alamat wajib diisi' });
     }
 
+    const files = extractUploadedFiles(req);
+    if (files.length > 5) {
+      return res.status(400).json({ message: 'Maksimal 5 foto' });
+    }
+
     const tracking_code = generateTrackingCode();
-    const photo_url = req.file ? `/uploads/${req.file.filename}` : null;
+    const photo_url = files.length > 0 ? `/uploads/${files[0].filename}` : null;
 
     const reporter_user_id = req.user?.role === 'pelapor' ? req.user.id : null;
 
-    const [result] = await pool.query(
+    // koordinat opsional - jika tidak ada tetap simpan null agar bisa tanpa titik peta
+    const lat = latitude && latitude !== '' ? parseFloat(latitude) : null;
+    const lng = longitude && longitude !== '' ? parseFloat(longitude) : null;
+    const validLat = lat !== null && !isNaN(lat) ? lat : null;
+    const validLng = lng !== null && !isNaN(lng) ? lng : null;
+
+    await conn.beginTransaction();
+    const [result] = await conn.query(
       `INSERT INTO reports (tracking_code, reporter_user_id, reporter_name, reporter_phone, disaster_type, description, photo_url, latitude, longitude, address, status)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'baru')`,
-      [tracking_code, reporter_user_id, reporter_name, reporter_phone || null, disaster_type, description || null, photo_url, latitude || null, longitude || null, address]
+      [tracking_code, reporter_user_id, reporter_name, reporter_phone || null, disaster_type, description || null, photo_url, validLat, validLng, address]
     );
+
+    const reportId = result.insertId;
+    // simpan semua foto ke report_photos (untuk fitur max 5)
+    for (const f of files) {
+      const url = `/uploads/${f.filename}`;
+      await conn.query('INSERT INTO report_photos (report_id, photo_url) VALUES (?, ?)', [reportId, url]);
+    }
+    await conn.commit();
 
     // Kirim notifikasi real-time ke dashboard admin
     const io = req.app.get('io');
-    io.emit('new_report', { id: result.insertId, tracking_code, disaster_type, address, status: 'baru' });
+    io.emit('new_report', { id: reportId, tracking_code, disaster_type, address, status: 'baru', latitude: validLat, longitude: validLng });
 
     res.status(201).json({
       message: 'Laporan berhasil dikirim',
       tracking_code,
-      report_id: result.insertId,
+      report_id: reportId,
     });
   } catch (err) {
+    await conn.rollback();
     console.error(err);
     res.status(500).json({ message: 'Terjadi kesalahan server' });
+  } finally {
+    conn.release();
   }
 };
+
+// Helper untuk attach foto-foto ke list reports
+async function attachPhotosToReports(reports) {
+  if (reports.length === 0) return reports;
+  const ids = reports.map((r) => r.id);
+  const [photos] = await pool.query(`SELECT report_id, photo_url FROM report_photos WHERE report_id IN (?) ORDER BY id ASC`, [ids]);
+  const map = {};
+  photos.forEach((p) => {
+    if (!map[p.report_id]) map[p.report_id] = [];
+    map[p.report_id].push(p.photo_url);
+  });
+  return reports.map((r) => ({
+    ...r,
+    photos: map[r.id] || (r.photo_url ? [r.photo_url] : []),
+  }));
+}
 
 // READ - List semua laporan (admin/petugas, butuh login)
 exports.getReports = async (req, res) => {
@@ -60,7 +115,8 @@ exports.getReports = async (req, res) => {
     query += ' ORDER BY r.created_at DESC';
 
     const [rows] = await pool.query(query, params);
-    res.json(rows);
+    const withPhotos = await attachPhotosToReports(rows);
+    res.json(withPhotos);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Terjadi kesalahan server' });
@@ -76,8 +132,8 @@ exports.getMyReports = async (req, res) => {
       'SELECT * FROM reports WHERE reporter_user_id = ? ORDER BY created_at DESC',
       [userId]
     );
-
-    res.json(rows);
+    const withPhotos = await attachPhotosToReports(rows);
+    res.json(withPhotos);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Terjadi kesalahan server' });
@@ -98,8 +154,11 @@ exports.getReportByTrackingCode = async (req, res) => {
       'SELECT * FROM report_logs WHERE report_id = ? ORDER BY created_at ASC',
       [rows[0].id]
     );
+    const [photos] = await pool.query('SELECT photo_url FROM report_photos WHERE report_id = ? ORDER BY id ASC', [rows[0].id]);
+    const report = { ...rows[0], photos: photos.map((p) => p.photo_url) };
+    if (report.photos.length === 0 && report.photo_url) report.photos = [report.photo_url];
 
-    res.json({ report: rows[0], history: logs });
+    res.json({ report, history: logs });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Terjadi kesalahan server' });
@@ -114,6 +173,16 @@ exports.getPublicReports = async (req, res) => {
        FROM reports
        ORDER BY created_at DESC`
     );
+    // attach photos
+    let photoMap = {};
+    if (rows.length > 0) {
+      const ids = rows.map((r) => r.id);
+      const [photos] = await pool.query(`SELECT report_id, photo_url FROM report_photos WHERE report_id IN (?)`, [ids]);
+      photos.forEach((p) => {
+        if (!photoMap[p.report_id]) photoMap[p.report_id] = [];
+        photoMap[p.report_id].push(p.photo_url);
+      });
+    }
     // Filter: hanya kembalikan field aman; reporter_* sengaja tidak di-select
     const sanitized = rows.map((r) => ({
       id: r.id,
@@ -125,10 +194,40 @@ exports.getPublicReports = async (req, res) => {
       address: r.address,
       status: r.status,
       photo_url: r.photo_url,
+      photos: photoMap[r.id] || (r.photo_url ? [r.photo_url] : []),
       created_at: r.created_at,
       updated_at: r.updated_at,
     }));
     res.json(sanitized);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Terjadi kesalahan server' });
+  }
+};
+
+// DELETE - Hapus laporan (admin/petugas)
+exports.deleteReport = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [existing] = await pool.query('SELECT * FROM reports WHERE id = ?', [id]);
+    if (existing.length === 0) {
+      return res.status(404).json({ message: 'Laporan tidak ditemukan' });
+    }
+    // hapus file foto fisik jika ada
+    const [photos] = await pool.query('SELECT photo_url FROM report_photos WHERE report_id = ?', [id]);
+    const fs = require('fs');
+    const path = require('path');
+    const allUrls = [...photos.map(p=>p.photo_url), existing[0].photo_url].filter(Boolean);
+    for (const url of allUrls) {
+      try {
+        const filePath = path.join(__dirname, '../../uploads', path.basename(url));
+        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+      } catch {}
+    }
+    await pool.query('DELETE FROM reports WHERE id = ?', [id]);
+    const io = req.app.get('io');
+    io.emit('report_deleted', { id: Number(id) });
+    res.json({ message: 'Laporan berhasil dihapus' });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Terjadi kesalahan server' });

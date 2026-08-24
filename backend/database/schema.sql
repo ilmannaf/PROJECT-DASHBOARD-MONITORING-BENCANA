@@ -49,6 +49,15 @@ CREATE TABLE report_logs (
   FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
 );
 
+-- Tabel REPORT_PHOTOS (foto multiple max 5 per laporan)
+CREATE TABLE report_photos (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  report_id INT NOT NULL,
+  photo_url VARCHAR(255) NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (report_id) REFERENCES reports(id) ON DELETE CASCADE
+);
+
 -- Tabel POSKO
 CREATE TABLE posko (
   id INT AUTO_INCREMENT PRIMARY KEY,

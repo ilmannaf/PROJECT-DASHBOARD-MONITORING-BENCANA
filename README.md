@@ -20,19 +20,20 @@ PROJECT-DASHBOARD-MONITORING-BENCANA/
 ### 🌐 Public Features
 - **Landing Page Modern** - Full-bleed hero foto kantor (≈90vh) dengan overlay gradient, navbar transparan, dan judul besar "BPBD KOTA SEMARANG"
 - **Login Publik** - Split-screen seperti admin dengan penanda badge "PORTAL PUBLIK" (aksen biru) pembeda dari admin
-- **Laporan Bencana** - Form pelaporan dengan GPS dan upload foto
-- **Lacak Status** - Tracking laporan dengan kode unik + peta lokasi
-- **Dashboard Pelapor** - Login/register untuk melihat laporan pribadi
+- **Laporan Bencana** - Form pelaporan dengan peta interaktif (klik/drag marker, GPS opsional), koordinat opsional (laporan tetap terkirim tanpa titik), dan upload **max 5 foto** (JPG/PNG/WEBP 5MB)
+- **Lacak Status** - Tracking laporan dengan kode unik `BPBD-2026-XXXX` + peta lokasi & galeri foto
+- **Dashboard Pelapor** - Login/register untuk melihat laporan pribadi (ter-link via `reporter_user_id` + fallback `localStorage` tracking codes), auto-refresh 15s, tombol Refresh, badge 📷/📍
 
 ### 🔐 Admin/Petugas Features
 - **Dashboard Admin** - Statistik dan charts (Recharts)
-- **Kelola Laporan** - Update status, filter, assign petugas
+- **Kelola Laporan** - Update status, filter, assign petugas, **hapus laporan** (icon 🗑️ dengan konfirmasi), preview foto & koordinat
 - **Pendataan Bencana** - Formulir detail kejadian (kronologi, korban, terdampak, kerugian)
 - **Download PDF** - Ekspor formulir pendataan bencana sebagai dokumen resmi BPBD
 - **Inventaris** - Manajemen logistik dan peralatan
 - **Kendaraan** - Fleet management dengan status service
 - **Posko** - Kelola titik posko pengungsian
 - **Kegiatan** - Laporan kegiatan lapangan dengan dokumentasi
+- **Peta Sebaran** - `/peta` publik tanpa login, filter jenis/status, marker warna per bencana
 
 ### 🔥 Highlight Features
 - ✅ Logo resmi BPBD (gambar) menggantikan teks logo di seluruh halaman
@@ -44,10 +45,12 @@ PROJECT-DASHBOARD-MONITORING-BENCANA/
 - ✅ Formulir pendataan bencana dengan field korban/terdampak terpisah
 - ✅ Privasi sumber info — nama & no. HP bisa dikosongkan (opsional)
 - ✅ Export PDF formulir pendataan (pdfkit)
-- ✅ Google Maps integration di halaman lacak
+- ✅ Google Maps + Leaflet integration di halaman lacak & peta sebaran
 - ✅ Real-time tracking dengan kode `BPBD-2026-XXXX`
-- ✅ Role-based authorization (admin/petugas)
-- ✅ Upload foto untuk laporan dan dokumentasi
+- ✅ Role-based authorization (admin/petugas/pelapor - fix ENUM pelapor)
+- ✅ Upload **max 5 foto** per laporan (report_photos table) + koordinat opsional dengan map picker presisi
+- ✅ Dashboard publik auto-refresh & localStorage fallback untuk laporan anonim
+- ✅ Hapus laporan di admin dengan hapus file fisik
 
 ---
 
@@ -88,6 +91,7 @@ Jika database sudah pernah dibuat sebelumnya, jalankan migration yang ada di `ba
 SOURCE backend/database/migration_role_pelapor_reporter_user.sql;
 SOURCE backend/database/migration_disaster_records_sumber_info_optional.sql;
 SOURCE backend/database/migration_disaster_records_korban_terdampak.sql;
+SOURCE backend/database/migration_report_photos.sql;
 ```
 
 ### 2. Backend
@@ -136,9 +140,10 @@ npm run dev
 
 ### Public
 - `/` - Landing page
-- `/dashboard` - Public dashboard pelapor (login required)
-- `/lapor` - Form pelaporan bencana
+- `/dashboard` - Public dashboard pelapor (login required, auto-refresh + localStorage tracking codes)
+- `/lapor` - Form pelaporan bencana (map picker, max 5 foto)
 - `/lacak` - Cek status laporan via tracking code
+- `/peta` - Peta sebaran bencana publik (tanpa login, filter & marker warna)
 
 ### Admin
 - `/admin/login` - Login admin/petugas (split-screen)
@@ -154,12 +159,13 @@ npm run dev
 
 ## 🗄️ Database Schema
 
-**8 Tables:**
+**9 Tables:**
 
 | Table | Deskripsi |
 |-------|-----------|
-| `users` | Admin, petugas & pelapor BPBD |
-| `reports` | Laporan bencana dari publik |
+| `users` | Admin, petugas & pelapor BPBD (ENUM fix pelapor) |
+| `reports` | Laporan bencana dari publik (koordinat opsional, photo_url legacy) |
+| `report_photos` | Foto multiple max 5 per laporan (FK reports) |
 | `report_logs` | History perubahan status laporan |
 | `posko` | Lokasi posko pengungsian |
 | `inventory_items` | Logistik & peralatan |
@@ -183,11 +189,13 @@ Data korban disimpan dalam field terpisah dan otomatis dirangkum ke kolom teks `
 - `POST /api/auth/login` - Login
 
 ### Reports
-- `POST /api/reports` - Submit laporan baru (publik)
-- `GET /api/reports` - List semua laporan (auth required)
-- `GET /api/reports/my-reports` - List laporan user yang login
-- `GET /api/reports/track/:code` - Cek status via tracking code (publik)
+- `POST /api/reports` - Submit laporan baru (publik, `multipart` max 5 foto `photos`/`photo`, koordinat opsional, `optionalVerifyToken` link `reporter_user_id` jika pelapor login)
+- `GET /api/reports/public` - List untuk peta sebaran (publik, tanpa data sensitif, include `photos[]`)
+- `GET /api/reports` - List semua laporan (admin/petugas)
+- `GET /api/reports/my-reports` - List laporan user yang login (merge `report_photos`, fallback localStorage di frontend)
+- `GET /api/reports/track/:code` - Cek status via tracking code (publik, include `photos[]`)
 - `PATCH /api/reports/:id/status` - Update status laporan (admin/petugas)
+- `DELETE /api/reports/:id` - Hapus laporan + foto (admin/petugas)
 
 ### Disaster Records (Pendataan Bencana)
 - `GET /api/disaster-records` - List pendataan bencana (auth required)
@@ -232,14 +240,17 @@ Sistem menggunakan tema warna oranye konsisten untuk branding BPBD:
 
 - [x] Landing page dengan hero section
 - [x] Admin dashboard dengan charts
-- [x] Laporan bencana publik
-- [x] Tracking status dengan peta
-- [x] Role-based authorization
+- [x] Laporan bencana publik (map picker presisi + max 5 foto + koordinat opsional)
+- [x] Tracking status dengan peta + galeri foto
+- [x] Peta sebaran publik `/peta` tanpa login
+- [x] Role-based authorization (fix ENUM pelapor + reporter_user_id)
 - [x] Pendataan bencana + export PDF
 - [x] Redesign login split-screen (admin & portal publik)
 - [x] Landing page polish (hero, fitur, CTA, footer) + logo gambar BPBD
+- [x] Kelola laporan admin dengan hapus + preview foto/koordinat
+- [x] Dashboard publik dengan auto-refresh & localStorage fallback
 - [ ] Google OAuth login (backend)
-- [ ] Socket.IO live updates (backend ready)
+- [ ] Socket.IO live updates (full real-time)
 - [ ] Mobile app (React Native)
 
 ---

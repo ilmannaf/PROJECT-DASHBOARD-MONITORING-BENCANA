@@ -356,6 +356,16 @@ export default function DisasterMap() {
                                 <p className="text-gray-700 line-clamp-3">{report.description}</p>
                               </div>
                             )}
+                            {(report.photos?.length > 0 || report.photo_url) && (
+                              <div>
+                                <p className="text-xs text-gray-400">Foto ({(report.photos || [report.photo_url]).filter(Boolean).length})</p>
+                                <div className="grid grid-cols-2 gap-1 mt-1">
+                                  {(report.photos || [report.photo_url]).filter(Boolean).slice(0,5).map((url, idx) => (
+                                    <img key={idx} src={`${(import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace('/api','')}${url}`} alt="" className="w-full h-20 object-cover rounded border" onError={(e)=> e.target.style.display='none'} />
+                                  ))}
+                                </div>
+                              </div>
+                            )}
                             {report.tracking_code && (
                               <p className="text-[11px] font-mono text-gray-400">Kode: {report.tracking_code}</p>
                             )}

@@ -11,6 +11,7 @@ USE sistem_kebencanaan;
 
 -- Hapus tabel lama jika ada (urutan penting karena foreign key)
 SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS report_photos;
 DROP TABLE IF EXISTS report_logs;
 DROP TABLE IF EXISTS reports;
 DROP TABLE IF EXISTS activities;
@@ -68,6 +69,15 @@ CREATE TABLE report_logs (
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (report_id) REFERENCES reports(id) ON DELETE CASCADE,
   FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Tabel REPORT_PHOTOS (foto multiple max 5 per laporan)
+CREATE TABLE report_photos (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  report_id INT NOT NULL,
+  photo_url VARCHAR(255) NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (report_id) REFERENCES reports(id) ON DELETE CASCADE
 );
 
 -- Tabel POSKO
