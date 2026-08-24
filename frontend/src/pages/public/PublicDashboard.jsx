@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login, register, isAuthenticated, getCurrentUser, logout } from '../../services/authService';
-import { getReports } from '../../services/reportService';
+import { login, register, isAuthenticated, getCurrentUser, logout, getMyReports } from '../../services/authService';
 
 const STATUS_COLOR = {
   baru: 'bg-red-100 text-red-700',
@@ -21,10 +20,8 @@ export default function PublicDashboard() {
 
   const loadReports = async () => {
     try {
-      const data = await getReports();
-      const user = getCurrentUser('public');
-      const myReports = data.filter(r => r.reporter_name === user?.name);
-      setReports(myReports);
+      const data = await getMyReports();
+      setReports(data);
     } catch (err) {
       console.error(err);
     }
