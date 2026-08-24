@@ -106,6 +106,35 @@ exports.getReportByTrackingCode = async (req, res) => {
   }
 };
 
+// READ - Public reports untuk peta (tanpa data sensitif)
+exports.getPublicReports = async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      `SELECT id, tracking_code, disaster_type, description, latitude, longitude, address, status, photo_url, created_at, updated_at
+       FROM reports
+       ORDER BY created_at DESC`
+    );
+    // Filter: hanya kembalikan field aman; reporter_* sengaja tidak di-select
+    const sanitized = rows.map((r) => ({
+      id: r.id,
+      tracking_code: r.tracking_code,
+      disaster_type: r.disaster_type,
+      description: r.description,
+      latitude: r.latitude,
+      longitude: r.longitude,
+      address: r.address,
+      status: r.status,
+      photo_url: r.photo_url,
+      created_at: r.created_at,
+      updated_at: r.updated_at,
+    }));
+    res.json(sanitized);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Terjadi kesalahan server' });
+  }
+};
+
 // UPDATE - Ubah status laporan (admin/petugas)
 exports.updateReportStatus = async (req, res) => {
   const conn = await pool.getConnection();

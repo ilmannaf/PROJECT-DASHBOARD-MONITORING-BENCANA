@@ -37,6 +37,12 @@ export default function LandingPage() {
 
           <div className="hidden items-center gap-6 md:flex">
             <button
+              onClick={() => navigate("/peta")}
+              className="text-sm font-semibold text-white transition hover:text-orange-300"
+            >
+              Peta Bencana
+            </button>
+            <button
               onClick={() => navigate("/lacak")}
               className="text-sm font-semibold text-white transition hover:text-orange-300"
             >
@@ -96,6 +102,12 @@ export default function LandingPage() {
         {mobileMenuOpen && (
           <div className="absolute inset-x-4 top-20 z-30 space-y-3 rounded-xl border border-white/20 bg-gray-900/95 p-4 shadow-2xl backdrop-blur md:hidden">
             <button
+              onClick={() => navigate("/peta")}
+              className="block w-full rounded-lg px-4 py-2.5 text-left text-sm font-semibold text-white transition hover:bg-white/10"
+            >
+              Peta Bencana
+            </button>
+            <button
               onClick={() => navigate("/lacak")}
               className="block w-full rounded-lg px-4 py-2.5 text-left text-sm font-semibold text-white transition hover:bg-white/10"
             >
@@ -143,6 +155,12 @@ export default function LandingPage() {
                 className="rounded-lg border border-brand-600 bg-brand-600 px-8 py-4 text-sm font-semibold tracking-wider text-white transition hover:bg-brand-700"
               >
                 Laporkan Bencana
+              </button>
+              <button
+                onClick={() => navigate("/peta")}
+                className="rounded-lg border border-white/50 bg-white/10 px-8 py-4 text-sm font-semibold tracking-wider text-white backdrop-blur transition hover:bg-white hover:text-brand-600"
+              >
+                Peta Bencana
               </button>
               <button
                 onClick={() => navigate("/lacak")}
@@ -327,6 +345,11 @@ export default function LandingPage() {
                 <li>
                   <button onClick={() => navigate("/")} className="transition hover:text-orange-300">
                     Beranda
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => navigate("/peta")} className="transition hover:text-orange-300">
+                    Peta Bencana
                   </button>
                 </li>
                 <li>
