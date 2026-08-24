@@ -12,6 +12,7 @@ import ReportForm from './pages/public/ReportForm';
 import TrackStatus from './pages/public/TrackStatus';
 import PublicDashboard from './pages/public/PublicDashboard';
 import LandingPage from './pages/public/LandingPage';
+import DisasterMap from './pages/public/DisasterMap';
 import AdminLayout from './layouts/AdminLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -23,6 +24,7 @@ function App() {
         <Route path="/dashboard" element={<PublicDashboard />} />
         <Route path="/lapor" element={<ReportForm />} />
         <Route path="/lacak" element={<TrackStatus />} />
+        <Route path="/peta" element={<DisasterMap />} />
         <Route path="/admin/login" element={<Login />} />
 
         <Route

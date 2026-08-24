@@ -11,7 +11,19 @@ const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
   .filter(Boolean);
 
 app.use(helmet());
-app.use(cors({ origin: allowedOrigins }));
+app.use(cors({
+  origin: (origin, callback) => {
+    // Izinkan request tanpa origin (mobile apps, curl, Postman)
+    if (!origin) return callback(null, true);
+    // Izinkan semua origin yang sudah didaftarkan
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    // Izinkan semua localhost dengan port berapapun
+    if (/^http:\/\/localhost:\d+$/.test(origin)) return callback(null, true);
+    // Izinkan semua IP lokal (192.168.x.x, 10.x.x.x, 172.16-31.x.x)
+    if (/^http:\/\/(192\.168|10\.|172\.(1[6-9]|2\d|3[01]))\.\d+\.\d+(:\d+)?$/.test(origin)) return callback(null, true);
+    callback(new Error('CORS: origin tidak diizinkan'));
+  },
+}));
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 

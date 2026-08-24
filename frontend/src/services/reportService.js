@@ -21,3 +21,8 @@ export const updateReportStatus = async (id, payload) => {
   const { data } = await api.patch(`/reports/${id}/status`, payload);
   return data;
 };
+
+export const getMyReports = async () => {
+  const { data } = await api.get('/reports/my-reports');
+  return data;
+};
