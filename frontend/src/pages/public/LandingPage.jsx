@@ -10,7 +10,7 @@ export default function LandingPage() {
       {/* ===== HERO ===== */}
       <section className="relative flex h-[90vh] min-h-[600px] flex-col overflow-hidden">
         <img
-          src="/assets/hero-bpbd.jpg"
+          src="/assets/BPBD KOTA SEMARANG.jpeg"
           alt="Kantor BPBD Kota Semarang"
           className="absolute inset-0 h-full w-full object-cover"
         />
@@ -234,7 +234,7 @@ export default function LandingPage() {
               <div className="absolute -inset-4 rounded-[2rem] bg-gradient-to-br from-brand-500/15 to-orange-500/15"></div>
               <div className="absolute -bottom-8 -left-8 h-44 w-44 rounded-full bg-brand-500/10 blur-2xl"></div>
               <img
-                src="/assets/hero-bpbd.jpg"
+                src="/assets/BPBD KOTA SEMARANG.jpeg"
                 alt="Kantor BPBD Kota Semarang"
                 className="relative rounded-3xl border-[6px] border-white shadow-2xl"
               />
