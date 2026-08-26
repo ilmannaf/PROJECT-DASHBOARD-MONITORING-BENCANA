@@ -1,5 +1,6 @@
 const pool = require('../config/db');
 const generateTrackingCode = require('../utils/generateTrackingCode');
+const ExcelJS = require('exceljs');
 
 // Helper untuk ambil daftar foto dari request (support photo single + photos array max 5)
 function extractUploadedFiles(req) {
@@ -293,5 +294,78 @@ exports.updateReportStatus = async (req, res) => {
     res.status(500).json({ message: 'Terjadi kesalahan server' });
   } finally {
     conn.release();
+  }
+};
+
+// EXPORT EXCEL - Laporan Bencana
+exports.exportReportsExcel = async (req, res) => {
+  try {
+    let query = `SELECT r.*, u.name AS assigned_name FROM reports r LEFT JOIN users u ON r.assigned_to = u.id WHERE 1=1`;
+    const params = [];
+
+    if (req.query.status) {
+      query += ' AND r.status = ?';
+      params.push(req.query.status);
+    }
+    if (req.query.disaster_type) {
+      query += ' AND r.disaster_type = ?';
+      params.push(req.query.disaster_type);
+    }
+    if (req.query.date_from) {
+      query += ' AND r.created_at >= ?';
+      params.push(req.query.date_from);
+    }
+    if (req.query.date_to) {
+      query += ' AND r.created_at <= ?';
+      params.push(req.query.date_to + ' 23:59:59');
+    }
+
+    query += ' ORDER BY r.created_at DESC';
+    const [rows] = await pool.query(query, params);
+
+    const wb = new ExcelJS.Workbook();
+    wb.creator = 'BPBD Kota Semarang';
+    const ws = wb.addWorksheet('Laporan Bencana', { views: [{ state: 'frozen', ySplit: 1 }] });
+
+    ws.columns = [
+      { header: 'No', key: 'no', width: 6 },
+      { header: 'Kode Tracking', key: 'tracking_code', width: 22 },
+      { header: 'Pelapor', key: 'reporter_name', width: 20 },
+      { header: 'Jenis Bencana', key: 'disaster_type', width: 18 },
+      { header: 'Status', key: 'status', width: 16 },
+      { header: 'Lokasi', key: 'address', width: 35 },
+      { header: 'Latitude', key: 'latitude', width: 12 },
+      { header: 'Longitude', key: 'longitude', width: 12 },
+      { header: 'Deskripsi', key: 'description', width: 40 },
+      { header: 'Tanggal', key: 'created_at', width: 20 },
+    ];
+
+    const headerRow = ws.getRow(1);
+    headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+    headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFe65100' } };
+    headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+
+    rows.forEach((r, i) => {
+      ws.addRow({
+        no: i + 1,
+        tracking_code: r.tracking_code,
+        reporter_name: r.reporter_name,
+        disaster_type: r.disaster_type,
+        status: r.status,
+        address: r.address,
+        latitude: r.latitude,
+        longitude: r.longitude,
+        description: r.description || '',
+        created_at: new Date(r.created_at).toLocaleDateString('id-ID'),
+      });
+    });
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=laporan-bencana.xlsx');
+    await wb.xlsx.write(res);
+    res.end();
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Gagal export Excel' });
   }
 };

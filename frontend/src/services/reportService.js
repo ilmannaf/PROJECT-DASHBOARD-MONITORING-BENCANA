@@ -31,3 +31,13 @@ export const deleteReport = async (id) => {
   const { data } = await api.delete(`/reports/${id}`);
   return data;
 };
+
+export const exportReportsExcel = async (filters = {}) => {
+  const res = await api.get('/reports/export', { params: filters, responseType: 'blob' });
+  const url = window.URL.createObjectURL(new Blob([res.data]));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'laporan-bencana.xlsx';
+  link.click();
+  window.URL.revokeObjectURL(url);
+};

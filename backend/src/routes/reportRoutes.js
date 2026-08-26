@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { createReport, getReports, getMyReports, getReportByTrackingCode, updateReportStatus, deleteReport, getPublicReports } = require('../controllers/reportController');
+const { createReport, getReports, getMyReports, getReportByTrackingCode, updateReportStatus, deleteReport, getPublicReports, exportReportsExcel } = require('../controllers/reportController');
 const { verifyToken, optionalVerifyToken, requireRole } = require('../middlewares/authMiddleware');
 const { reportLimiter } = require('../middlewares/rateLimit');
 const upload = require('../middlewares/uploadMiddleware');
@@ -16,6 +16,7 @@ router.get('/my-reports', verifyToken, getMyReports);
 
 // Admin/petugas - perlu login
 router.get('/', verifyToken, requireRole('admin', 'petugas'), getReports);
+router.get('/export', verifyToken, requireRole('admin', 'petugas'), exportReportsExcel);
 router.patch('/:id/status', verifyToken, requireRole('admin', 'petugas'), updateReportStatus);
 router.delete('/:id', verifyToken, requireRole('admin', 'petugas'), deleteReport);
 

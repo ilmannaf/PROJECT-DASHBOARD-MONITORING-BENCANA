@@ -1,5 +1,6 @@
 const pool = require('../config/db');
 const PDFDocument = require('pdfkit');
+const ExcelJS = require('exceljs');
 
 exports.createDisasterRecord = async (req, res) => {
   try {
@@ -234,5 +235,88 @@ exports.exportDisasterRecordPdf = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Terjadi kesalahan server' });
+  }
+};
+
+// EXPORT EXCEL - Pendataan Bencana
+exports.exportDisasterRecordsExcel = async (req, res) => {
+  try {
+    let query = 'SELECT * FROM disaster_records WHERE 1=1';
+    const params = [];
+
+    if (req.query.kecamatan) {
+      query += ' AND kecamatan = ?';
+      params.push(req.query.kecamatan);
+    }
+    if (req.query.date_from) {
+      query += ' AND disaster_date >= ?';
+      params.push(req.query.date_from);
+    }
+    if (req.query.date_to) {
+      query += ' AND disaster_date <= ?';
+      params.push(req.query.date_to);
+    }
+
+    query += ' ORDER BY disaster_date DESC, disaster_time DESC';
+    const [rows] = await pool.query(query, params);
+
+    const wb = new ExcelJS.Workbook();
+    wb.creator = 'BPBD Kota Semarang';
+    const ws = wb.addWorksheet('Pendataan Bencana', { views: [{ state: 'frozen', ySplit: 1 }] });
+
+    ws.columns = [
+      { header: 'No', key: 'no', width: 6 },
+      { header: 'Tanggal', key: 'disaster_date', width: 14 },
+      { header: 'Jam', key: 'disaster_time', width: 10 },
+      { header: 'Lokasi', key: 'location', width: 30 },
+      { header: 'Kelurahan', key: 'kelurahan', width: 18 },
+      { header: 'Kecamatan', key: 'kecamatan', width: 18 },
+      { header: 'Kronologi', key: 'kronologi', width: 40 },
+      { header: 'Korban Pengungsi', key: 'korban_ps', width: 16 },
+      { header: 'Korban Meninggal', key: 'korban_md', width: 16 },
+      { header: 'Korban Luka Berat', key: 'korban_lb', width: 16 },
+      { header: 'Korban Luka Ringan', key: 'korban_lr', width: 16 },
+      { header: 'Terdampak Laki-laki', key: 'terdampak_laki', width: 18 },
+      { header: 'Terdampak Perempuan', key: 'terdampak_perempuan', width: 18 },
+      { header: 'Terdampak Anak', key: 'terdampak_anak', width: 15 },
+      { header: 'Kerugian', key: 'kerugian', width: 25 },
+      { header: 'Pemilik', key: 'pemilik', width: 20 },
+      { header: 'Sumber Info', key: 'sumber_info_nama', width: 20 },
+    ];
+
+    const headerRow = ws.getRow(1);
+    headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 10 };
+    headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFe65100' } };
+    headerRow.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+
+    rows.forEach((r, i) => {
+      ws.addRow({
+        no: i + 1,
+        disaster_date: r.disaster_date ? new Date(r.disaster_date).toLocaleDateString('id-ID') : '',
+        disaster_time: r.disaster_time || '',
+        location: r.location || '',
+        kelurahan: r.kelurahan || '',
+        kecamatan: r.kecamatan || '',
+        kronologi: r.kronologi || '',
+        korban_ps: r.korban_ps || 0,
+        korban_md: r.korban_md || 0,
+        korban_lb: r.korban_lb || 0,
+        korban_lr: r.korban_lr || 0,
+        terdampak_laki: r.terdampak_laki || 0,
+        terdampak_perempuan: r.terdampak_perempuan || 0,
+        terdampak_anak: r.terdampak_anak || 0,
+        kerugian: r.kerugian || '',
+        pemilik: r.pemilik || '',
+        sumber_info_nama: r.sumber_info_nama || '',
+      });
+    });
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=pendataan-bencana.xlsx');
+    await wb.xlsx.write(res);
+    res.end();
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Gagal export Excel' });
   }
 };

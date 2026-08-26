@@ -34,3 +34,13 @@ export const downloadDisasterPdf = async (id) => {
   link.click();
   window.URL.revokeObjectURL(url);
 };
+
+export const exportDisasterRecordsExcel = async (filters = {}) => {
+  const res = await api.get('/disaster-records/export', { params: filters, responseType: 'blob' });
+  const url = window.URL.createObjectURL(new Blob([res.data]));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'pendataan-bencana.xlsx';
+  link.click();
+  window.URL.revokeObjectURL(url);
+};
