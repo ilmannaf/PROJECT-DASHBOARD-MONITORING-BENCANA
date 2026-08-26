@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Polygon, GeoJSON, useMapEvents, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { submitReport } from "../../services/reportService";
+import semarangGeojson from "../../assets/kota_semarang.json";
 
 const DISASTER_TYPES = [
   { id: "Banjir", label: "Banjir", icon: "banjir" },
@@ -15,7 +16,33 @@ const DISASTER_TYPES = [
 ];
 
 const SEMARANG_CENTER = [-7.005, 110.4381];
+const SEMARANG_ZOOM = 11;
 const MAX_PHOTOS = 5;
+
+const KOTA_SEMARANG_GEOJSON = semarangGeojson;
+const SEMARANG_RING = semarangGeojson.features[0].geometry.coordinates[0];
+const SEMARANG_LATLNG = SEMARANG_RING.map(([lng, lat]) => [lat, lng]);
+const SEMARANG_BOUNDS = L.latLngBounds(SEMARANG_LATLNG);
+const SEMARANG_MAX_BOUNDS = SEMARANG_BOUNDS.pad(0.06);
+
+const WORLD_RECT = [
+  [-85, -180],
+  [-85, 180],
+  [85, 180],
+  [85, -180],
+];
+
+function FitSemarang() {
+  const map = useMap();
+  const fitted = useRef(false);
+  useEffect(() => {
+    if (!fitted.current) {
+      fitted.current = true;
+      map.fitBounds(SEMARANG_BOUNDS, { padding: [12, 12] });
+    }
+  }, [map]);
+  return null;
+}
 
 // custom marker icon
 const markerIcon = new L.Icon({
@@ -299,12 +326,18 @@ export default function ReportForm() {
                 <div className="rounded-xl overflow-hidden border border-gray-200">
                   <MapContainer
                     center={SEMARANG_CENTER}
-                    zoom={11}
+                    zoom={SEMARANG_ZOOM}
+                    minZoom={11}
+                    maxBounds={SEMARANG_MAX_BOUNDS}
+                    maxBoundsViscosity={1.0}
                     style={{ height: "300px", width: "100%" }}
                     ref={mapRef}
                     whenReady={(e) => { mapRef.current = e.target; }}
                   >
-                    <TileLayer attribution='&copy; OpenStreetMap' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                    <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                    <FitSemarang />
+                    <Polygon positions={[WORLD_RECT, SEMARANG_LATLNG]} pathOptions={{ stroke: false, fillColor: "#0f172a", fillOpacity: 0.55, fillRule: "evenodd" }} />
+                    <GeoJSON key="kota-semarang-boundary" data={KOTA_SEMARANG_GEOJSON} style={{ color: "#f97316", weight: 3, opacity: 0.9, fill: false }} />
                     <LocationPicker location={location} setLocation={setLocation} />
                   </MapContainer>
                 </div>
