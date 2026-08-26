@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup, Polygon, GeoJSON, useMap } from "react-leaflet";
 import L from "leaflet";
@@ -42,8 +42,12 @@ function pointInSemarang(lat, lng) {
 
 function FitSemarang() {
   const map = useMap();
+  const fitted = useRef(false);
   useEffect(() => {
-    map.fitBounds(SEMARANG_BOUNDS, { padding: [12, 12] });
+    if (!fitted.current) {
+      fitted.current = true;
+      map.fitBounds(SEMARANG_BOUNDS, { padding: [12, 12] });
+    }
   }, [map]);
   return null;
 }
@@ -465,9 +469,7 @@ export default function DisasterMap() {
                 <MapContainer
                   center={SEMARANG_CENTER}
                   zoom={SEMARANG_ZOOM}
-                  minZoom={11}
-                  maxBounds={SEMARANG_MAX_BOUNDS}
-                  maxBoundsViscosity={1.0}
+                  minZoom={5}
                   style={{ height: "100%", width: "100%" }}
                   scrollWheelZoom={true}
                 >
