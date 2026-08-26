@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login, register, isAuthenticated, getCurrentUser, logout } from '../../services/authService';
 import { getMyReports, trackReport } from '../../services/reportService';
+import { getSocket } from '../../services/socket';
+import { showToast } from '../../components/Toast';
 
 const STATUS_COLOR = {
   baru: 'bg-red-100 text-red-700',
@@ -69,19 +71,28 @@ export default function PublicDashboard() {
     }
   }, []);
 
-  // load whenever tab becomes dashboard + polling + focus refresh
+  // load whenever tab becomes dashboard + polling + focus refresh + socket
   useEffect(() => {
     if (tab === 'dashboard' && isAuthenticated()) {
       loadReports();
-      const interval = setInterval(loadReports, 15000); // auto refresh every 15s
+      const interval = setInterval(loadReports, 15000);
       const onFocus = () => loadReports();
       const onVisibility = () => { if (document.visibilityState === 'visible') loadReports(); };
       window.addEventListener('focus', onFocus);
       document.addEventListener('visibilitychange', onVisibility);
+
+      const socket = getSocket();
+      const onStatusUpdate = (data) => {
+        showToast(`Laporan ${data.tracking_code} status berubah menjadi "${data.status}"`, 'success');
+        loadReports();
+      };
+      socket.on('report_status_updated', onStatusUpdate);
+
       return () => {
         clearInterval(interval);
         window.removeEventListener('focus', onFocus);
         document.removeEventListener('visibilitychange', onVisibility);
+        socket.off('report_status_updated', onStatusUpdate);
       };
     }
   }, [tab]);

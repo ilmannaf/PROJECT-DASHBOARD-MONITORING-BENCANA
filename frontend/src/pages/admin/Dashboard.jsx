@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import api from '../../services/api';
+import { getSocket } from '../../services/socket';
+import { showToast } from '../../components/Toast';
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend,
@@ -59,19 +61,38 @@ export default function Dashboard() {
   const [showContent, setShowContent] = useState(false);
 
   useEffect(() => {
-    Promise.all([
-      api.get('/reports'),
-      api.get('/disaster-records').catch(() => ({ data: [] }))
-    ])
-      .then(([res, res2]) => {
-        setReports(res.data);
-        setDisasterRecords(res2.data);
-      })
-      .catch((err) => console.error('Gagal ambil data:', err))
-      .finally(() => {
-        setLoading(false);
-        setTimeout(() => setShowContent(true), 80);
-      });
+    const load = () => {
+      Promise.all([
+        api.get('/reports'),
+        api.get('/disaster-records').catch(() => ({ data: [] }))
+      ])
+        .then(([res, res2]) => {
+          setReports(res.data);
+          setDisasterRecords(res2.data);
+        })
+        .catch((err) => console.error('Gagal ambil data:', err))
+        .finally(() => {
+          setLoading(false);
+          setTimeout(() => setShowContent(true), 80);
+        });
+    };
+    load();
+
+    const socket = getSocket();
+    const onNewReport = (data) => {
+      showToast(`Laporan baru: ${data.disaster_type} di ${data.address || '-'}`, 'info');
+      load();
+    };
+    const onStatusUpdate = (data) => {
+      showToast(`Laporan ${data.tracking_code} → ${data.status}`, 'info');
+      load();
+    };
+    socket.on('new_report', onNewReport);
+    socket.on('report_status_updated', onStatusUpdate);
+    return () => {
+      socket.off('new_report', onNewReport);
+      socket.off('report_status_updated', onStatusUpdate);
+    };
   }, []);
 
   const total = reports.length;

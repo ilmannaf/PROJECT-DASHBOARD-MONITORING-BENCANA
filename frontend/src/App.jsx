@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
+import ToastContainer from './components/Toast';
 import Login from './pages/admin/Login';
 import Dashboard from './pages/admin/Dashboard';
 import ReportsManagement from './pages/admin/ReportsManagement';
@@ -33,6 +34,7 @@ function App() {
   return (
     <BrowserRouter>
       <ScrollToTop />
+      <ToastContainer />
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/dashboard" element={<PageWrapper><PublicDashboard /></PageWrapper>} />

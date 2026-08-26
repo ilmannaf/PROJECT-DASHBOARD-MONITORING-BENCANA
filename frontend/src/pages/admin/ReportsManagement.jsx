@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getReports, updateReportStatus, deleteReport } from '../../services/reportService';
+import { getSocket } from '../../services/socket';
+import { showToast } from '../../components/Toast';
 
 const STATUS_OPTIONS = ['baru', 'diverifikasi', 'ditindaklanjuti', 'selesai'];
 const STATUS_COLOR = {
@@ -48,6 +50,27 @@ export default function ReportsManagement() {
   };
 
   useEffect(() => { loadReports(); }, [filter]);
+
+  useEffect(() => {
+    const socket = getSocket();
+    const onNewReport = (data) => {
+      showToast(`Laporan baru: ${data.disaster_type} di ${data.address || '-'}`, 'info');
+      loadReports();
+    };
+    const onStatusUpdate = (data) => {
+      showToast(`Laporan ${data.tracking_code} → ${data.status}`, 'info');
+      loadReports();
+    };
+    const onReportDeleted = () => { loadReports(); };
+    socket.on('new_report', onNewReport);
+    socket.on('report_status_updated', onStatusUpdate);
+    socket.on('report_deleted', onReportDeleted);
+    return () => {
+      socket.off('new_report', onNewReport);
+      socket.off('report_status_updated', onStatusUpdate);
+      socket.off('report_deleted', onReportDeleted);
+    };
+  }, [filter]);
 
   const handleStatusChange = async (id, status) => {
     try {
