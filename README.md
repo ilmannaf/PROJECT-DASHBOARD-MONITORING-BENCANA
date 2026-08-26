@@ -51,6 +51,17 @@ PROJECT-DASHBOARD-MONITORING-BENCANA/
 - ✅ Upload **max 5 foto** per laporan (report_photos table) + koordinat opsional dengan map picker presisi
 - ✅ Dashboard publik auto-refresh & localStorage fallback untuk laporan anonim
 - ✅ Hapus laporan di admin dengan hapus file fisik
+- ✅ Animasi UI murni CSS + vanilla JS (tanpa library tambahan)
+  - Landing page: hero stagger entrance, kenburns image effect, scroll-reveal sections
+  - Admin dashboard: animated counter (countUp) untuk statistik, staggered card/chart entrance
+  - Login admin: floating animated blobs + form stagger entrance
+  - Login publik: floating animated blobs + form stagger entrance
+  - ReportForm: form section entrance + bounce-in hasil + checkmark draw animation
+  - TrackStatus: progress step bounce-in + connector line grow + result bounce
+  - DisasterMap: stat card stagger entrance
+  - Admin sidebar: sliding gradient indicator yang track menu aktif
+  - Semua halaman: page fade-in transition + auto scroll-to-top
+  - `prefers-reduced-motion` respected untuk accessibility
 
 ---
 
@@ -70,6 +81,8 @@ PROJECT-DASHBOARD-MONITORING-BENCANA/
 - React Router DOM 7.18
 - Axios + Socket.IO Client
 - Recharts (data visualization)
+- Leaflet (peta interaktif)
+- Pure CSS + JS animations (tanpa library tambahan)
 
 ---
 
@@ -249,6 +262,7 @@ Sistem menggunakan tema warna oranye konsisten untuk branding BPBD:
 - [x] Landing page polish (hero, fitur, CTA, footer) + logo gambar BPBD
 - [x] Kelola laporan admin dengan hapus + preview foto/koordinat
 - [x] Dashboard publik dengan auto-refresh & localStorage fallback
+- [x] Animasi UI murni CSS + vanilla JS (stagger, bounce, scroll-reveal, page transitions)
 - [ ] Google OAuth login (backend)
 - [ ] Socket.IO live updates (full real-time)
 - [ ] Mobile app (React Native)

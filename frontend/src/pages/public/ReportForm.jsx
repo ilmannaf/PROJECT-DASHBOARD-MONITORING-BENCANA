@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import L from "leaflet";
@@ -63,6 +63,12 @@ export default function ReportForm() {
   const [loading, setLoading] = useState(false);
   const mapRef = useRef(null);
   const fileInputRef = useRef(null);
+  const [showForm, setShowForm] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setShowForm(true), 80);
+    return () => clearTimeout(t);
+  }, []);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -183,10 +189,10 @@ export default function ReportForm() {
       <div className="min-h-screen bg-gray-50">
         <ReportHeader />
         <main className="max-w-xl mx-auto px-4 py-12 lg:py-16">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="result-bounce bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="bg-gradient-to-br from-emerald-500 to-green-600 px-6 py-8 text-center">
               <div className="w-16 h-16 mx-auto rounded-full bg-white/20 flex items-center justify-center mb-4">
-                <svg className="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="check-anim w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
@@ -214,14 +220,14 @@ export default function ReportForm() {
     <div className="min-h-screen bg-gray-50">
       <ReportHeader />
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-10 lg:py-14">
-        <div className="mb-10 max-w-2xl">
+        <div className={`form-section mb-10 max-w-2xl ${showForm ? 'show' : ''}`}>
           <div className="inline-flex items-center gap-2 text-xs font-bold tracking-wider text-red-600 bg-red-50 border border-red-100 rounded-full px-3 py-1 mb-4 uppercase"><span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>Siaga Darurat</div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">Laporkan Kejadian Bencana</h1>
           <p className="mt-2 text-gray-600 leading-relaxed">Isi formulir berikut sejelas mungkin. Tandai titik di peta agar petugas tepat lokasi — koordinat opsional tapi sangat membantu.</p>
         </div>
 
         <div className="grid lg:grid-cols-5 gap-8 items-start">
-          <aside className="lg:col-span-2 space-y-6 order-2 lg:order-1">
+          <aside className={`form-section lg:col-span-2 space-y-6 order-2 lg:order-1 ${showForm ? 'show' : ''}`} style={{ transitionDelay: '0.15s' }}>
             <div className="bg-gray-900 rounded-2xl text-white p-6 overflow-hidden relative">
               <div className="absolute -right-10 -top-10 w-40 h-40 bg-brand-600/10 rounded-full"></div>
               <div className="flex items-center gap-3 mb-5">
@@ -248,7 +254,7 @@ export default function ReportForm() {
             </div>
           </aside>
 
-          <form onSubmit={handleSubmit} className="lg:col-span-3 bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden order-1 lg:order-2">
+          <form onSubmit={handleSubmit} className={`form-section lg:col-span-3 bg-white border border-gray-100 rounded-2xl shadow-sm overflow-hidden order-1 lg:order-2 ${showForm ? 'show' : ''}`} style={{ transitionDelay: '0.25s' }}>
             <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
               <div><h2 className="font-bold text-gray-900">Formulir Laporan</h2><p className="text-xs text-gray-500 mt-0.5">Tanda * wajib diisi — peta opsional</p></div>
               <span className="text-xs font-semibold text-brand-700 bg-brand-50 border border-brand-100 rounded-full px-3 py-1">Gratis</span>

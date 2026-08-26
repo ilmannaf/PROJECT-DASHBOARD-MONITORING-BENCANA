@@ -136,6 +136,12 @@ export default function DisasterMap() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [legendOpen, setLegendOpen] = useState(true);
   const [mapMode, setMapMode] = useState("bencana"); // bencana | smab | katana
+  const [showStats, setShowStats] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setShowStats(true), 300);
+    return () => clearTimeout(t);
+  }, []);
 
   useEffect(() => {
     let mounted = true;
@@ -742,7 +748,7 @@ export default function DisasterMap() {
             {mapMode === "bencana" && (
               <>
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-                  <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition flex flex-col">
+                  <div className={`map-stat bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition flex flex-col ${showStats ? 'show' : ''}`} style={{ transitionDelay: '0s' }}>
                     <div className="flex items-center justify-between mb-2">
                       <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-500 to-orange-600 text-white flex items-center justify-center shadow">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -755,8 +761,8 @@ export default function DisasterMap() {
                     <p className="text-xs text-gray-500">Laporan tampil</p>
                   </div>
 
-                  {ALL_TYPES.slice(0, 3).map((type) => (
-                    <div key={type} className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition">
+                  {ALL_TYPES.slice(0, 3).map((type, i) => (
+                    <div key={type} className={`map-stat bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition ${showStats ? 'show' : ''}`} style={{ transitionDelay: `${(i + 1) * 0.08}s` }}>
                       <div className="flex items-center justify-between mb-2">
                         <span className="w-9 h-9 rounded-xl flex items-center justify-center text-white shadow text-sm" style={{ background: getColorForType(type) }}>
                           {getEmojiForType(type)}
