@@ -92,6 +92,32 @@ async function attachPhotosToReports(reports) {
   }));
 }
 
+// READ - Stats untuk dashboard (tanpa fetch semua data)
+exports.getReportStats = async (req, res) => {
+  try {
+    const [statusRows] = await pool.query(
+      'SELECT status, COUNT(*) AS count FROM reports GROUP BY status'
+    );
+    const [typeRows] = await pool.query(
+      'SELECT disaster_type AS name, COUNT(*) AS count FROM reports GROUP BY disaster_type'
+    );
+    const [totalRows] = await pool.query('SELECT COUNT(*) AS total FROM reports');
+    const [recentRows] = await pool.query(
+      'SELECT r.*, u.name AS assigned_name FROM reports r LEFT JOIN users u ON r.assigned_to = u.id ORDER BY r.created_at DESC LIMIT 8'
+    );
+    const withPhotos = await attachPhotosToReports(recentRows);
+    res.json({
+      total: totalRows[0].total,
+      byStatus: Object.fromEntries(statusRows.map((r) => [r.status, r.count])),
+      byType: typeRows.map((r) => ({ name: r.name, jumlah: r.count })),
+      recent: withPhotos,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Terjadi kesalahan server' });
+  }
+};
+
 // READ - List semua laporan (admin/petugas, butuh login)
 exports.getReports = async (req, res) => {
   try {

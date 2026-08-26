@@ -49,7 +49,7 @@ export default function VehicleManagement() {
     e.preventDefault();
     try {
       await createVehicle(form);
-      setForm({ plate_number: "", type: "", status: "siap" });
+      setForm({ plate_number: "", type: "", status: "siap", posko_id: "" });
       setShowForm(false);
       loadVehicles();
     } catch (err) {

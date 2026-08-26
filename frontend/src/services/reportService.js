@@ -12,6 +12,11 @@ export const getReports = async (filters = {}) => {
   return data;
 };
 
+export const getReportStats = async () => {
+  const { data } = await api.get('/reports/stats');
+  return data;
+};
+
 export const trackReport = async (code) => {
   const { data } = await api.get(`/reports/track/${code}`);
   return data;

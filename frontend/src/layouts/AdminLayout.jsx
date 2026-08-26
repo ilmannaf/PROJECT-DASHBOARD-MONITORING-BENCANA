@@ -61,7 +61,7 @@ export default function AdminLayout() {
   const location = useLocation();
   const user = getCurrentUser();
   const navRef = useRef(null);
-  const [indicator, setIndicator] = useState({ top: 0, height: 0 });
+  const [indicator, setIndicator] = useState({ y: 0, height: 0, visible: false });
 
   const handleLogout = () => {
     logout();
@@ -76,12 +76,16 @@ export default function AdminLayout() {
 
   useEffect(() => {
     if (!navRef.current) return;
-    const activeLink = navRef.current.children[activeIndex];
+    const links = navRef.current.querySelectorAll('a');
+    const activeLink = links[activeIndex];
     if (activeLink) {
       setIndicator({
-        top: activeLink.offsetTop,
+        y: activeLink.offsetTop,
         height: activeLink.offsetHeight,
+        visible: true,
       });
+    } else {
+      setIndicator((prev) => ({ ...prev, visible: false }));
     }
   }, [activeIndex, location.pathname]);
 
@@ -115,10 +119,10 @@ export default function AdminLayout() {
 
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto relative" ref={navRef}>
           {/* Sliding indicator */}
-          {activeIndex >= 0 && (
+          {indicator.visible && (
             <div
               className="sidebar-indicator absolute left-4 right-4 rounded-xl bg-gradient-to-r from-brand-500 to-orange-600 shadow-lg shadow-brand-500/25 z-0"
-              style={{ top: indicator.top, height: indicator.height }}
+              style={{ transform: `translateY(${indicator.y}px)`, height: indicator.height }}
             />
           )}
           {MENU.map((item) => (

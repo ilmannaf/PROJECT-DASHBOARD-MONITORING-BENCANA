@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { getReports, updateReportStatus, deleteReport, exportReportsExcel } from '../../services/reportService';
+import { getReports, updateReportStatus, deleteReport, exportReportsExcel, getReportStats } from '../../services/reportService';
 import { getSocket } from '../../services/socket';
 import { showToast } from '../../components/Toast';
 
@@ -39,6 +39,7 @@ const STATUS_ICON = {
 export default function ReportsManagement() {
   const [reports, setReports] = useState([]);
   const [total, setTotal] = useState(0);
+  const [statusCounts, setStatusCounts] = useState({});
   const [totalPages, setTotalPages] = useState(1);
   const [page, setPage] = useState(1);
   const [filter, setFilter] = useState('');
@@ -64,11 +65,15 @@ export default function ReportsManagement() {
     if (dateFrom) params.date_from = dateFrom;
     if (dateTo) params.date_to = dateTo;
     if (debouncedSearch) params.search = debouncedSearch;
-    getReports(params)
-      .then((res) => {
-        setReports(res.data);
-        setTotal(res.total);
-        setTotalPages(res.totalPages);
+    Promise.all([
+      getReports(params),
+      getReportStats().catch(() => ({ total: 0, byStatus: {} })),
+    ])
+      .then(([reportsRes, stats]) => {
+        setReports(reportsRes.data);
+        setTotal(reportsRes.total);
+        setTotalPages(reportsRes.totalPages);
+        setStatusCounts(stats.byStatus || {});
       })
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
@@ -171,7 +176,7 @@ export default function ReportsManagement() {
               {filter === s ? STATUS_ICON[s] : <span className="text-gray-400">{STATUS_ICON[s]}</span>}
               <p className="text-sm font-semibold capitalize">{s}</p>
             </div>
-            <p className="text-2xl font-extrabold">{reports.filter((r) => r.status === s).length || '—'}</p>
+            <p className="text-2xl font-extrabold">{statusCounts[s] || '—'}</p>
           </button>
         ))}
       </div>

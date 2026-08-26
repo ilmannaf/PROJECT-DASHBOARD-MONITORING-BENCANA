@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import api from '../../services/api';
+import { getReportStats } from '../../services/reportService';
 import { getSocket } from '../../services/socket';
 import { showToast } from '../../components/Toast';
 import {
@@ -28,23 +29,25 @@ const STATUS_BG = {
   selesai: 'from-emerald-500 to-green-600',
 };
 
-function useCountUp(end, duration = 1200, startOnMount = true) {
+function useCountUp(end, duration = 1200) {
   const [count, setCount] = useState(0);
-  const started = useRef(false);
+  const prevEnd = useRef(0);
 
   useEffect(() => {
-    if (!startOnMount || end === 0 || started.current) return;
-    started.current = true;
+    if (end === prevEnd.current) return;
+    const startVal = prevEnd.current;
+    prevEnd.current = end;
+    if (end === 0 && startVal === 0) return;
     const startTime = performance.now();
     const step = (now) => {
       const elapsed = now - startTime;
       const progress = Math.min(elapsed / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
-      setCount(Math.round(eased * end));
+      setCount(Math.round(startVal + (end - startVal) * eased));
       if (progress < 1) requestAnimationFrame(step);
     };
     requestAnimationFrame(step);
-  }, [end, duration, startOnMount]);
+  }, [end, duration]);
 
   return count;
 }
@@ -55,7 +58,10 @@ function AnimatedNumber({ value, duration = 1200 }) {
 }
 
 export default function Dashboard() {
-  const [reports, setReports] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [byStatus, setByStatus] = useState({});
+  const [byType, setByType] = useState([]);
+  const [recent, setRecent] = useState([]);
   const [disasterRecords, setDisasterRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showContent, setShowContent] = useState(false);
@@ -63,11 +69,14 @@ export default function Dashboard() {
   useEffect(() => {
     const load = () => {
       Promise.all([
-        api.get('/reports', { params: { limit: 1000 } }),
-        api.get('/disaster-records').catch(() => ({ data: [] }))
+        getReportStats().catch(() => ({ total: 0, byStatus: {}, byType: [], recent: [] })),
+        api.get('/disaster-records').catch(() => ({ data: [] })),
       ])
-        .then(([res, res2]) => {
-          setReports(res.data.data || []);
+        .then(([stats, res2]) => {
+          setTotal(stats.total);
+          setByStatus(stats.byStatus);
+          setByType(stats.byType);
+          setRecent(stats.recent);
           setDisasterRecords(res2.data);
         })
         .catch((err) => console.error('Gagal ambil data:', err))
@@ -95,8 +104,7 @@ export default function Dashboard() {
     };
   }, []);
 
-  const total = reports.length;
-  const countByStatus = (status) => reports.filter((r) => r.status === status).length;
+  const countByStatus = (s) => byStatus[s] || 0;
 
   const statCards = [
     { label: 'Total Laporan', value: total, icon: 'doc', color: 'text-gray-900', bg: 'from-blue-500 to-blue-700', shadow: 'shadow-blue-500/25' },
@@ -113,16 +121,9 @@ export default function Dashboard() {
     }))
     .filter((d) => d.value > 0);
 
-  const disasterCounts = reports.reduce((acc, r) => {
-    acc[r.disaster_type] = (acc[r.disaster_type] || 0) + 1;
-    return acc;
-  }, {});
-  const barData = Object.entries(disasterCounts).map(([name, jumlah]) => ({ name, jumlah }));
-
   const kecamatanCount = new Set(disasterRecords.map((d) => d.kecamatan)).size;
   const totalKorban = disasterRecords.reduce((sum, r) => {
-    const match = r.korban ? r.korban.match(/\d+/g) : null;
-    return sum + (match ? match.reduce((a, b) => a + parseInt(b), 0) : 0);
+    return sum + (Number(r.korban_ps) || 0) + (Number(r.korban_md) || 0) + (Number(r.korban_lb) || 0) + (Number(r.korban_lr) || 0);
   }, 0);
 
   if (loading) {
@@ -270,11 +271,11 @@ export default function Dashboard() {
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             Laporan per Jenis Bencana
           </h2>
-          {barData.length === 0 ? (
+          {byType.length === 0 ? (
             <p className="text-xs text-gray-400 text-center py-10">Belum ada data</p>
           ) : (
             <ResponsiveContainer width="100%" height={240}>
-              <BarChart data={barData}>
+              <BarChart data={byType}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
                 <XAxis dataKey="name" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
                 <YAxis allowDecimals={false} tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
@@ -292,7 +293,7 @@ export default function Dashboard() {
             <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
             Laporan Terbaru
           </h2>
-          <span className="text-xs text-gray-400">{reports.length} laporan</span>
+          <span className="text-xs text-gray-400">{total} laporan</span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
@@ -306,7 +307,7 @@ export default function Dashboard() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {reports.slice(0, 8).map((r) => (
+              {recent.map((r) => (
                 <tr key={r.id} className="hover:bg-orange-50/40 transition-colors">
                   <td className="py-3 px-6 font-mono text-xs text-gray-500">{r.tracking_code}</td>
                   <td className="py-3 px-6 font-medium text-gray-900">{r.reporter_name}</td>
@@ -322,7 +323,7 @@ export default function Dashboard() {
               ))}
             </tbody>
           </table>
-          {reports.length === 0 && <p className="text-sm text-gray-500 py-8 text-center">Belum ada laporan.</p>}
+          {recent.length === 0 && <p className="text-sm text-gray-500 py-8 text-center">Belum ada laporan.</p>}
         </div>
       </div>
     </div>

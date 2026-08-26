@@ -57,6 +57,7 @@ export default function InventoryManagement() {
         item_condition: "baik",
         quantity: 0,
         unit: "",
+        posko_id: "",
       });
       setShowForm(false);
       loadItems();

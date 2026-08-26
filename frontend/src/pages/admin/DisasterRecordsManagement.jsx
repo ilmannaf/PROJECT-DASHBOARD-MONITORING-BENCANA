@@ -156,8 +156,7 @@ export default function DisasterRecordsManagement() {
   }).length;
 
   const totalKorban = records.reduce((sum, r) => {
-    const match = r.korban ? r.korban.match(/\d+/g) : null;
-    return sum + (match ? match.reduce((a, b) => a + parseInt(b), 0) : 0);
+    return sum + (Number(r.korban_ps) || 0) + (Number(r.korban_md) || 0) + (Number(r.korban_lb) || 0) + (Number(r.korban_lr) || 0);
   }, 0);
 
   const korbanFields = [
