@@ -95,7 +95,8 @@ async function attachPhotosToReports(reports) {
 // READ - List semua laporan (admin/petugas, butuh login)
 exports.getReports = async (req, res) => {
   try {
-    const { status, disaster_type } = req.query;
+    const { status, disaster_type, search, date_from, date_to, page = 1, limit = 50 } = req.query;
+    let countQuery = 'SELECT COUNT(*) AS total FROM reports r WHERE 1=1';
     let query = `
       SELECT r.*, u.name AS assigned_name
       FROM reports r
@@ -103,21 +104,51 @@ exports.getReports = async (req, res) => {
       WHERE 1=1
     `;
     const params = [];
+    const countParams = [];
 
     if (status) {
       query += ' AND r.status = ?';
+      countQuery += ' AND r.status = ?';
       params.push(status);
+      countParams.push(status);
     }
     if (disaster_type) {
       query += ' AND r.disaster_type = ?';
+      countQuery += ' AND r.disaster_type = ?';
       params.push(disaster_type);
+      countParams.push(disaster_type);
+    }
+    if (search) {
+      const like = `%${search}%`;
+      query += ' AND (r.tracking_code LIKE ? OR r.reporter_name LIKE ? OR r.disaster_type LIKE ? OR r.address LIKE ? OR r.description LIKE ?)';
+      countQuery += ' AND (r.tracking_code LIKE ? OR r.reporter_name LIKE ? OR r.disaster_type LIKE ? OR r.address LIKE ? OR r.description LIKE ?)';
+      params.push(like, like, like, like, like);
+      countParams.push(like, like, like, like, like);
+    }
+    if (date_from) {
+      query += ' AND r.created_at >= ?';
+      countQuery += ' AND r.created_at >= ?';
+      params.push(date_from);
+      countParams.push(date_from);
+    }
+    if (date_to) {
+      query += ' AND r.created_at <= ?';
+      countQuery += ' AND r.created_at <= ?';
+      params.push(date_to + ' 23:59:59');
+      countParams.push(date_to + ' 23:59:59');
     }
 
-    query += ' ORDER BY r.created_at DESC';
+    const [[{ total }]] = await pool.query(countQuery, countParams);
+    const pageNum = Math.max(1, parseInt(page));
+    const limitNum = Math.min(200, Math.max(1, parseInt(limit)));
+    const offset = (pageNum - 1) * limitNum;
+
+    query += ' ORDER BY r.created_at DESC LIMIT ? OFFSET ?';
+    params.push(limitNum, offset);
 
     const [rows] = await pool.query(query, params);
     const withPhotos = await attachPhotosToReports(rows);
-    res.json(withPhotos);
+    res.json({ data: withPhotos, total, page: pageNum, limit: limitNum, totalPages: Math.ceil(total / limitNum) });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Terjadi kesalahan server' });

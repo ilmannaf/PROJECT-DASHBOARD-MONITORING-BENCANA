@@ -63,11 +63,11 @@ export default function Dashboard() {
   useEffect(() => {
     const load = () => {
       Promise.all([
-        api.get('/reports'),
+        api.get('/reports', { params: { limit: 1000 } }),
         api.get('/disaster-records').catch(() => ({ data: [] }))
       ])
         .then(([res, res2]) => {
-          setReports(res.data);
+          setReports(res.data.data || []);
           setDisasterRecords(res2.data);
         })
         .catch((err) => console.error('Gagal ambil data:', err))
