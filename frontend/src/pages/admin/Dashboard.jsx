@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import api from '../../services/api';
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
@@ -26,10 +26,37 @@ const STATUS_BG = {
   selesai: 'from-emerald-500 to-green-600',
 };
 
+function useCountUp(end, duration = 1200, startOnMount = true) {
+  const [count, setCount] = useState(0);
+  const started = useRef(false);
+
+  useEffect(() => {
+    if (!startOnMount || end === 0 || started.current) return;
+    started.current = true;
+    const startTime = performance.now();
+    const step = (now) => {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.round(eased * end));
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, [end, duration, startOnMount]);
+
+  return count;
+}
+
+function AnimatedNumber({ value, duration = 1200 }) {
+  const display = useCountUp(value, duration);
+  return <>{display}</>;
+}
+
 export default function Dashboard() {
   const [reports, setReports] = useState([]);
   const [disasterRecords, setDisasterRecords] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showContent, setShowContent] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -41,7 +68,10 @@ export default function Dashboard() {
         setDisasterRecords(res2.data);
       })
       .catch((err) => console.error('Gagal ambil data:', err))
-      .finally(() => setLoading(false));
+      .finally(() => {
+        setLoading(false);
+        setTimeout(() => setShowContent(true), 80);
+      });
   }, []);
 
   const total = reports.length;
@@ -108,7 +138,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="p-6 lg:p-8 animate-fade-in">
+    <div className="p-6 lg:p-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight mb-1">Dashboard</h1>
@@ -129,21 +159,27 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
-        {statCards.map((c) => (
-          <div key={c.label} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-lg transition-all group">
+        {statCards.map((c, i) => (
+          <div
+            key={c.label}
+            className={`stat-card bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-lg transition-all group ${showContent ? 'show' : ''}`}
+            style={{ transitionDelay: `${i * 0.08}s` }}
+          >
             <div className="flex items-center justify-between mb-4">
               <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${c.bg} text-white flex items-center justify-center shadow-lg ${c.shadow} group-hover:scale-110 transition-transform`}>
                 {icons[c.icon]}
               </div>
               <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">{c.label}</span>
             </div>
-            <p className={`text-3xl font-extrabold ${c.color}`}>{c.value}</p>
+            <p className={`text-3xl font-extrabold ${c.color}`}>
+              <AnimatedNumber value={c.value} />
+            </p>
           </div>
         ))}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-5 text-white shadow-lg relative overflow-hidden">
+        <div className={`stat-card bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-5 text-white shadow-lg relative overflow-hidden ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0.35s' }}>
           <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/5 rounded-full"></div>
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-amber-400">
@@ -153,10 +189,10 @@ export default function Dashboard() {
             </div>
             <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Pendataan</span>
           </div>
-          <p className="text-3xl font-extrabold">{disasterRecords.length}</p>
+          <p className="text-3xl font-extrabold"><AnimatedNumber value={disasterRecords.length} /></p>
           <p className="text-xs text-gray-400 mt-1">Total data bencana</p>
         </div>
-        <div className="bg-gradient-to-br from-purple-600 to-purple-800 rounded-2xl p-5 text-white shadow-lg relative overflow-hidden">
+        <div className={`stat-card bg-gradient-to-br from-purple-600 to-purple-800 rounded-2xl p-5 text-white shadow-lg relative overflow-hidden ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0.43s' }}>
           <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/5 rounded-full"></div>
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
@@ -167,10 +203,10 @@ export default function Dashboard() {
             </div>
             <span className="text-xs font-bold uppercase tracking-wider text-purple-200">Kecamatan</span>
           </div>
-          <p className="text-3xl font-extrabold">{kecamatanCount}</p>
+          <p className="text-3xl font-extrabold"><AnimatedNumber value={kecamatanCount} /></p>
           <p className="text-xs text-purple-200 mt-1">Wilayah terdampak</p>
         </div>
-        <div className="bg-gradient-to-br from-red-500 to-rose-700 rounded-2xl p-5 text-white shadow-lg relative overflow-hidden">
+        <div className={`stat-card bg-gradient-to-br from-red-500 to-rose-700 rounded-2xl p-5 text-white shadow-lg relative overflow-hidden ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0.51s' }}>
           <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/5 rounded-full"></div>
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
@@ -180,13 +216,13 @@ export default function Dashboard() {
             </div>
             <span className="text-xs font-bold uppercase tracking-wider text-red-200">Korban</span>
           </div>
-          <p className="text-3xl font-extrabold">{totalKorban}</p>
+          <p className="text-3xl font-extrabold"><AnimatedNumber value={totalKorban} /></p>
           <p className="text-xs text-red-200 mt-1">Total korban tercatat</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
-        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6">
+        <div className={`chart-enter bg-white rounded-3xl shadow-sm border border-gray-100 p-6 ${showContent ? 'show' : ''}`}>
           <h2 className="font-bold text-gray-900 mb-4 text-sm flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
             Distribusi Status
@@ -208,7 +244,7 @@ export default function Dashboard() {
           )}
         </div>
 
-        <div className="lg:col-span-2 bg-white rounded-3xl shadow-sm border border-gray-100 p-6">
+        <div className={`chart-enter lg:col-span-2 bg-white rounded-3xl shadow-sm border border-gray-100 p-6 ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0.1s' }}>
           <h2 className="font-bold text-gray-900 mb-4 text-sm flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             Laporan per Jenis Bencana
@@ -229,7 +265,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className={`chart-enter bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0.2s' }}>
         <div className="p-6 border-b border-gray-100 flex items-center justify-between">
           <h2 className="font-bold text-gray-900 text-sm flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>

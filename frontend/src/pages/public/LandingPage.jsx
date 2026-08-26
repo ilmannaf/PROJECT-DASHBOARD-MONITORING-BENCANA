@@ -1,9 +1,39 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function LandingPage() {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const sectionsRef = useRef(null);
+
+  useEffect(() => {
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (prefersReduced) return;
+
+    const timer = setTimeout(() => {
+      document.querySelectorAll(".hero-badge, .hero-subtitle, .hero-title, .hero-desc, .hero-btn")
+        .forEach((el) => el.classList.add("show"));
+    }, 120);
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("in");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15 }
+    );
+
+    document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+
+    return () => {
+      clearTimeout(timer);
+      observer.disconnect();
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-white">
@@ -12,7 +42,7 @@ export default function LandingPage() {
         <img
           src="/assets/hero-bpbd.jpg"
           alt="Kantor BPBD Kota Semarang"
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover scale-105 animate-[kenburns_20s_ease-in-out_infinite_alternate]"
         />
 
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/30 to-transparent"></div>
@@ -130,26 +160,26 @@ export default function LandingPage() {
 
         <div className="relative z-10 flex flex-1 items-end">
           <div className="mx-auto w-full max-w-7xl space-y-6 px-6 pb-16 lg:pb-20">
-            <div className="inline-flex items-center gap-2 rounded-lg border border-white/40 bg-white/10 px-4 py-1.5 backdrop-blur-sm">
+            <div className="hero-badge inline-flex items-center gap-2 rounded-lg border border-white/40 bg-white/10 px-4 py-1.5 backdrop-blur-sm">
               <span className="h-2 w-2 animate-pulse rounded-full bg-brand-500"></span>
               <span className="text-xs font-bold tracking-[0.3em] text-white">
                 TANGGAP DARURAT 24/7
               </span>
             </div>
             <div className="space-y-2">
-              <p className="text-sm font-bold tracking-[0.25em] text-orange-100 lg:text-base">
+              <p className="hero-subtitle text-sm font-bold tracking-[0.25em] text-orange-100 lg:text-base">
                 SISTEM PELAPORAN DAN MONITORING BENCANA
               </p>
-              <h1 className="text-4xl font-extrabold leading-[0.95] text-white sm:text-5xl lg:text-7xl xl:text-8xl">
+              <h1 className="hero-title text-4xl font-extrabold leading-[0.95] text-white sm:text-5xl lg:text-7xl xl:text-8xl">
                 BPBD KOTA SEMARANG
               </h1>
             </div>
-            <p className="max-w-xl text-sm leading-relaxed text-white/80 lg:text-base">
+            <p className="hero-desc max-w-xl text-sm leading-relaxed text-white/80 lg:text-base">
               Laporkan kejadian bencana secara cepat dan akurat. Pantau status
               penanganan secara real-time melalui sistem terpadu BPBD Kota
               Semarang.
             </p>
-            <div className="flex flex-wrap gap-4 pt-2">
+            <div className="hero-btn flex flex-wrap gap-4 pt-2">
               <button
                 onClick={() => navigate("/lapor")}
                 className="rounded-lg border border-brand-600 bg-brand-600 px-8 py-4 text-sm font-semibold tracking-wider text-white transition hover:bg-brand-700"
@@ -173,11 +203,11 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="relative overflow-hidden bg-white py-20">
+      <section ref={sectionsRef} className="relative overflow-hidden bg-white py-20">
         <div className="absolute -right-40 -top-40 h-96 w-96 rounded-full bg-brand-50 blur-3xl"></div>
         <div className="absolute -left-40 bottom-0 h-80 w-80 rounded-full bg-orange-50 blur-3xl"></div>
         <div className="relative mx-auto max-w-7xl px-6">
-          <div className="mb-14 text-center">
+          <div className="reveal mb-14 text-center">
             <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-brand-100 bg-brand-50 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.25em] text-brand-600">
               Layanan Kami
             </span>
@@ -190,39 +220,45 @@ export default function LandingPage() {
             </p>
           </div>
           <div className="grid gap-6 md:grid-cols-3">
-            <FeatureCard
-              gradient="from-sky-500 to-blue-600"
-              shadow="shadow-sky-500/25"
-              icon={
-                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              }
-              title="Lapor Mudah"
-              description="Laporkan kejadian bencana dengan foto, lokasi GPS, dan deskripsi lengkap hanya dalam hitungan detik."
-            />
-            <FeatureCard
-              gradient="from-brand-500 to-orange-600"
-              shadow="shadow-brand-500/25"
-              icon={
-                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-              }
-              title="Dashboard Real-time"
-              description="Pantau status penanganan laporan secara real-time dengan tracking code unik untuk setiap laporan."
-            />
-            <FeatureCard
-              gradient="from-emerald-500 to-teal-600"
-              shadow="shadow-emerald-500/25"
-              icon={
-                <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              }
-              title="Respon Cepat"
-              description="Tim BPBD siaga 24/7 untuk merespon setiap laporan dengan prioritas tinggi pada kasus darurat."
-            />
+            <div className="reveal">
+              <FeatureCard
+                gradient="from-sky-500 to-blue-600"
+                shadow="shadow-sky-500/25"
+                icon={
+                  <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                }
+                title="Lapor Mudah"
+                description="Laporkan kejadian bencana dengan foto, lokasi GPS, dan deskripsi lengkap hanya dalam hitungan detik."
+              />
+            </div>
+            <div className="reveal">
+              <FeatureCard
+                gradient="from-brand-500 to-orange-600"
+                shadow="shadow-brand-500/25"
+                icon={
+                  <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                }
+                title="Dashboard Real-time"
+                description="Pantau status penanganan laporan secara real-time dengan tracking code unik untuk setiap laporan."
+              />
+            </div>
+            <div className="reveal">
+              <FeatureCard
+                gradient="from-emerald-500 to-teal-600"
+                shadow="shadow-emerald-500/25"
+                icon={
+                  <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                }
+                title="Respon Cepat"
+                description="Tim BPBD siaga 24/7 untuk merespon setiap laporan dengan prioritas tinggi pada kasus darurat."
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -230,7 +266,7 @@ export default function LandingPage() {
       <section className="relative overflow-hidden bg-gray-50 py-20">
         <div className="relative mx-auto max-w-7xl px-6">
           <div className="grid items-center gap-12 lg:grid-cols-2">
-            <div className="relative">
+            <div className="reveal relative">
               <div className="absolute -inset-4 rounded-[2rem] bg-gradient-to-br from-brand-500/15 to-orange-500/15"></div>
               <div className="absolute -bottom-8 -left-8 h-44 w-44 rounded-full bg-brand-500/10 blur-2xl"></div>
               <img
@@ -251,7 +287,7 @@ export default function LandingPage() {
               </div>
             </div>
 
-            <div className="space-y-6">
+            <div className="reveal space-y-6">
               <span className="inline-flex items-center gap-2 rounded-full border border-brand-100 bg-white px-4 py-1.5 text-xs font-bold uppercase tracking-[0.25em] text-brand-600">
                 Keunggulan Sistem
               </span>
@@ -279,7 +315,7 @@ export default function LandingPage() {
         <div className="absolute -right-16 -bottom-32 h-[28rem] w-[28rem] rounded-full bg-white/10"></div>
         <div className="absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-yellow-300/20 blur-3xl"></div>
 
-        <div className="relative mx-auto max-w-4xl space-y-6 px-6 text-center">
+        <div className="reveal relative mx-auto max-w-4xl space-y-6 px-6 text-center">
           <span className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.25em] backdrop-blur-sm">
             <span className="h-2 w-2 animate-pulse rounded-full bg-white"></span>
             Call Center 24 Jam
@@ -317,7 +353,7 @@ export default function LandingPage() {
       </section>
 
       <footer className="bg-gray-900 text-gray-400">
-        <div className="mx-auto max-w-7xl px-6 py-14">
+        <div className="reveal mx-auto max-w-7xl px-6 py-14">
           <div className="grid gap-10 md:grid-cols-3">
             <div className="space-y-3">
               <div className="flex items-center gap-3">

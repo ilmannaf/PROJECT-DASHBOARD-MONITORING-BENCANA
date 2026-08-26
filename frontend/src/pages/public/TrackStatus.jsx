@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { trackReport } from '../../services/reportService';
 
@@ -18,6 +18,8 @@ export default function TrackStatus() {
   const [loading, setLoading] = useState(false);
   const [searchHistory, setSearchHistory] = useState([]);
   const [showMap, setShowMap] = useState(false);
+  const [showResult, setShowResult] = useState(false);
+  const [showSteps, setShowSteps] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,6 +41,12 @@ export default function TrackStatus() {
     try {
       const data = await trackReport(searchCode.trim());
       setResult(data);
+      setShowResult(false);
+      setShowSteps(false);
+      requestAnimationFrame(() => {
+        setShowResult(true);
+        setTimeout(() => setShowSteps(true), 200);
+      });
       
       const history = JSON.parse(localStorage.getItem('trackHistory') || '[]');
       const newHistory = [searchCode.trim(), ...history.filter(c => c !== searchCode.trim())].slice(0, 5);
@@ -112,7 +120,7 @@ export default function TrackStatus() {
         )}
 
         {result && (
-          <div className="bg-white shadow-sm border border-gray-100 rounded-xl p-5">
+          <div className={`${showResult ? 'result-bounce' : 'opacity-0'} bg-white shadow-sm border border-gray-100 rounded-xl p-5`}>
             <div className="flex justify-between items-start mb-4">
               <div>
                 <p className="text-xs text-gray-500">Kode Laporan</p>
@@ -168,14 +176,16 @@ export default function TrackStatus() {
               {STATUS_STEPS.map((step, i) => (
                 <div key={step} className="flex-1 flex items-center">
                   <div
-                    className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${
+                    className={`tracking-step w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 ${
                       i <= currentStepIndex ? 'bg-brand-600 text-white' : 'bg-gray-200 text-gray-400'
-                    }`}
+                    } ${showSteps ? 'show' : ''}`}
+                    style={{ transitionDelay: `${i * 0.12}s` }}
                   >
                     {i + 1}
                   </div>
                   {i < STATUS_STEPS.length - 1 && (
-                    <div className={`flex-1 h-0.5 ${i < currentStepIndex ? 'bg-brand-600' : 'bg-gray-200'}`} />
+                    <div className={`tracking-line flex-1 h-0.5 ${i < currentStepIndex ? 'bg-brand-600' : 'bg-gray-200'} ${showSteps ? 'show' : ''}`}
+                      style={{ transitionDelay: `${i * 0.12 + 0.1}s` }} />
                   )}
                 </div>
               ))}

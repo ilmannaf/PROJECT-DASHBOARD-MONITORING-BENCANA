@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import Login from './pages/admin/Login';
 import Dashboard from './pages/admin/Dashboard';
 import ReportsManagement from './pages/admin/ReportsManagement';
@@ -16,16 +17,29 @@ import DisasterMap from './pages/public/DisasterMap';
 import AdminLayout from './layouts/AdminLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
+
+function PageWrapper({ children }) {
+  return <div className="page-enter">{children}</div>;
+}
+
 function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/dashboard" element={<PublicDashboard />} />
-        <Route path="/lapor" element={<ReportForm />} />
-        <Route path="/lacak" element={<TrackStatus />} />
-        <Route path="/peta" element={<DisasterMap />} />
-        <Route path="/admin/login" element={<Login />} />
+        <Route path="/dashboard" element={<PageWrapper><PublicDashboard /></PageWrapper>} />
+        <Route path="/lapor" element={<PageWrapper><ReportForm /></PageWrapper>} />
+        <Route path="/lacak" element={<PageWrapper><TrackStatus /></PageWrapper>} />
+        <Route path="/peta" element={<PageWrapper><DisasterMap /></PageWrapper>} />
+        <Route path="/admin/login" element={<PageWrapper><Login /></PageWrapper>} />
 
         <Route
           element={
@@ -34,14 +48,14 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route path="/admin/dashboard" element={<Dashboard />} />
-          <Route path="/admin/reports" element={<ReportsManagement />} />
-          <Route path="/admin/inventory" element={<InventoryManagement />} />
-          <Route path="/admin/vehicles" element={<VehicleManagement />} />
-          <Route path="/admin/posko" element={<PoskoManagement />} />
-          <Route path="/admin/activities" element={<ActivityManagement />} />
-          <Route path="/admin/disaster-records" element={<DisasterRecordsManagement />} />
-          <Route path="/admin/users" element={<UsersManagement />} />
+          <Route path="/admin/dashboard" element={<PageWrapper><Dashboard /></PageWrapper>} />
+          <Route path="/admin/reports" element={<PageWrapper><ReportsManagement /></PageWrapper>} />
+          <Route path="/admin/inventory" element={<PageWrapper><InventoryManagement /></PageWrapper>} />
+          <Route path="/admin/vehicles" element={<PageWrapper><VehicleManagement /></PageWrapper>} />
+          <Route path="/admin/posko" element={<PageWrapper><PoskoManagement /></PageWrapper>} />
+          <Route path="/admin/activities" element={<PageWrapper><ActivityManagement /></PageWrapper>} />
+          <Route path="/admin/disaster-records" element={<PageWrapper><DisasterRecordsManagement /></PageWrapper>} />
+          <Route path="/admin/users" element={<PageWrapper><UsersManagement /></PageWrapper>} />
         </Route>
       </Routes>
     </BrowserRouter>

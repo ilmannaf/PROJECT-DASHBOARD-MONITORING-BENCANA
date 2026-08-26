@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../../services/authService";
 
@@ -8,7 +8,13 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showForm, setShowForm] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const t = setTimeout(() => setShowForm(true), 100);
+    return () => clearTimeout(t);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -32,18 +38,21 @@ export default function Login() {
     <div className="min-h-screen flex bg-white font-sans">
       {/* KOLOM KIRI — Form Login (45%) */}
       <div className="flex-1 bg-white flex items-center justify-center px-4 sm:px-8 py-12">
-        <div className="w-full max-w-md animate-fade-in">
+        <div className="w-full max-w-md">
           {/* Logo */}
           <img
             src="/assets/logo-bpbd.jpg"
             alt="Logo BPBD Kota Semarang"
-            className="w-14 h-14 rounded-xl object-cover mb-6 shadow-lg shadow-brand-500/30"
+            className={`login-stagger w-14 h-14 rounded-xl object-cover mb-6 shadow-lg shadow-brand-500/30 ${showForm ? 'show' : ''}`}
+            style={{ transitionDelay: '0s' }}
           />
 
-          <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">
+          <h1 className={`login-stagger text-2xl font-extrabold text-gray-900 tracking-tight ${showForm ? 'show' : ''}`}
+            style={{ transitionDelay: '0.06s' }}>
             Masuk ke Dashboard
           </h1>
-          <p className="text-sm text-gray-500 mt-1.5 mb-8">
+          <p className={`login-stagger text-sm text-gray-500 mt-1.5 mb-8 ${showForm ? 'show' : ''}`}
+            style={{ transitionDelay: '0.12s' }}>
             BPBD Kota Semarang - Sistem Manajemen Kebencanaan
           </p>
 
@@ -53,7 +62,7 @@ export default function Login() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className={`login-stagger ${showForm ? 'show' : ''}`} style={{ transitionDelay: '0.18s' }}>
             <div className="mb-5">
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 Email
@@ -186,10 +195,10 @@ export default function Login() {
 
       {/* KOLOM KANAN — Panel Branding (55%) */}
       <div className="hidden lg:flex lg:w-[55%] relative overflow-hidden bg-brand-600 items-center justify-center">
-        {/* Dekorasi lingkaran transparan */}
-        <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-white/10"></div>
-        <div className="absolute -bottom-32 -left-24 w-[28rem] h-[28rem] rounded-full bg-white/10"></div>
-        <div className="absolute top-1/3 left-10 w-40 h-40 rounded-full bg-yellow-300/20 blur-2xl"></div>
+        {/* Floating blobs */}
+        <div className="blob bg-white" style={{ width: 320, height: 320, top: -60, right: -60 }}></div>
+        <div className="blob bg-yellow-300" style={{ width: 260, height: 260, bottom: -80, left: -40 }}></div>
+        <div className="blob bg-orange-300" style={{ width: 200, height: 200, top: '40%', left: '15%' }}></div>
 
         <div className="relative z-10 flex flex-col justify-center px-12 lg:px-16 py-16 w-full max-w-2xl">
           <img

@@ -1,4 +1,5 @@
-import { Outlet, NavLink, useNavigate } from "react-router-dom";
+import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
 import { logout, getCurrentUser, isAdmin } from "../services/authService";
 
 const ICONS = {
@@ -57,7 +58,10 @@ const MENU_ITEMS = [
 
 export default function AdminLayout() {
   const navigate = useNavigate();
+  const location = useLocation();
   const user = getCurrentUser();
+  const navRef = useRef(null);
+  const [indicator, setIndicator] = useState({ top: 0, height: 0 });
 
   const handleLogout = () => {
     logout();
@@ -67,6 +71,19 @@ export default function AdminLayout() {
   const MENU = isAdmin()
     ? MENU_ITEMS
     : MENU_ITEMS.filter((item) => item.path !== "/admin/users");
+
+  const activeIndex = MENU.findIndex((item) => location.pathname === item.path);
+
+  useEffect(() => {
+    if (!navRef.current) return;
+    const activeLink = navRef.current.children[activeIndex];
+    if (activeLink) {
+      setIndicator({
+        top: activeLink.offsetTop,
+        height: activeLink.offsetHeight,
+      });
+    }
+  }, [activeIndex, location.pathname]);
 
   const initials = user?.name
     ?.split(" ")
@@ -96,15 +113,22 @@ export default function AdminLayout() {
           </div>
         </div>
 
-        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+        <nav className="flex-1 p-4 space-y-1 overflow-y-auto relative" ref={navRef}>
+          {/* Sliding indicator */}
+          {activeIndex >= 0 && (
+            <div
+              className="sidebar-indicator absolute left-4 right-4 rounded-xl bg-gradient-to-r from-brand-500 to-orange-600 shadow-lg shadow-brand-500/25 z-0"
+              style={{ top: indicator.top, height: indicator.height }}
+            />
+          )}
           {MENU.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
+                `relative z-10 flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                   isActive
-                    ? "bg-gradient-to-r from-brand-500 to-orange-600 text-white shadow-lg shadow-brand-500/25"
+                    ? "text-white"
                     : "text-gray-300 hover:bg-white/10 hover:text-white"
                 }`
               }
