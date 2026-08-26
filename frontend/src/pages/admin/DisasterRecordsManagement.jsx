@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getDisasterRecords, createDisasterRecord, updateDisasterRecord, deleteDisasterRecord, downloadDisasterPdf, exportDisasterRecordsExcel } from '../../services/disasterService';
 import { isAdmin } from '../../services/authService';
+import AnimatedNumber from '../../components/AnimatedNumber';
 
 const inputClass =
   "w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition shadow-sm bg-white";
@@ -9,6 +10,7 @@ export default function DisasterRecordsManagement() {
   const adminUser = isAdmin();
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showContent, setShowContent] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -42,7 +44,7 @@ export default function DisasterRecordsManagement() {
     getDisasterRecords()
       .then(setRecords)
       .catch(console.error)
-      .finally(() => setLoading(false));
+      .finally(() => { setLoading(false); setTimeout(() => setShowContent(true), 80); });
   };
 
   useEffect(() => { loadRecords(); }, []);
@@ -350,7 +352,7 @@ export default function DisasterRecordsManagement() {
       )}
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-all group">
+        <div className={`stat-card bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-all group ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0ms' }}>
           <div className="flex items-center justify-between mb-3">
             <div className="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -359,11 +361,11 @@ export default function DisasterRecordsManagement() {
             </div>
             <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Total</span>
           </div>
-          <p className="text-3xl font-extrabold text-gray-900">{records.length}</p>
+          <p className="text-3xl font-extrabold text-gray-900"><AnimatedNumber value={records.length} /></p>
           <p className="text-xs text-gray-500 mt-1">Data bencana tercatat</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-all group">
+        <div className={`stat-card bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-all group ${showContent ? 'show' : ''}`} style={{ transitionDelay: '60ms' }}>
           <div className="flex items-center justify-between mb-3">
             <div className="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -372,11 +374,11 @@ export default function DisasterRecordsManagement() {
             </div>
             <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Bulan Ini</span>
           </div>
-          <p className="text-3xl font-extrabold text-gray-900">{monthStats}</p>
+          <p className="text-3xl font-extrabold text-gray-900"><AnimatedNumber value={monthStats} /></p>
           <p className="text-xs text-gray-500 mt-1">Kejadian bulan ini</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-all group">
+        <div className={`stat-card bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-all group ${showContent ? 'show' : ''}`} style={{ transitionDelay: '120ms' }}>
           <div className="flex items-center justify-between mb-3">
             <div className="w-11 h-11 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -386,11 +388,11 @@ export default function DisasterRecordsManagement() {
             </div>
             <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Wilayah</span>
           </div>
-          <p className="text-3xl font-extrabold text-gray-900">{kecamatanList.length}</p>
+          <p className="text-3xl font-extrabold text-gray-900"><AnimatedNumber value={kecamatanList.length} /></p>
           <p className="text-xs text-gray-500 mt-1">Kecamatan terdampak</p>
         </div>
 
-        <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-all group">
+        <div className={`stat-card bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-all group ${showContent ? 'show' : ''}`} style={{ transitionDelay: '180ms' }}>
           <div className="flex items-center justify-between mb-3">
             <div className="w-11 h-11 rounded-xl bg-red-50 text-red-500 flex items-center justify-center group-hover:scale-110 transition-transform">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -399,7 +401,7 @@ export default function DisasterRecordsManagement() {
             </div>
             <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Korban</span>
           </div>
-          <p className="text-3xl font-extrabold text-gray-900">{totalKorban}</p>
+          <p className="text-3xl font-extrabold text-gray-900"><AnimatedNumber value={totalKorban} /></p>
           <p className="text-xs text-gray-500 mt-1">Total korban tercatat</p>
         </div>
       </div>

@@ -7,6 +7,7 @@ import {
 } from "../../services/vehicleService";
 import { getPosko } from "../../services/poskoService";
 import { isAdmin } from "../../services/authService";
+import AnimatedNumber from '../../components/AnimatedNumber';
 
 const STATUS_OPTIONS = ["siap", "maintenance", "rusak"];
 const STATUS_BG = {
@@ -19,6 +20,7 @@ export default function VehicleManagement() {
   const adminUser = isAdmin();
   const [vehicles, setVehicles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showContent, setShowContent] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [form, setForm] = useState({
@@ -34,7 +36,7 @@ export default function VehicleManagement() {
     getVehicles()
       .then(setVehicles)
       .catch(console.error)
-      .finally(() => setLoading(false));
+      .finally(() => { setLoading(false); setTimeout(() => setShowContent(true), 80); });
   };
 
   useEffect(() => {
@@ -211,25 +213,25 @@ export default function VehicleManagement() {
       )}
 
       <div className="grid grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
-        <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+        <div className={`stat-card bg-white rounded-2xl p-5 border border-gray-100 shadow-sm ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0s' }}>
           <p className="text-sm text-gray-500 mb-1">Total</p>
-          <p className="text-3xl font-extrabold text-gray-900">{vehicles.length}</p>
+          <p className="text-3xl font-extrabold text-gray-900"><AnimatedNumber value={vehicles.length} /></p>
         </div>
-        <div className="bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl p-5 text-white shadow-lg shadow-emerald-500/25">
+        <div className={`stat-card bg-gradient-to-br from-emerald-500 to-green-600 rounded-2xl p-5 text-white shadow-lg shadow-emerald-500/25 ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0.08s' }}>
           <p className="text-xs text-emerald-100 mb-1">Siap</p>
-          <p className="text-3xl font-extrabold">{countByStatus('siap')}</p>
+          <p className="text-3xl font-extrabold"><AnimatedNumber value={countByStatus('siap')} /></p>
         </div>
-        <div className="bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl p-5 text-white shadow-lg shadow-amber-500/25">
+        <div className={`stat-card bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl p-5 text-white shadow-lg shadow-amber-500/25 ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0.16s' }}>
           <p className="text-xs text-amber-100 mb-1">Maintenance</p>
-          <p className="text-3xl font-extrabold">{countByStatus('maintenance')}</p>
+          <p className="text-3xl font-extrabold"><AnimatedNumber value={countByStatus('maintenance')} /></p>
         </div>
-        <div className="bg-gradient-to-br from-red-500 to-rose-600 rounded-2xl p-5 text-white shadow-lg shadow-red-500/25">
+        <div className={`stat-card bg-gradient-to-br from-red-500 to-rose-600 rounded-2xl p-5 text-white shadow-lg shadow-red-500/25 ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0.24s' }}>
           <p className="text-xs text-red-100 mb-1">Rusak</p>
-          <p className="text-3xl font-extrabold">{countByStatus('rusak')}</p>
+          <p className="text-3xl font-extrabold"><AnimatedNumber value={countByStatus('rusak')} /></p>
         </div>
-        <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-5 text-white shadow-lg shadow-blue-500/25">
+        <div className={`stat-card bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-5 text-white shadow-lg shadow-blue-500/25 ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0.32s' }}>
           <p className="text-xs text-blue-100 mb-1">Posko</p>
-          <p className="text-3xl font-extrabold">{new Set(vehicles.filter(v => v.posko_id).map(v => v.posko_id)).size}</p>
+          <p className="text-3xl font-extrabold"><AnimatedNumber value={new Set(vehicles.filter(v => v.posko_id).map(v => v.posko_id)).size} /></p>
         </div>
       </div>
 

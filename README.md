@@ -19,13 +19,13 @@ PROJECT-DASHBOARD-MONITORING-BENCANA/
 
 ### 🌐 Public Features
 - **Landing Page Modern** - Full-bleed hero foto kantor (≈90vh) dengan overlay gradient, navbar transparan, dan judul besar "BPBD KOTA SEMARANG"
-- **Login Publik** - Split-screen seperti admin dengan penanda badge "PORTAL PUBLIK" (aksen biru) pembeda dari admin
-- **Laporan Bencana** - Form pelaporan dengan peta interaktif (klik/drag marker, GPS opsional), koordinat opsional (laporan tetap terkirim tanpa titik), dan upload **max 5 foto** (JPG/PNG/WEBP 5MB)
+- **Laporan Bencana** - Form pelaporan dengan peta interaktif (klik/drag marker, GPS opsional), koordinat opsional (laporan tetap terkirim tanpa titik), dan upload **max 5 foto** (JPG/PNG/WEBP 5MB). Akses langsung tanpa login publik
 - **Lacak Status** - Tracking laporan dengan kode unik `BPBD-2026-XXXX` + peta lokasi & galeri foto
-- **Dashboard Pelapor** - Login/register untuk melihat laporan pribadi (ter-link via `reporter_user_id` + fallback `localStorage` tracking codes), auto-refresh 15s, tombol Refresh, badge 📷/📍
+- **Peta Sebaran** - `/peta` publik tanpa login, filter jenis/status, marker warna per bencana
 
 ### 🔐 Admin/Petugas Features
-- **Dashboard Admin** - Statistik dan charts (Recharts)
+- **Admin Sidebar** - Dark sidebar layout (bg-gray-900) dengan sliding gradient indicator, lucide-react icons, mobile drawer, dan user footer dengan logout
+- **Dashboard Admin** - Statistik dan charts (Recharts) dengan AnimatedNumber count-up
 - **Kelola Laporan** - Update status, filter, assign petugas, **hapus laporan** (icon 🗑️ dengan konfirmasi), preview foto & koordinat
 - **Pendataan Bencana** - Formulir detail kejadian (kronologi, korban, terdampak, kerugian)
 - **Download PDF** - Ekspor formulir pendataan bencana sebagai dokumen resmi BPBD
@@ -33,34 +33,28 @@ PROJECT-DASHBOARD-MONITORING-BENCANA/
 - **Kendaraan** - Fleet management dengan status service
 - **Posko** - Kelola titik posko pengungsian
 - **Kegiatan** - Laporan kegiatan lapangan dengan dokumentasi
-- **Peta Sebaran** - `/peta` publik tanpa login, filter jenis/status, marker warna per bencana
 
 ### 🔥 Highlight Features
 - ✅ Logo resmi BPBD (gambar) menggantikan teks logo di seluruh halaman
 - ✅ Landasan hero & login publik pakai foto/logo dari `frontend/public/assets/`
-- ✅ Split-screen login admin (form kiri + panel branding kanan)
-- ✅ Split-screen login publik dengan penanda "PORTAL PUBLIK" + akses terpisah ke login admin
+- ✅ Admin sidebar dark mode (bg-gray-900) dengan lucide-react icons & sliding active indicator
+- ✅ Mobile drawer sidebar dengan backdrop + animated slide-in/out
 - ✅ Toggle show/hide password + kursor pointer di semua tombol
-- ✅ Tombol "Masuk dengan Google" (UI siap; butuh konfigurasi OAuth backend)
 - ✅ Formulir pendataan bencana dengan field korban/terdampak terpisah
 - ✅ Privasi sumber info — nama & no. HP bisa dikosongkan (opsional)
 - ✅ Export PDF formulir pendataan (pdfkit)
 - ✅ Google Maps + Leaflet integration di halaman lacak & peta sebaran
-- ✅ Real-time tracking dengan kode `BPBD-2026-XXXX`
 - ✅ Role-based authorization (admin/petugas/pelapor - fix ENUM pelapor)
 - ✅ Upload **max 5 foto** per laporan (report_photos table) + koordinat opsional dengan map picker presisi
-- ✅ Dashboard publik auto-refresh & localStorage fallback untuk laporan anonim
-- ✅ Hapus laporan di admin dengan hapus file fisik
-- ✅ Animasi UI murni CSS + vanilla JS (tanpa library tambahan)
+- ✅ Animasi UI konsisten di semua halaman admin (CSS + vanilla JS)
   - Landing page: hero stagger entrance, kenburns image effect, scroll-reveal sections
-  - Admin dashboard: animated counter (countUp) untuk statistik, staggered card/chart entrance
-  - Login admin: floating animated blobs + form stagger entrance
-  - Login publik: floating animated blobs + form stagger entrance
+  - Admin sidebar: sliding gradient indicator yang track menu aktif, stagger menu entrance
+  - Admin dashboard: AnimatedNumber count-up, staggered card/chart entrance, pulse status dots
+  - Login admin: floating animated blobs + form stagger entrance + loading spinner di tombol
   - ReportForm: form section entrance + bounce-in hasil + checkmark draw animation
   - TrackStatus: progress step bounce-in + connector line grow + result bounce
   - DisasterMap: stat card stagger entrance
-  - Admin sidebar: sliding gradient indicator yang track menu aktif
-  - Semua halaman: page fade-in transition + auto scroll-to-top
+  - Semua admin pages: showContent stagger entrance (80ms delay), stat-card animation, pulse dots
   - `prefers-reduced-motion` respected untuk accessibility
 
 ---
@@ -82,6 +76,7 @@ PROJECT-DASHBOARD-MONITORING-BENCANA/
 - Axios + Socket.IO Client
 - Recharts (data visualization)
 - Leaflet (peta interaktif)
+- Lucide React (icons)
 - Pure CSS + JS animations (tanpa library tambahan)
 
 ---
@@ -128,7 +123,6 @@ npm run dev
 ### 4. Akses Aplikasi
 - **Landing**: http://localhost:5173/
 - **Login Admin**: http://localhost:5173/admin/login
-- **Login Pelapor**: http://localhost:5173/dashboard
 - **Lapor Bencana**: http://localhost:5173/lapor
 - **Lacak Status**: http://localhost:5173/lacak
 
@@ -153,8 +147,7 @@ npm run dev
 
 ### Public
 - `/` - Landing page
-- `/dashboard` - Public dashboard pelapor (login required, auto-refresh + localStorage tracking codes)
-- `/lapor` - Form pelaporan bencana (map picker, max 5 foto)
+- `/lapor` - Form pelaporan bencana (tanpa login, map picker, max 5 foto)
 - `/lacak` - Cek status laporan via tracking code
 - `/peta` - Peta sebaran bencana publik (tanpa login, filter & marker warna)
 
@@ -258,11 +251,11 @@ Sistem menggunakan tema warna oranye konsisten untuk branding BPBD:
 - [x] Peta sebaran publik `/peta` tanpa login
 - [x] Role-based authorization (fix ENUM pelapor + reporter_user_id)
 - [x] Pendataan bencana + export PDF
-- [x] Redesign login split-screen (admin & portal publik)
+- [x] Admin sidebar dark mode (lucide-react icons + sliding indicator + mobile drawer)
+- [x] Consistent animations across all admin pages (stagger entrance, AnimatedNumber, pulse dots)
+- [x] Login admin split-screen + loading spinner
 - [x] Landing page polish (hero, fitur, CTA, footer) + logo gambar BPBD
 - [x] Kelola laporan admin dengan hapus + preview foto/koordinat
-- [x] Dashboard publik dengan auto-refresh & localStorage fallback
-- [x] Animasi UI murni CSS + vanilla JS (stagger, bounce, scroll-reveal, page transitions)
 - [ ] Google OAuth login (backend)
 - [ ] Socket.IO live updates (full real-time)
 - [ ] Mobile app (React Native)

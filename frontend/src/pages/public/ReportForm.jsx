@@ -441,7 +441,7 @@ function ReportHeader() {
           <img src="/assets/logo-bpbd.jpg" alt="Logo BPBD Kota Semarang" className="h-9 w-9 rounded-lg object-cover" />
           <div className="leading-tight text-left"><p className="font-extrabold text-gray-900 text-sm">BPBD Kota Semarang</p><p className="text-[11px] text-gray-500">Sistem Monitoring Kebencanaan</p></div>
         </button>
-        <div className="hidden sm:flex items-center gap-1"><NavLinkPath to="/lacak" label="Lacak Laporan" /><NavLinkPath to="/dashboard" label="Dashboard" /></div>
+        <div className="hidden sm:flex items-center gap-1"><NavLinkPath to="/lacak" label="Lacak Laporan" /><NavLinkPath to="/" label="Beranda" /></div>
       </div>
     </header>
   );

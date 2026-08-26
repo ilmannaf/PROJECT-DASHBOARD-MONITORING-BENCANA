@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { trackReport } from '../../services/reportService';
 
 const STATUS_STEPS = ['baru', 'diverifikasi', 'ditindaklanjuti', 'selesai'];
@@ -20,7 +20,6 @@ export default function TrackStatus() {
   const [showMap, setShowMap] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [showSteps, setShowSteps] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const history = JSON.parse(localStorage.getItem('trackHistory') || '[]');
@@ -208,14 +207,6 @@ export default function TrackStatus() {
           </div>
         )}
 
-        <div className="mt-6 text-center">
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="text-sm text-brand-600 hover:text-brand-700 font-semibold"
-          >
-            ← Kembali ke Dashboard
-          </button>
-        </div>
       </div>
     </div>
   );

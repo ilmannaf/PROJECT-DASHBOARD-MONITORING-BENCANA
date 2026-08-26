@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getUsers, createUser, resetPassword, deleteUser } from '../../services/userService';
 import { getCurrentUser } from '../../services/authService';
+import AnimatedNumber from '../../components/AnimatedNumber';
 
 const inputClass =
   "w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition bg-white";
@@ -9,23 +10,25 @@ export default function UsersManagement() {
   const currentUser = getCurrentUser();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showContent, setShowContent] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [message, setMessage] = useState('');
 
   const loadUsers = () => {
     setLoading(true);
+    setShowContent(false);
     getUsers()
       .then(setUsers)
       .catch(console.error)
-      .finally(() => setLoading(false));
+      .finally(() => { setLoading(false); setTimeout(() => setShowContent(true), 80); });
   };
 
   useEffect(() => {
     getUsers()
       .then(setUsers)
       .catch(console.error)
-      .finally(() => setLoading(false));
+      .finally(() => { setLoading(false); setTimeout(() => setShowContent(true), 80); });
   }, []);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
@@ -79,7 +82,7 @@ export default function UsersManagement() {
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div>
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-indigo-700 text-white flex items-center justify-center shadow-lg shadow-indigo-500/30">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 text-white flex items-center justify-center shadow-lg shadow-brand-500/30">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
@@ -92,7 +95,7 @@ export default function UsersManagement() {
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="btn btn-primary flex items-center gap-2 px-5 py-3 shadow-lg shadow-indigo-500/25"
+          className="btn btn-primary flex items-center gap-2 px-5 py-3 shadow-lg shadow-brand-500/25"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={showForm ? "M6 18L18 6M6 6l12 12" : "M12 4v16m8-8H4"} />
@@ -110,7 +113,7 @@ export default function UsersManagement() {
       {showForm && (
         <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/60 border border-gray-100 p-6 mb-8 animate-slide-in">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 text-white flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white flex items-center justify-center">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
               </svg>
@@ -138,10 +141,21 @@ export default function UsersManagement() {
         </div>
       )}
 
+      {!loading && (
+        <div className={`grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 transition-all duration-500 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+          <div className="stat-card bg-white rounded-2xl shadow-lg shadow-gray-200/60 border border-gray-100 p-5">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Total Pengguna</p>
+            <p className="text-3xl font-extrabold text-gray-900">
+              <AnimatedNumber value={users.length} />
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/60 border border-gray-100 overflow-hidden">
         <div className="p-6 border-b border-gray-100 flex items-center justify-between">
           <h2 className="font-bold text-gray-900 text-sm flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+            <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
             Daftar Pengguna
           </h2>
           <span className="text-xs text-gray-400">{users.length} pengguna</span>
@@ -149,7 +163,7 @@ export default function UsersManagement() {
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-20">
-            <div className="w-14 h-14 rounded-full border-4 border-indigo-100 border-t-indigo-500 animate-spin mb-4"></div>
+            <div className="w-14 h-14 rounded-full border-4 border-brand-100 border-t-brand-500 animate-spin mb-4"></div>
             <p className="text-gray-500 font-medium">Memuat data...</p>
           </div>
         ) : (

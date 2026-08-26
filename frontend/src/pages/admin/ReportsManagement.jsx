@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { getReports, updateReportStatus, deleteReport, exportReportsExcel, getReportStats } from '../../services/reportService';
 import { getSocket } from '../../services/socket';
 import { showToast } from '../../components/Toast';
+import AnimatedNumber from '../../components/AnimatedNumber';
 
 const STATUS_OPTIONS = ['baru', 'diverifikasi', 'ditindaklanjuti', 'selesai'];
 const DISASTER_TYPES = ['Banjir', 'Longsor', 'Kebakaran', 'Angin Puting Beliung', 'Gempa Bumi', 'Lainnya'];
@@ -47,6 +48,7 @@ export default function ReportsManagement() {
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [loading, setLoading] = useState(true);
+  const [showContent, setShowContent] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const debounceRef = useRef(null);
@@ -76,7 +78,7 @@ export default function ReportsManagement() {
         setStatusCounts(stats.byStatus || {});
       })
       .catch((err) => console.error(err))
-      .finally(() => setLoading(false));
+      .finally(() => { setLoading(false); setTimeout(() => setShowContent(true), 80); });
   }, [filter, disasterType, dateFrom, dateTo, debouncedSearch, page]);
 
   useEffect(() => { setPage(1); }, [filter, disasterType, dateFrom, dateTo, debouncedSearch]);
@@ -161,22 +163,24 @@ export default function ReportsManagement() {
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
         <button
           onClick={() => setFilter('')}
-          className={`rounded-2xl p-5 border transition-all ${filter === '' ? 'bg-gradient-to-br from-gray-900 to-gray-800 text-white border-gray-900 shadow-lg shadow-gray-900/25' : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'}`}
+          className={`stat-card ${showContent ? 'show' : ''} rounded-2xl p-5 border transition-all ${filter === '' ? 'bg-gradient-to-br from-gray-900 to-gray-800 text-white border-gray-900 shadow-lg shadow-gray-900/25' : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'}`}
+          style={{ transitionDelay: '0s' }}
         >
           <p className="text-sm font-semibold mb-1">Semua</p>
-          <p className="text-2xl font-extrabold">{total}</p>
+          <p className="text-2xl font-extrabold"><AnimatedNumber value={total} /></p>
         </button>
-        {STATUS_OPTIONS.map((s) => (
+        {STATUS_OPTIONS.map((s, index) => (
           <button
             key={s}
             onClick={() => setFilter(s)}
-            className={`rounded-2xl p-5 border transition-all ${filter === s ? `bg-gradient-to-br ${STATUS_COLOR[s]} text-white border-transparent shadow-lg` : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'}`}
+            className={`stat-card ${showContent ? 'show' : ''} rounded-2xl p-5 border transition-all ${filter === s ? `bg-gradient-to-br ${STATUS_COLOR[s]} text-white border-transparent shadow-lg` : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'}`}
+            style={{ transitionDelay: `${(index + 1) * 0.08}s` }}
           >
             <div className="flex items-center gap-2 mb-1">
               {filter === s ? STATUS_ICON[s] : <span className="text-gray-400">{STATUS_ICON[s]}</span>}
               <p className="text-sm font-semibold capitalize">{s}</p>
             </div>
-            <p className="text-2xl font-extrabold">{statusCounts[s] || '—'}</p>
+            <p className="text-2xl font-extrabold"><AnimatedNumber value={statusCounts[s] || 0} /></p>
           </button>
         ))}
       </div>
@@ -308,6 +312,7 @@ export default function ReportsManagement() {
                         <td className="py-4 px-6 text-center">
                           <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r ${STATUS_COLOR[r.status]} text-white shadow-sm`}>
                             {STATUS_ICON[r.status]}
+                            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
                             <span className="capitalize">{r.status}</span>
                           </span>
                         </td>

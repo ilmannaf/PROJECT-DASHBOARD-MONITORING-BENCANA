@@ -37,7 +37,6 @@ function App() {
       <ToastContainer />
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/dashboard" element={<PageWrapper><PublicDashboard /></PageWrapper>} />
         <Route path="/lapor" element={<PageWrapper><ReportForm /></PageWrapper>} />
         <Route path="/lacak" element={<PageWrapper><TrackStatus /></PageWrapper>} />
         <Route path="/peta" element={<PageWrapper><DisasterMap /></PageWrapper>} />

@@ -79,10 +79,10 @@ export default function LandingPage() {
               Lacak Laporan
             </button>
             <button
-              onClick={() => navigate("/dashboard")}
+              onClick={() => navigate("/lapor")}
               className="rounded-lg border border-white/50 px-4 py-2 text-sm font-semibold text-white transition hover:border-white hover:bg-white/10"
             >
-              Login Public
+              Lapor Bencana
             </button>
             <button
               onClick={() => navigate("/admin/login")}
@@ -144,10 +144,10 @@ export default function LandingPage() {
               Lacak Laporan
             </button>
             <button
-              onClick={() => navigate("/dashboard")}
+              onClick={() => navigate("/lapor")}
               className="block w-full rounded-lg border border-white/40 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white hover:text-brand-600"
             >
-              Login Public
+              Lapor Bencana
             </button>
             <button
               onClick={() => navigate("/admin/login")}
@@ -336,7 +336,7 @@ export default function LandingPage() {
               Buat Laporan Sekarang
             </button>
             <button
-              onClick={() => navigate("/dashboard")}
+              onClick={() => navigate("/lapor")}
               className="rounded-xl border border-white/40 bg-transparent px-8 py-4 font-bold text-white transition-all hover:bg-brand-900/60"
             >
               Lihat Dashboard

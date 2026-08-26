@@ -7,20 +7,27 @@ import {
 } from "../../services/inventoryService";
 import { getPosko } from "../../services/poskoService";
 import { isAdmin } from "../../services/authService";
+import { Package, Search, Plus, X, Trash2 } from "lucide-react";
+import AnimatedNumber from '../../components/AnimatedNumber';
 
 const CATEGORIES = ["logistik", "peralatan", "p3k"];
 const CONDITIONS = ["baik", "rusak", "perlu_maintenance"];
 const CONDITION_COLOR = {
-  baik: "bg-green-100 text-green-700",
-  rusak: "bg-red-100 text-red-700",
-  perlu_maintenance: "bg-yellow-100 text-yellow-700",
+  baik: "from-emerald-500 to-green-600",
+  rusak: "from-red-500 to-rose-600",
+  perlu_maintenance: "from-amber-400 to-orange-500",
 };
+
+const inputClass =
+  "w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition shadow-sm bg-white";
 
 export default function InventoryManagement() {
   const adminUser = isAdmin();
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showContent, setShowContent] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const [form, setForm] = useState({
     name: "",
     category: "logistik",
@@ -36,7 +43,7 @@ export default function InventoryManagement() {
     getItems()
       .then(setItems)
       .catch(console.error)
-      .finally(() => setLoading(false));
+      .finally(() => { setLoading(false); setTimeout(() => setShowContent(true), 80); });
   };
 
   useEffect(() => {
@@ -47,19 +54,23 @@ export default function InventoryManagement() {
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
+  const resetForm = () => {
+    setForm({
+      name: "",
+      category: "logistik",
+      item_condition: "baik",
+      quantity: 0,
+      unit: "",
+      posko_id: "",
+    });
+    setShowForm(false);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await createItem(form);
-      setForm({
-        name: "",
-        category: "logistik",
-        item_condition: "baik",
-        quantity: 0,
-        unit: "",
-        posko_id: "",
-      });
-      setShowForm(false);
+      resetForm();
       loadItems();
     } catch (err) {
       alert(err.response?.data?.message || "Gagal menambah item");
@@ -85,168 +96,305 @@ export default function InventoryManagement() {
     }
   };
 
+  const filteredItems = items.filter((item) => {
+    const q = searchTerm.toLowerCase();
+    return (
+      item.name?.toLowerCase().includes(q) ||
+      item.category?.toLowerCase().includes(q) ||
+      item.posko_name?.toLowerCase().includes(q)
+    );
+  });
+
+  const countByCondition = (c) => items.filter((i) => i.item_condition === c).length;
+
   return (
-    <div className="p-6">
-      <div className="flex justify-between items-center mb-4">
-        <h1 className="text-2xl font-bold">Manajemen Inventaris</h1>
+    <div className="p-6 lg:p-8 animate-fade-in">
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+        <div>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 text-white flex items-center justify-center shadow-lg shadow-brand-500/30">
+              <Package className="w-6 h-6" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Manajemen Inventaris</h1>
+              <p className="text-gray-500 text-sm mt-0.5">Kelola data inventaris dan logistik BPBD</p>
+            </div>
+          </div>
+        </div>
         {adminUser && (
           <button
-            onClick={() => setShowForm(!showForm)}
-            className="bg-brand-600 text-white px-4 py-2 rounded-lg text-sm"
+            onClick={() => {
+              if (showForm) resetForm();
+              else setShowForm(true);
+            }}
+            className="btn btn-primary flex items-center gap-2 shadow-lg shadow-brand-500/25 px-5 py-3"
           >
-            {showForm ? "Batal" : "+ Tambah Item"}
+            {showForm ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+            {showForm ? "Tutup Form" : "Tambah Item"}
           </button>
         )}
       </div>
 
       {showForm && adminUser && (
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white shadow rounded-xl p-4 mb-6 grid grid-cols-2 gap-4"
-        >
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Nama Barang
-            </label>
-            <input
-              name="name"
-              value={form.name}
-              onChange={handleChange}
-              required
-              className="w-full border rounded-lg px-3 py-2 text-sm"
-            />
+        <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/60 border border-gray-100 p-8 mb-8 animate-slide-in">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white flex items-center justify-center">
+              <Plus className="w-5 h-5" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900">Formulir Inventaris</h2>
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Kategori</label>
-            <select
-              name="category"
-              value={form.category}
-              onChange={handleChange}
-              className="w-full border rounded-lg px-3 py-2 text-sm"
-            >
-              {CATEGORIES.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Jumlah</label>
-            <input
-              type="number"
-              name="quantity"
-              value={form.quantity}
-              onChange={handleChange}
-              className="w-full border rounded-lg px-3 py-2 text-sm"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Satuan</label>
-            <input
-              name="unit"
-              value={form.unit}
-              onChange={handleChange}
-              placeholder="unit, kg, kotak, dll"
-              className="w-full border rounded-lg px-3 py-2 text-sm"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Posko</label>
-            <select
-              name="posko_id"
-              value={form.posko_id}
-              onChange={handleChange}
-              className="w-full border rounded-lg px-3 py-2 text-sm"
-            >
-              <option value="">Pilih posko</option>
-              {poskoList.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="col-span-2">
-            <button
-              type="submit"
-              className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm"
-            >
-              Simpan
-            </button>
-          </div>
-        </form>
-      )}
-
-      {loading ? (
-        <p className="text-sm text-gray-500">Memuat data...</p>
-      ) : (
-        <div className="bg-white shadow rounded-xl overflow-hidden">
-          <table className="w-full text-sm text-left">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="py-2 px-4">Nama</th>
-                <th className="py-2 px-4">Kategori</th>
-                <th className="py-2 px-4">Jumlah</th>
-                <th className="py-2 px-4">Posko</th>
-                <th className="py-2 px-4">Kondisi</th>
-                <th className="py-2 px-4">Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((item) => (
-                <tr key={item.id} className="border-t">
-                  <td className="py-2 px-4">{item.name}</td>
-                  <td className="py-2 px-4 capitalize">{item.category}</td>
-                  <td className="py-2 px-4">
-                    {item.quantity} {item.unit}
-                  </td>
-                  <td className="py-2 px-4">{item.posko_name || "-"}</td>
-                  <td className="py-2 px-4">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs ${CONDITION_COLOR[item.item_condition]}`}
-                    >
-                      {item.item_condition}
-                    </span>
-                  </td>
-                  <td className="py-2 px-4 flex gap-2 items-center">
-                    {adminUser ? (
-                      <>
-                        <select
-                          value={item.item_condition}
-                          onChange={(e) =>
-                            handleConditionChange(item.id, e.target.value)
-                          }
-                          className="border rounded px-2 py-1 text-xs"
-                        >
-                          {CONDITIONS.map((c) => (
-                            <option key={c} value={c}>
-                              {c}
-                            </option>
-                          ))}
-                        </select>
-                        <button
-                          onClick={() => handleDelete(item.id)}
-                          className="text-red-500 text-xs underline"
-                        >
-                          Hapus
-                        </button>
-                      </>
-                    ) : (
-                      <span className="text-xs text-gray-400">-</span>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {items.length === 0 && (
-            <p className="text-sm text-gray-500 p-4">
-              Belum ada data inventaris.
-            </p>
-          )}
+          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Nama Barang <span className="text-red-500">*</span>
+              </label>
+              <input
+                name="name"
+                value={form.name}
+                onChange={handleChange}
+                required
+                placeholder="Nama barang inventaris"
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Kategori</label>
+              <select
+                name="category"
+                value={form.category}
+                onChange={handleChange}
+                className={inputClass}
+              >
+                {CATEGORIES.map((c) => (
+                  <option key={c} value={c} className="capitalize">
+                    {c}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Jumlah</label>
+              <input
+                type="number"
+                name="quantity"
+                value={form.quantity}
+                onChange={handleChange}
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Satuan</label>
+              <input
+                name="unit"
+                value={form.unit}
+                onChange={handleChange}
+                placeholder="unit, kg, kotak, dll"
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Posko</label>
+              <select
+                name="posko_id"
+                value={form.posko_id}
+                onChange={handleChange}
+                className={inputClass}
+              >
+                <option value="">Pilih posko</option>
+                {poskoList.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Kondisi</label>
+              <select
+                name="item_condition"
+                value={form.item_condition}
+                onChange={handleChange}
+                className={inputClass}
+              >
+                {CONDITIONS.map((c) => (
+                  <option key={c} value={c} className="capitalize">
+                    {c.replace("_", " ")}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="md:col-span-2 flex gap-3">
+              <button type="submit" className="flex-1 btn btn-primary py-3.5">
+                Simpan Item
+              </button>
+              <button type="button" onClick={resetForm} className="btn btn-secondary py-3.5 px-8">
+                Batal
+              </button>
+            </div>
+          </form>
         </div>
       )}
+
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className={`stat-card bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-all group ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0s' }}>
+          <div className="flex items-center justify-between mb-3">
+            <div className="w-11 h-11 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <Package className="w-5 h-5" />
+            </div>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Total</span>
+          </div>
+          <p className="text-3xl font-extrabold text-gray-900"><AnimatedNumber value={items.length} /></p>
+          <p className="text-xs text-gray-500 mt-1">Total item inventaris</p>
+        </div>
+        <div className={`stat-card bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-all group ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0.08s' }}>
+          <div className="flex items-center justify-between mb-3">
+            <div className="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <span className="w-5 h-5 flex items-center justify-center font-bold text-sm">✓</span>
+            </div>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Baik</span>
+          </div>
+          <p className="text-3xl font-extrabold text-gray-900"><AnimatedNumber value={countByCondition("baik")} /></p>
+          <p className="text-xs text-gray-500 mt-1">Kondisi baik</p>
+        </div>
+        <div className={`stat-card bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-all group ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0.16s' }}>
+          <div className="flex items-center justify-between mb-3">
+            <div className="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <span className="w-5 h-5 flex items-center justify-center font-bold text-sm">!</span>
+            </div>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Maintenance</span>
+          </div>
+          <p className="text-3xl font-extrabold text-gray-900"><AnimatedNumber value={countByCondition("perlu_maintenance")} /></p>
+          <p className="text-xs text-gray-500 mt-1">Perlu maintenance</p>
+        </div>
+        <div className={`stat-card bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-all group ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0.24s' }}>
+          <div className="flex items-center justify-between mb-3">
+            <div className="w-11 h-11 rounded-xl bg-red-50 text-red-500 flex items-center justify-center group-hover:scale-110 transition-transform">
+              <span className="w-5 h-5 flex items-center justify-center font-bold text-sm">✕</span>
+            </div>
+            <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">Rusak</span>
+          </div>
+          <p className="text-3xl font-extrabold text-gray-900"><AnimatedNumber value={countByCondition("rusak")} /></p>
+          <p className="text-xs text-gray-500 mt-1">Kondisi rusak</p>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/60 border border-gray-100 overflow-hidden">
+        <div className="p-6 border-b border-gray-100">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
+            <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider">Daftar Inventaris</h3>
+          </div>
+          <div className="relative">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Cari nama barang, kategori, atau posko..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
+            />
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <div className="w-14 h-14 rounded-full border-4 border-brand-100 border-t-brand-500 animate-spin mb-4"></div>
+            <p className="text-gray-500 font-medium">Memuat data...</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="bg-gray-50/80">
+                  <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-500">Nama Barang</th>
+                  <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-500">Kategori</th>
+                  <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-500">Jumlah</th>
+                  <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-500">Posko</th>
+                  <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-500 text-center">Kondisi</th>
+                  <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-500 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {filteredItems.length > 0 ? (
+                  filteredItems.map((item) => (
+                    <tr key={item.id} className="hover:bg-orange-50/40 transition-colors group">
+                      <td className="py-4 px-6">
+                        <span className="font-semibold text-gray-900 text-sm">{item.name}</span>
+                      </td>
+                      <td className="py-4 px-6">
+                        <span className="capitalize text-sm text-gray-700">{item.category}</span>
+                      </td>
+                      <td className="py-4 px-6">
+                        <span className="text-sm font-medium text-gray-900">
+                          {item.quantity} {item.unit}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6">
+                        <span className="text-sm text-gray-600">{item.posko_name || "-"}</span>
+                      </td>
+                      <td className="py-4 px-6 text-center">
+                        <span
+                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r ${CONDITION_COLOR[item.item_condition]} text-white shadow-sm capitalize`}
+                        >
+                          {item.item_condition.replace("_", " ")}
+                        </span>
+                      </td>
+                      <td className="py-4 px-6">
+                        <div className="flex justify-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
+                          {adminUser ? (
+                            <>
+                              <select
+                                value={item.item_condition}
+                                onChange={(e) =>
+                                  handleConditionChange(item.id, e.target.value)
+                                }
+                                className="border border-gray-200 rounded-xl px-3 py-2 text-xs font-medium focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition bg-white capitalize cursor-pointer"
+                              >
+                                {CONDITIONS.map((c) => (
+                                  <option key={c} value={c}>
+                                    {c.replace("_", " ")}
+                                  </option>
+                                ))}
+                              </select>
+                              <button
+                                onClick={() => handleDelete(item.id)}
+                                className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"
+                                title="Hapus"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </>
+                          ) : (
+                            <span className="text-xs text-gray-400">-</span>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="6" className="py-20 text-center">
+                      <div className="flex flex-col items-center gap-4">
+                        <div className="w-20 h-20 rounded-full bg-gray-50 flex items-center justify-center">
+                          <Package className="w-10 h-10 text-gray-300" />
+                        </div>
+                        <div>
+                          <p className="text-lg font-semibold text-gray-700">
+                            {searchTerm ? "Tidak ada hasil" : "Belum ada data inventaris"}
+                          </p>
+                          <p className="text-sm text-gray-400 mt-1">
+                            {searchTerm ? "Coba ubah kata kunci" : 'Klik "Tambah Item" untuk memulai'}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
