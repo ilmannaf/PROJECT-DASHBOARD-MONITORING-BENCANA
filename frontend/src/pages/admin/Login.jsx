@@ -137,7 +137,7 @@ export default function Login() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between mb-6">
+            <div className="mb-6">
               <label className="flex items-center gap-2 text-sm text-gray-600 cursor-pointer select-none">
                 <input
                   type="checkbox"
@@ -145,13 +145,6 @@ export default function Login() {
                 />
                 Ingat saya
               </label>
-              <a
-                href="#"
-                onClick={(e) => e.preventDefault()}
-                className="text-sm font-medium text-brand-600 hover:text-brand-700"
-              >
-                Lupa password?
-              </a>
             </div>
 
             <button
