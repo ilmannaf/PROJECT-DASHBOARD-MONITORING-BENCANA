@@ -58,6 +58,9 @@ app.use('/api/disaster-records', disasterRoutes);
 const userRoutes = require('./routes/userRoutes');
 app.use('/api/users', userRoutes);
 
+const publicRoutes = require('./routes/publicRoutes');
+app.use('/api/public', publicRoutes);
+
 // 404 handler untuk route yang tidak ada
 app.use((req, res) => {
   res.status(404).json({ message: 'Endpoint tidak ditemukan' });

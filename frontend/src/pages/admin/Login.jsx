@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../../services/authService";
+import api from "../../services/api";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -9,11 +10,18 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [stats, setStats] = useState({ laporan: 0, kendaraan: 0, posko: 0 });
   const navigate = useNavigate();
 
   useEffect(() => {
     const t = setTimeout(() => setShowForm(true), 100);
     return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    api.get('/public/stats')
+      .then((res) => setStats(res.data))
+      .catch(() => {});
   }, []);
 
   const handleSubmit = async (e) => {
@@ -173,15 +181,15 @@ export default function Login() {
 
             <div className="grid grid-cols-3 gap-2 mb-4">
               <div className="bg-gray-50 rounded-lg p-2.5">
-                <p className="text-lg font-extrabold text-gray-900">24</p>
+                <p className="text-lg font-extrabold text-gray-900">{stats.laporan}</p>
                 <p className="text-[9px] text-gray-500 leading-tight">Laporan</p>
               </div>
               <div className="bg-gray-50 rounded-lg p-2.5">
-                <p className="text-lg font-extrabold text-gray-900">12</p>
+                <p className="text-lg font-extrabold text-gray-900">{stats.kendaraan}</p>
                 <p className="text-[9px] text-gray-500 leading-tight">Kendaraan</p>
               </div>
               <div className="bg-gray-50 rounded-lg p-2.5">
-                <p className="text-lg font-extrabold text-gray-900">3</p>
+                <p className="text-lg font-extrabold text-gray-900">{stats.posko}</p>
                 <p className="text-[9px] text-gray-500 leading-tight">Posko</p>
               </div>
             </div>

@@ -469,7 +469,10 @@ export default function DisasterMap() {
                 <MapContainer
                   center={SEMARANG_CENTER}
                   zoom={SEMARANG_ZOOM}
-                  minZoom={5}
+                  minZoom={11}
+                  maxZoom={18}
+                  maxBounds={SEMARANG_MAX_BOUNDS}
+                  maxBoundsViscosity={1.0}
                   style={{ height: "100%", width: "100%" }}
                   scrollWheelZoom={true}
                 >
@@ -481,7 +484,7 @@ export default function DisasterMap() {
                   {/* Gelapkan area di luar Kota Semarang */}
                   <Polygon
                     positions={[WORLD_RECT, SEMARANG_LATLNG]}
-                    pathOptions={{ stroke: false, fillColor: "#0f172a", fillOpacity: 0.55, fillRule: "evenodd" }}
+                    pathOptions={{ stroke: false, fillColor: "#0f172a", fillOpacity: 0.35, fillRule: "evenodd" }}
                   />
                   {/* Garis batas resmi Kota Semarang */}
                   <GeoJSON
@@ -558,27 +561,27 @@ export default function DisasterMap() {
                     const icon = L.divIcon({
                       html: `
                         <div style="
-                          width:36px;height:36px;
+                          width:28px;height:28px;
                           background:#3b82f6;
-                          border:3px solid white;
+                          border:2px solid white;
                           border-radius:50% 50% 50% 0;
                           transform: rotate(-45deg);
-                          box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+                          box-shadow: 0 2px 6px rgba(0,0,0,0.3);
                           display:flex;align-items:center;justify-content:center;
                         ">
                           <span style="
                             transform: rotate(45deg);
                             color:white;
-                            font-size:16px;
+                            font-size:13px;
                             line-height:1;
                             display:flex;
                           ">🏫</span>
                         </div>
                       `,
                       className: "custom-div-icon",
-                      iconSize: [36, 36],
-                      iconAnchor: [18, 36],
-                      popupAnchor: [0, -36],
+                      iconSize: [28, 28],
+                      iconAnchor: [14, 28],
+                      popupAnchor: [0, -28],
                     });
                     return (
                       <Marker key={`smab-${smab.id}`} position={[lat, lng]} icon={icon}>
@@ -623,27 +626,27 @@ export default function DisasterMap() {
                     const icon = L.divIcon({
                       html: `
                         <div style="
-                          width:36px;height:36px;
+                          width:28px;height:28px;
                           background:#10b981;
-                          border:3px solid white;
+                          border:2px solid white;
                           border-radius:50% 50% 50% 0;
                           transform: rotate(-45deg);
-                          box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+                          box-shadow: 0 2px 6px rgba(0,0,0,0.3);
                           display:flex;align-items:center;justify-content:center;
                         ">
                           <span style="
                             transform: rotate(45deg);
                             color:white;
-                            font-size:16px;
+                            font-size:13px;
                             line-height:1;
                             display:flex;
                           ">🛡️</span>
                         </div>
                       `,
                       className: "custom-div-icon",
-                      iconSize: [36, 36],
-                      iconAnchor: [18, 36],
-                      popupAnchor: [0, -36],
+                      iconSize: [28, 28],
+                      iconAnchor: [14, 28],
+                      popupAnchor: [0, -28],
                     });
                     return (
                       <Marker key={`katana-${katana.id}`} position={[lat, lng]} icon={icon}>
