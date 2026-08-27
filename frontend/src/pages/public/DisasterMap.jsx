@@ -300,7 +300,7 @@ export default function DisasterMap() {
             top-[61px] lg:top-auto h-[calc(100vh-61px)] lg:h-auto lg:max-h-[calc(100vh-80px)] lg:sticky lg:self-start
           `}
         >
-          <div className="p-5 space-y-6">
+          <div className="max-h-[80vh] overflow-y-auto p-5 space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="font-bold text-gray-900 flex items-center gap-2">
                 <svg className="w-5 h-5 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -444,6 +444,22 @@ export default function DisasterMap() {
                   <p>✓ Total KATANA: <span className="font-bold">{katanaData.length}</span></p>
                   <p>✓ Klik marker untuk detail</p>
                 </div>
+                <div className="mt-4 border-t border-emerald-100 pt-3">
+                  <h6 className="text-sm font-bold text-gray-700 mb-2">Daftar Wilayah KATANA:</h6>
+                  <div className="overflow-y-auto max-h-[180px] pr-1" style={{ scrollbarWidth: "thin" }}>
+                    <ul className="space-y-1.5">
+                      {katanaData.map((item) => (
+                        <li
+                          key={item.id}
+                          className="text-xs p-2 bg-gray-50 hover:bg-emerald-50 rounded border border-gray-100 cursor-pointer transition-colors"
+                        >
+                          <span className="font-medium text-gray-600">{item.id}.</span> {item.kelurahan}
+                          <span className="block text-[11px] text-gray-500 ml-4">{item.kecamatan}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
               </div>
             )}
           </div>
@@ -452,7 +468,7 @@ export default function DisasterMap() {
         {/* Main Map + Stats */}
         <div className="flex-1 min-w-0 flex flex-col gap-4">
           {/* Map Card */}
-          <div className="relative bg-white lg:rounded-2xl border-y lg:border border-gray-200 shadow-sm overflow-hidden">
+          <div className="relative bg-white lg:rounded-2xl border-y lg:border border-gray-200 shadow-sm overflow-visible">
             {/* Map */}
             <div className="relative h-[65vh] sm:h-[70vh] lg:h-[62vh] min-h-[380px] w-full">
               {loading ? (
@@ -504,18 +520,18 @@ export default function DisasterMap() {
                         position={[lat, lng]}
                         icon={createDivIcon(report.disaster_type)}
                       >
-                        <Popup maxWidth={300} minWidth={240}>
-                          <div className="space-y-2 text-sm leading-relaxed">
+                        <Popup maxWidth={220} minWidth={150} maxHeight={200} autoPan={true} autoPanPadding={[20, 120]} autoPanPaddingTop={120} direction="bottom">
+                          <div className="max-h-[175px] overflow-y-auto p-1 pr-2 space-y-1 text-[11px] leading-relaxed">
                             <div className="flex items-center justify-between gap-2">
-                              <span className="inline-flex items-center gap-1.5 text-xs font-bold px-2.5 py-1 rounded-full text-white" style={{ background: getColorForType(report.disaster_type) }}>
+                                <span className="inline-flex items-center gap-1 text-[10px] font-bold px-1.5 py-0.5 rounded-full text-white" style={{ background: getColorForType(report.disaster_type) }}>
                                 {report.disaster_type}
                               </span>
-                              <span className={`text-[11px] font-bold px-2 py-1 rounded-full border ${STATUS_META[report.status]?.bg || "bg-gray-100 text-gray-600"}`}>
+                              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full border ${STATUS_META[report.status]?.bg || "bg-gray-100 text-gray-600"}`}>
                                 {STATUS_META[report.status]?.label || report.status}
                               </span>
                             </div>
                             <div>
-                              <p className="text-xs text-gray-400 font-medium">Lokasi</p>
+                              <p className="text-[10px] text-gray-400 font-medium">Lokasi</p>
                               <p className="font-semibold text-gray-900">{report.address || "-"}</p>
                             </div>
                             <div className="grid grid-cols-2 gap-2">
@@ -530,13 +546,13 @@ export default function DisasterMap() {
                             </div>
                             {report.description && (
                               <div>
-                                <p className="text-xs text-gray-400">Keterangan</p>
-                                <p className="text-gray-700 line-clamp-3">{report.description}</p>
+                                <p className="text-[10px] text-gray-400">Keterangan</p>
+                                <p className="text-gray-700">{report.description}</p>
                               </div>
                             )}
                             {(report.photos?.length > 0 || report.photo_url) && (
                               <div>
-                                <p className="text-xs text-gray-400">Foto ({(report.photos || [report.photo_url]).filter(Boolean).length})</p>
+                                <p className="text-[10px] text-gray-400">Foto ({(report.photos || [report.photo_url]).filter(Boolean).length})</p>
                                 <div className="grid grid-cols-2 gap-1 mt-1">
                                   {(report.photos || [report.photo_url]).filter(Boolean).slice(0,5).map((url, idx) => (
                                     <img key={idx} src={`${(import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace('/api','')}${url}`} alt="" className="w-full h-20 object-cover rounded border" onError={(e)=> e.target.style.display='none'} />
@@ -585,8 +601,8 @@ export default function DisasterMap() {
                     });
                     return (
                       <Marker key={`smab-${smab.id}`} position={[lat, lng]} icon={icon}>
-                        <Popup maxWidth={300} minWidth={240}>
-                          <div className="space-y-3 text-sm">
+                        <Popup maxWidth={220} minWidth={150} maxHeight={200} autoPan={true} autoPanPadding={[20, 120]} autoPanPaddingTop={120} direction="bottom">
+                          <div className="max-h-[175px] overflow-y-auto p-1 pr-2 space-y-1 text-[11px] leading-relaxed">
                             <div>
                               <p className="text-xs text-gray-400 font-medium">Nama Sekolah</p>
                               <p className="font-bold text-gray-900">{smab.nama_sekolah}</p>
@@ -650,8 +666,8 @@ export default function DisasterMap() {
                     });
                     return (
                       <Marker key={`katana-${katana.id}`} position={[lat, lng]} icon={icon}>
-                        <Popup maxWidth={300} minWidth={240}>
-                          <div className="space-y-3 text-sm">
+                        <Popup maxWidth={220} minWidth={150} maxHeight={200} autoPan={true} autoPanPadding={[20, 120]} autoPanPaddingTop={120} direction="bottom">
+                          <div className="max-h-[175px] overflow-y-auto p-1 pr-2 space-y-1 text-[11px] leading-relaxed">
                             <div>
                               <p className="text-xs text-gray-400 font-medium">Kelurahan</p>
                               <p className="font-bold text-gray-900">{katana.kelurahan}</p>
