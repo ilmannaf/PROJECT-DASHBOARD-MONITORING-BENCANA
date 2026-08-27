@@ -29,7 +29,7 @@ PROJECT-DASHBOARD-MONITORING-BENCANA/
 - **Kelola Laporan** - Update status, filter, assign petugas, **hapus laporan** (icon 🗑️ dengan konfirmasi), preview foto & koordinat
 - **Pendataan Bencana** - Formulir detail kejadian (kronologi, korban, terdampak, kerugian)
 - **Download PDF** - Ekspor formulir pendataan bencana sebagai dokumen resmi BPBD
-- **Inventaris** - Manajemen logistik dan peralatan
+- **Inventaris** - Manajemen logistik dan peralatan (CRUD lengkap: tambah, edit, hapus, ubah kondisi)
 - **Kendaraan** - Fleet management dengan status service
 - **Posko** - Kelola titik posko pengungsian
 - **Kegiatan** - Laporan kegiatan lapangan dengan dokumentasi

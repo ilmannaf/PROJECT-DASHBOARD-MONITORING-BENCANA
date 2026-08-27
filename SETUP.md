@@ -139,6 +139,8 @@ Frontend jalan di: `http://localhost:5173`
 | `http://localhost:5173/dashboard` | Login/register untuk pelapor |
 |  | Lihat laporan pribadi & tracking |
 
+> **Note**: Fitur login pelapor saat ini dinonaktifkan dari routing untuk mempercepat proses pelaporan bencana. Pelapor dapat mengirim laporan langsung tanpa login di `/lapor`.
+
 ### Login Admin/Petugas
 
 | URL | Deskripsi | Credentials |
@@ -233,6 +235,7 @@ Hasil build ada di `frontend/dist/`
 ✅ Real-time tracking dengan kode unik  
 ✅ Role-based access (admin/petugas - tidak bisa registrasi admin via public)  
 ✅ Error handling & 404 handler di backend  
+✅ Manajemen inventaris CRUD lengkap (tambah, edit, hapus, ubah kondisi)  
 
 ---
 

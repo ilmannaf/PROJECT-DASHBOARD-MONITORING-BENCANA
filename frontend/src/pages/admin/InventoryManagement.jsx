@@ -7,7 +7,7 @@ import {
 } from "../../services/inventoryService";
 import { getPosko } from "../../services/poskoService";
 import { isAdmin } from "../../services/authService";
-import { Package, Search, Plus, X, Trash2 } from "lucide-react";
+import { Package, Search, Plus, X, Trash2, Pencil } from "lucide-react";
 import AnimatedNumber from '../../components/AnimatedNumber';
 
 const CATEGORIES = ["logistik", "peralatan", "p3k"];
@@ -37,6 +37,7 @@ export default function InventoryManagement() {
     posko_id: "",
   });
   const [poskoList, setPoskoList] = useState([]);
+  const [editingId, setEditingId] = useState(null);
 
   const loadItems = () => {
     setLoading(true);
@@ -54,6 +55,19 @@ export default function InventoryManagement() {
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
+  const handleEdit = (item) => {
+    setEditingId(item.id);
+    setForm({
+      name: item.name || "",
+      category: item.category || "logistik",
+      item_condition: item.item_condition || "baik",
+      quantity: item.quantity || 0,
+      unit: item.unit || "",
+      posko_id: item.posko_id || "",
+    });
+    setShowForm(true);
+  };
+
   const resetForm = () => {
     setForm({
       name: "",
@@ -63,17 +77,22 @@ export default function InventoryManagement() {
       unit: "",
       posko_id: "",
     });
+    setEditingId(null);
     setShowForm(false);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await createItem(form);
+      if (editingId) {
+        await updateItem(editingId, form);
+      } else {
+        await createItem(form);
+      }
       resetForm();
       loadItems();
     } catch (err) {
-      alert(err.response?.data?.message || "Gagal menambah item");
+      alert(err.response?.data?.message || "Gagal menyimpan item");
     }
   };
 
@@ -137,11 +156,16 @@ export default function InventoryManagement() {
 
       {showForm && adminUser && (
         <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/60 border border-gray-100 p-8 mb-8 animate-slide-in">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white flex items-center justify-center">
-              <Plus className="w-5 h-5" />
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-white ${editingId ? 'bg-gradient-to-br from-blue-500 to-blue-700' : 'bg-gradient-to-br from-brand-500 to-brand-700'}`}>
+                {editingId ? <Pencil className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+              </div>
+              <h2 className="text-xl font-bold text-gray-900">{editingId ? 'Edit Data Inventaris' : 'Formulir Inventaris'}</h2>
             </div>
-            <h2 className="text-xl font-bold text-gray-900">Formulir Inventaris</h2>
+            <button onClick={resetForm} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition">
+              <X className="w-5 h-5" />
+            </button>
           </div>
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -224,8 +248,8 @@ export default function InventoryManagement() {
               </select>
             </div>
             <div className="md:col-span-2 flex gap-3">
-              <button type="submit" className="flex-1 btn btn-primary py-3.5">
-                Simpan Item
+              <button type="submit" className={`flex-1 btn py-3.5 ${editingId ? 'bg-gradient-to-r from-blue-500 to-blue-700 hover:shadow-blue-500/40 text-white' : 'btn-primary'}`}>
+                {editingId ? 'Simpan Perubahan' : 'Simpan Item'}
               </button>
               <button type="button" onClick={resetForm} className="btn btn-secondary py-3.5 px-8">
                 Batal
@@ -356,6 +380,13 @@ export default function InventoryManagement() {
                                   </option>
                                 ))}
                               </select>
+                              <button
+                                onClick={() => handleEdit(item)}
+                                className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                                title="Edit"
+                              >
+                                <Pencil className="w-4 h-4" />
+                              </button>
                               <button
                                 onClick={() => handleDelete(item.id)}
                                 className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"
