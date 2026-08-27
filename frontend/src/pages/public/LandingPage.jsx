@@ -1,5 +1,280 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+
+const GALERI_IMAGES = [
+  { src: "/assets/dokumentasi1.jpeg", alt: "Dokumentasi Kegiatan 1" },
+  { src: "/assets/dokumentasi2.jpeg", alt: "Dokumentasi Kegiatan 2" },
+  { src: "/assets/dokumentasi3.jpeg", alt: "Dokumentasi Kegiatan 3" },
+  { src: "/assets/dokumentasi4.jpeg", alt: "Dokumentasi Kegiatan 4" },
+  { src: "/assets/dokumentasi5.jpeg", alt: "Dokumentasi Kegiatan 5" },
+  { src: "/assets/dokumentasi6.jpeg", alt: "Dokumentasi Kegiatan 6" },
+  { src: "/assets/BPBD KOTA SEMARANG.jpeg", alt: "BPBD Kota Semarang" },
+];
+
+function FotoHighlight() {
+  const [current, setCurrent] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [dragDelta, setDragDelta] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+  const containerRef = useRef(null);
+  const timerRef = useRef(null);
+  const total = GALERI_IMAGES.length;
+
+  const goTo = useCallback((idx) => {
+    setCurrent(((idx % total) + total) % total);
+  }, [total]);
+
+  const next = useCallback(() => setCurrent((p) => (p + 1) % total), [total]);
+  const prev = useCallback(() => setCurrent((p) => (p - 1 + total) % total), [total]);
+
+  useEffect(() => {
+    if (isHovered || isDragging) return;
+    timerRef.current = setInterval(next, 3500);
+    return () => clearInterval(timerRef.current);
+  }, [isHovered, isDragging, next]);
+
+  const handlePointerDown = (e) => {
+    setIsDragging(true);
+    setStartX(e.clientX ?? e.touches?.[0]?.clientX ?? 0);
+    setDragDelta(0);
+  };
+
+  const handlePointerMove = (e) => {
+    if (!isDragging) return;
+    const x = e.clientX ?? e.touches?.[0]?.clientX ?? 0;
+    setDragDelta(x - startX);
+  };
+
+  const handlePointerUp = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    if (Math.abs(dragDelta) > 50) {
+      dragDelta < 0 ? next() : prev();
+    }
+    setDragDelta(0);
+  };
+
+  const getCardTransform = (idx) => {
+    let diff = idx - current;
+    if (diff > total / 2) diff -= total;
+    if (diff < -total / 2) diff += total;
+
+    const absDiff = Math.abs(diff);
+    const sign = diff > 0 ? 1 : diff < 0 ? -1 : 0;
+
+    if (absDiff === 0) {
+      return {
+        transform: "translateX(0) translateZ(60px) rotateY(0deg) scale(1)",
+        zIndex: 20,
+        opacity: 1,
+      };
+    }
+
+    if (absDiff === 1) {
+      const dragOffset = isDragging ? (dragDelta / (containerRef.current?.offsetWidth || 1)) * 30 * sign : 0;
+      return {
+        transform: `translateX(${sign * 55 + dragOffset}%) translateZ(-80px) rotateY(${sign * -30}deg) scale(0.88)`,
+        zIndex: 15 - absDiff,
+        opacity: 0.85,
+      };
+    }
+
+    if (absDiff === 2) {
+      return {
+        transform: `translateX(${sign * 90}%) translateZ(-160px) rotateY(${sign * -30}deg) scale(0.75)`,
+        zIndex: 15 - absDiff,
+        opacity: 0.5,
+      };
+    }
+
+    return {
+      transform: `translateX(${sign * 110}%) translateZ(-240px) rotateY(${sign * -30}deg) scale(0.65)`,
+      zIndex: 1,
+      opacity: 0,
+    };
+  };
+
+  return (
+    <section
+      className="relative py-20 overflow-hidden"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      style={{
+        background: "radial-gradient(ellipse at center, rgba(120,53,15,0.15) 0%, rgba(17,24,39,1) 70%)",
+      }}
+    >
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-brand-500/8 rounded-full blur-[100px]"></div>
+      </div>
+
+      <div className="mx-auto max-w-6xl px-6 relative z-10">
+        <div className="reveal mb-16 text-center">
+          <span className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-brand-300 backdrop-blur-sm">
+            <span className="h-1.5 w-1.5 rounded-full bg-brand-400 animate-pulse"></span>
+            Galeri Foto
+          </span>
+          <h2 className="mb-3 text-2xl font-extrabold tracking-tight text-white lg:text-3xl">
+            Dokumentasi Kegiatan
+          </h2>
+          <p className="mx-auto max-w-lg text-sm text-gray-400">
+            Cuplikan momen penting dalam penanganan bencana di Kota Semarang.
+          </p>
+        </div>
+
+        {/* 3D Coverflow Carousel */}
+        <div
+          ref={containerRef}
+          className="relative mx-auto cursor-grab active:cursor-grabbing select-none hidden md:block"
+          style={{ perspective: 1000, height: 440 }}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerLeave={handlePointerUp}
+          onTouchStart={(e) => handlePointerDown(e)}
+          onTouchMove={(e) => handlePointerMove(e)}
+          onTouchEnd={handlePointerUp}
+        >
+          <div
+            className="absolute inset-0 flex items-center justify-center"
+            style={{
+              transformStyle: "preserve-3d",
+              transform: `translateX(${isDragging ? (dragDelta / (containerRef.current?.offsetWidth || 1)) * 8 : 0}%)`,
+              transition: isDragging ? "none" : "transform 0.5s cubic-bezier(0.4,0,0.2,1)",
+            }}
+          >
+            {GALERI_IMAGES.map((img, idx) => {
+              const style = getCardTransform(idx);
+              const isActive = idx === current;
+
+              return (
+                <div
+                  key={idx}
+                  className="absolute"
+                  style={{
+                    transformStyle: "preserve-3d",
+                    transform: style.transform,
+                    zIndex: style.zIndex,
+                    opacity: style.opacity,
+                    transition: isDragging ? "none" : "all 0.5s cubic-bezier(0.4,0,0.2,1)",
+                    cursor: isActive ? "default" : "pointer",
+                  }}
+                  onClick={() => {
+                    if (!isActive) goTo(idx);
+                  }}
+                >
+                  <div
+                    className={`relative overflow-hidden rounded-2xl ${
+                      isActive
+                        ? "shadow-2xl shadow-brand-500/25 ring-1 ring-white/10"
+                        : "shadow-lg shadow-black/30"
+                    }`}
+                    style={{
+                      width: 280,
+                      height: 400,
+                      filter: isActive ? "none" : "brightness(0.65) saturate(0.9)",
+                      transition: "filter 0.5s ease",
+                    }}
+                  >
+                    <img
+                      src={img.src}
+                      alt={img.alt}
+                      className="h-full w-full object-cover"
+                      draggable={false}
+                    />
+
+                    {/* Bottom gradient for caption — always present, stronger on active */}
+                    <div
+                      className={`absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/70 via-black/30 to-transparent transition-opacity duration-500 ${
+                        isActive ? "opacity-100" : "opacity-60"
+                      }`}
+                    />
+
+                    {/* Caption */}
+                    <div
+                      className={`absolute bottom-0 left-0 right-0 p-5 transition-all duration-500 ${
+                        isActive ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
+                      }`}
+                    >
+                      <p className="text-sm font-semibold text-white leading-snug">{img.alt}</p>
+                      <div className="mt-1.5 h-0.5 w-8 rounded-full bg-brand-400/60"></div>
+                    </div>
+
+                    {/* Active glow edge */}
+                    {isActive && (
+                      <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/5 pointer-events-none"></div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Mobile: single card view */}
+        <div className="md:hidden">
+          <div
+            className="relative mx-auto overflow-hidden rounded-2xl shadow-2xl shadow-black/40"
+            style={{ maxWidth: 320, height: 380 }}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onTouchStart={(e) => handlePointerDown(e)}
+            onTouchMove={(e) => handlePointerMove(e)}
+            onTouchEnd={handlePointerUp}
+          >
+            <img
+              src={GALERI_IMAGES[current].src}
+              alt={GALERI_IMAGES[current].alt}
+              className="h-full w-full object-cover"
+              draggable={false}
+            />
+            <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 p-5">
+              <p className="text-sm font-semibold text-white">{GALERI_IMAGES[current].alt}</p>
+              <div className="mt-1.5 h-0.5 w-8 rounded-full bg-brand-400/60"></div>
+            </div>
+          </div>
+        </div>
+
+        {/* Controls */}
+        <div className="flex items-center justify-center gap-5 mt-8">
+          <button
+            onClick={prev}
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-gray-200 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 hover:text-white hover:scale-110 hover:shadow-lg hover:shadow-brand-500/20"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+
+          <div className="flex items-center gap-2.5">
+            {GALERI_IMAGES.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => goTo(idx)}
+                className={`rounded-full transition-all duration-400 ${
+                  idx === current
+                    ? "h-2.5 w-7 bg-brand-500 shadow-sm shadow-brand-500/40"
+                    : "h-2 w-2 bg-white/25 hover:bg-white/45"
+                }`}
+              />
+            ))}
+          </div>
+
+          <button
+            onClick={next}
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-white/10 text-gray-200 backdrop-blur-sm transition-all duration-300 hover:bg-white/20 hover:text-white hover:scale-110 hover:shadow-lg hover:shadow-brand-500/20"
+          >
+            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -316,6 +591,8 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      <FotoHighlight />
 
       <footer className="bg-gray-900 text-gray-400">
         <div className="mx-auto max-w-6xl px-6 py-10">
