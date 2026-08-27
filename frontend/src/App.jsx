@@ -17,6 +17,7 @@ import LandingPage from './pages/public/LandingPage';
 import DisasterMap from './pages/public/DisasterMap';
 import AdminLayout from './layouts/AdminLayout';
 import ProtectedRoute from './components/ProtectedRoute';
+import WhatsAppFloat from './components/WhatsAppFloat';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -35,6 +36,7 @@ function App() {
     <BrowserRouter>
       <ScrollToTop />
       <ToastContainer />
+      <WhatsAppFloat />
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/lapor" element={<PageWrapper><ReportForm /></PageWrapper>} />

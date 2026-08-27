@@ -80,10 +80,10 @@ export default function Dashboard() {
   const countByStatus = (s) => byStatus[s] || 0;
 
   const statCards = [
-    { label: 'Total Laporan', value: total, icon: 'doc', color: 'text-gray-900', bg: 'from-blue-500 to-blue-700', shadow: 'shadow-blue-500/25' },
-    { label: 'Baru', value: countByStatus('baru'), icon: 'bell', color: 'text-red-600', bg: 'from-red-500 to-rose-600', shadow: 'shadow-red-500/25' },
-    { label: 'Ditindaklanjuti', value: countByStatus('ditindaklanjuti'), icon: 'wrench', color: 'text-blue-600', bg: 'from-blue-400 to-indigo-500', shadow: 'shadow-blue-500/25' },
-    { label: 'Selesai', value: countByStatus('selesai'), icon: 'check', color: 'text-green-600', bg: 'from-emerald-500 to-green-600', shadow: 'shadow-emerald-500/25' },
+    { label: 'Total Laporan', value: total, icon: 'doc', color: 'text-gray-900', bg: 'bg-blue-50', iconColor: 'text-blue-600' },
+    { label: 'Baru', value: countByStatus('baru'), icon: 'bell', color: 'text-red-600', bg: 'bg-red-50', iconColor: 'text-red-500' },
+    { label: 'Ditindaklanjuti', value: countByStatus('ditindaklanjuti'), icon: 'wrench', color: 'text-blue-600', bg: 'bg-blue-50', iconColor: 'text-blue-500' },
+    { label: 'Selesai', value: countByStatus('selesai'), icon: 'check', color: 'text-green-600', bg: 'bg-green-50', iconColor: 'text-green-600' },
   ];
 
   const pieData = Object.keys(STATUS_LABELS)
@@ -110,24 +110,23 @@ export default function Dashboard() {
 
   const icons = {
     doc: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
       </svg>
     ),
     bell: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
       </svg>
     ),
     wrench: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M11.42 15.17l-5.1-5.1m0 0L2.74 5.39a2.12 2.12 0 013-3l5.1 5.1m0 0l3.16-3.16m-3.16 3.16l3.16 3.16m-3.16-3.16l-3.16 3.16" />
       </svg>
     ),
     check: (
-      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
     ),
   };
@@ -157,16 +156,16 @@ export default function Dashboard() {
         {statCards.map((c, i) => (
           <div
             key={c.label}
-            className={`stat-card bg-white rounded-2xl p-5 border border-gray-100 shadow-sm hover:shadow-lg transition-all group ${showContent ? 'show' : ''}`}
-            style={{ transitionDelay: `${i * 0.08}s` }}
+            className={`stat-card bg-white rounded-xl p-4 border border-gray-200 hover:shadow-md transition-all ${showContent ? 'show' : ''}`}
+            style={{ transitionDelay: `${i * 0.06}s` }}
           >
-            <div className="flex items-center justify-between mb-4">
-              <div className={`w-11 h-11 rounded-xl bg-gradient-to-br ${c.bg} text-white flex items-center justify-center shadow-lg ${c.shadow} group-hover:scale-110 transition-transform`}>
+            <div className="flex items-center justify-between mb-3">
+              <div className={`w-9 h-9 rounded-lg ${c.bg} ${c.iconColor} flex items-center justify-center`}>
                 {icons[c.icon]}
               </div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400">{c.label}</span>
+              <span className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">{c.label}</span>
             </div>
-            <p className={`text-3xl font-extrabold ${c.color}`}>
+            <p className={`text-2xl font-extrabold ${c.color}`}>
               <AnimatedNumber value={c.value} />
             </p>
           </div>
@@ -174,121 +173,114 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className={`stat-card bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-5 text-white shadow-lg relative overflow-hidden ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0.35s' }}>
-          <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/5 rounded-full"></div>
+        <div className={`stat-card bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0.3s' }}>
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-amber-400">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            <div className="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
-            <span className="text-xs font-bold uppercase tracking-wider text-gray-400">Pendataan</span>
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">Pendataan</span>
           </div>
-          <p className="text-3xl font-extrabold"><AnimatedNumber value={disasterRecords.length} /></p>
-          <p className="text-xs text-gray-400 mt-1">Total data bencana</p>
+          <p className="text-2xl font-extrabold text-gray-900"><AnimatedNumber value={disasterRecords.length} /></p>
+          <p className="text-[11px] text-gray-500 mt-0.5">Total data bencana</p>
         </div>
-        <div className={`stat-card bg-gradient-to-br from-purple-600 to-purple-800 rounded-2xl p-5 text-white shadow-lg relative overflow-hidden ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0.43s' }}>
-          <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/5 rounded-full"></div>
+        <div className={`stat-card bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0.36s' }}>
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            <div className="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center text-purple-600">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </div>
-            <span className="text-xs font-bold uppercase tracking-wider text-purple-200">Kecamatan</span>
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">Kecamatan</span>
           </div>
-          <p className="text-3xl font-extrabold"><AnimatedNumber value={kecamatanCount} /></p>
-          <p className="text-xs text-purple-200 mt-1">Wilayah terdampak</p>
+          <p className="text-2xl font-extrabold text-gray-900"><AnimatedNumber value={kecamatanCount} /></p>
+          <p className="text-[11px] text-gray-500 mt-0.5">Wilayah terdampak</p>
         </div>
-        <div className={`stat-card bg-gradient-to-br from-red-500 to-rose-700 rounded-2xl p-5 text-white shadow-lg relative overflow-hidden ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0.51s' }}>
-          <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/5 rounded-full"></div>
+        <div className={`stat-card bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0.42s' }}>
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            <div className="w-9 h-9 rounded-lg bg-red-50 flex items-center justify-center text-red-500">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
             </div>
-            <span className="text-xs font-bold uppercase tracking-wider text-red-200">Korban</span>
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">Korban</span>
           </div>
-          <p className="text-3xl font-extrabold"><AnimatedNumber value={totalKorban} /></p>
-          <p className="text-xs text-red-200 mt-1">Total korban tercatat</p>
+          <p className="text-2xl font-extrabold text-gray-900"><AnimatedNumber value={totalKorban} /></p>
+          <p className="text-[11px] text-gray-500 mt-0.5">Total korban tercatat</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
-        <div className={`chart-enter bg-white rounded-3xl shadow-sm border border-gray-100 p-6 ${showContent ? 'show' : ''}`}>
-          <h2 className="font-bold text-gray-900 mb-4 text-sm flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse"></span>
+        <div className={`chart-enter bg-white rounded-xl shadow-sm border border-gray-200 p-5 ${showContent ? 'show' : ''}`}>
+          <h2 className="font-semibold text-gray-900 mb-3 text-sm">
             Distribusi Status
           </h2>
           {pieData.length === 0 ? (
             <p className="text-xs text-gray-400 text-center py-10">Belum ada data</p>
           ) : (
-            <ResponsiveContainer width="100%" height={240}>
+            <ResponsiveContainer width="100%" height={220}>
               <PieChart>
-                <Pie data={pieData} dataKey="value" nameKey="name" innerRadius={55} outerRadius={85} paddingAngle={3} strokeWidth={0}>
+                <Pie data={pieData} dataKey="value" nameKey="name" innerRadius={50} outerRadius={80} paddingAngle={2} strokeWidth={0}>
                   {pieData.map((entry, i) => (
                     <Cell key={i} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }} />
-                <Legend verticalAlign="bottom" height={30} iconType="circle" iconSize={8} wrapperStyle={{ fontSize: '12px' }} />
+                <Tooltip contentStyle={{ borderRadius: 8, border: '1px solid #e5e7eb', fontSize: 12 }} />
+                <Legend verticalAlign="bottom" height={28} iconType="circle" iconSize={7} wrapperStyle={{ fontSize: '11px' }} />
               </PieChart>
             </ResponsiveContainer>
           )}
         </div>
 
-        <div className={`chart-enter lg:col-span-2 bg-white rounded-3xl shadow-sm border border-gray-100 p-6 ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0.1s' }}>
-          <h2 className="font-bold text-gray-900 mb-4 text-sm flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <div className={`chart-enter lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 p-5 ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0.08s' }}>
+          <h2 className="font-semibold text-gray-900 mb-3 text-sm">
             Laporan per Jenis Bencana
           </h2>
           {byType.length === 0 ? (
             <p className="text-xs text-gray-400 text-center py-10">Belum ada data</p>
           ) : (
-            <ResponsiveContainer width="100%" height={240}>
+            <ResponsiveContainer width="100%" height={220}>
               <BarChart data={byType}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
                 <XAxis dataKey="name" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
                 <YAxis allowDecimals={false} tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ borderRadius: 12, border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)' }} />
-                <Bar dataKey="jumlah" fill="#ff6f00" radius={[8, 8, 0, 0]} maxBarSize={40} />
+                <Tooltip contentStyle={{ borderRadius: 8, border: '1px solid #e5e7eb', fontSize: 12 }} />
+                <Bar dataKey="jumlah" fill="#e65100" radius={[6, 6, 0, 0]} maxBarSize={36} />
               </BarChart>
             </ResponsiveContainer>
           )}
         </div>
       </div>
 
-      <div className={`chart-enter bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0.2s' }}>
-        <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-          <h2 className="font-bold text-gray-900 text-sm flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+      <div className={`chart-enter bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0.16s' }}>
+        <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+          <h2 className="font-semibold text-gray-900 text-sm">
             Laporan Terbaru
           </h2>
-          <span className="text-xs text-gray-400">{total} laporan</span>
+          <span className="text-[11px] text-gray-400">{total} laporan</span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
             <thead>
-              <tr className="bg-gray-50/80">
-                <th className="py-3 px-6 text-xs font-bold uppercase tracking-wider text-gray-500">Kode</th>
-                <th className="py-3 px-6 text-xs font-bold uppercase tracking-wider text-gray-500">Pelapor</th>
-                <th className="py-3 px-6 text-xs font-bold uppercase tracking-wider text-gray-500">Jenis</th>
-                <th className="py-3 px-6 text-xs font-bold uppercase tracking-wider text-gray-500">Lokasi</th>
-                <th className="py-3 px-6 text-xs font-bold uppercase tracking-wider text-gray-500 text-center">Status</th>
+              <tr className="bg-gray-50">
+                <th className="py-2.5 px-5 text-[11px] font-semibold uppercase tracking-wide text-gray-500">Kode</th>
+                <th className="py-2.5 px-5 text-[11px] font-semibold uppercase tracking-wide text-gray-500">Pelapor</th>
+                <th className="py-2.5 px-5 text-[11px] font-semibold uppercase tracking-wide text-gray-500">Jenis</th>
+                <th className="py-2.5 px-5 text-[11px] font-semibold uppercase tracking-wide text-gray-500">Lokasi</th>
+                <th className="py-2.5 px-5 text-[11px] font-semibold uppercase tracking-wide text-gray-500 text-center">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-gray-100">
               {recent.map((r) => (
-                <tr key={r.id} className="hover:bg-orange-50/40 transition-colors">
-                  <td className="py-3 px-6 font-mono text-xs text-gray-500">{r.tracking_code}</td>
-                  <td className="py-3 px-6 font-medium text-gray-900">{r.reporter_name}</td>
-                  <td className="py-3 px-6">{r.disaster_type}</td>
-                  <td className="py-3 px-6 text-gray-500">{r.address}</td>
-                  <td className="py-3 px-6 text-center">
-                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${STATUS_BG[r.status]} text-white shadow-sm`}>
-                      <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                <tr key={r.id} className="hover:bg-gray-50 transition-colors">
+                  <td className="py-2.5 px-5 font-mono text-xs text-gray-500">{r.tracking_code}</td>
+                  <td className="py-2.5 px-5 font-medium text-gray-900">{r.reporter_name}</td>
+                  <td className="py-2.5 px-5 text-gray-600">{r.disaster_type}</td>
+                  <td className="py-2.5 px-5 text-gray-500 truncate max-w-[200px]">{r.address}</td>
+                  <td className="py-2.5 px-5 text-center">
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-gradient-to-r ${STATUS_BG[r.status]} text-white`}>
                       {STATUS_LABELS[r.status]}
                     </span>
                   </td>

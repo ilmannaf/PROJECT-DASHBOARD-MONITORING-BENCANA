@@ -100,7 +100,7 @@ export default function UsersManagement() {
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={showForm ? "M6 18L18 6M6 6l12 12" : "M12 4v16m8-8H4"} />
           </svg>
-          {showForm ? 'Tutup Form' : '+ Tambah Petugas'}
+          {showForm ? 'Tutup Form' : 'Tambah Petugas'}
         </button>
       </div>
 

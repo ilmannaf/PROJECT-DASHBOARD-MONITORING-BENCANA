@@ -1,5 +1,5 @@
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { logout, getCurrentUser, isAdmin } from "../services/authService";
 import {
   LayoutDashboard,
@@ -30,46 +30,6 @@ export default function AdminLayout() {
   const navigate = useNavigate();
   const user = getCurrentUser();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const [indicator, setIndicator] = useState({ y: 0, height: 0, visible: false });
-  const navRef = useRef(null);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    const timer = setTimeout(() => updateIndicator(), 50);
-    return () => clearTimeout(timer);
-  }, [mounted]);
-
-  const updateIndicator = () => {
-    if (!navRef.current) return;
-    const links = navRef.current.querySelectorAll("a");
-    let activeEl = null;
-    links.forEach((link) => {
-      if (link.classList.contains("sidebar-active")) {
-        activeEl = link;
-      }
-    });
-    if (activeEl) {
-      const navRect = navRef.current.getBoundingClientRect();
-      const linkRect = activeEl.getBoundingClientRect();
-      setIndicator({
-        y: linkRect.top - navRect.top + navRef.current.scrollTop,
-        height: linkRect.height,
-        visible: true,
-      });
-    } else {
-      setIndicator((prev) => ({ ...prev, visible: false }));
-    }
-  };
-
-  useEffect(() => {
-    const handler = () => updateIndicator();
-    window.addEventListener("resize", handler);
-    return () => window.removeEventListener("resize", handler);
-  }, []);
 
   const handleLogout = () => {
     logout();
@@ -92,9 +52,9 @@ export default function AdminLayout() {
   const sidebarContent = (
     <>
       {/* Logo */}
-      <div className="p-5 border-b border-white/10">
-        <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-xl overflow-hidden shadow-lg shadow-brand-500/30 shrink-0">
+      <div className="p-4 border-b border-white/10">
+        <div className="flex items-center gap-2.5">
+          <div className="w-9 h-9 rounded-lg overflow-hidden shrink-0">
             <img
               src="/assets/logo-bpbd.jpg"
               alt="Logo BPBD"
@@ -102,30 +62,15 @@ export default function AdminLayout() {
             />
           </div>
           <div className="leading-tight min-w-0">
-            <p className="font-extrabold text-white text-sm tracking-tight truncate">
+            <p className="font-bold text-white text-sm truncate">
               BPBD Kota Semarang
-            </p>
-            <p className="text-[11px] text-gray-400 truncate">
-              Sistem Manajemen Kebencanaan
             </p>
           </div>
         </div>
       </div>
 
       {/* Menu */}
-      <nav
-        ref={navRef}
-        className="flex-1 p-3 py-4 space-y-1.5 overflow-y-auto relative"
-      >
-        {indicator.visible && (
-          <div
-            className="sidebar-indicator absolute left-3 right-3 rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 shadow-lg shadow-brand-500/40 z-0"
-            style={{
-              transform: `translateY(${indicator.y}px)`,
-              height: indicator.height,
-            }}
-          />
-        )}
+      <nav className="flex-1 p-2.5 py-3 space-y-0.5 overflow-y-auto">
         {MENU.map((item, idx) => {
           const Icon = item.icon;
           return (
@@ -134,10 +79,10 @@ export default function AdminLayout() {
               to={item.path}
               onClick={closeMobile}
               className={({ isActive }) =>
-                `sidebar-link relative z-10 flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                `sidebar-link relative z-10 flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                   isActive
-                    ? "sidebar-active text-white font-semibold"
-                    : "text-gray-400 hover:bg-white/[0.06] hover:text-white"
+                    ? "sidebar-active bg-brand-600/20 text-white font-semibold border-l-[3px] border-brand-500"
+                    : "text-gray-400 hover:bg-white/[0.06] hover:text-white border-l-[3px] border-transparent"
                 }`
               }
               style={{ animationDelay: `${idx * 0.04}s` }}
@@ -145,11 +90,11 @@ export default function AdminLayout() {
               {({ isActive }) => (
                 <>
                   <Icon
-                    className={`w-5 h-5 shrink-0 transition-colors duration-200 ${
-                      isActive ? "text-white" : "text-gray-500"
+                    className={`w-4 h-4 shrink-0 transition-colors duration-200 ${
+                      isActive ? "text-brand-400" : "text-gray-500"
                     }`}
                   />
-                  <span>{item.label}</span>
+                  <span className="text-[13px]">{item.label}</span>
                 </>
               )}
             </NavLink>
@@ -158,25 +103,25 @@ export default function AdminLayout() {
       </nav>
 
       {/* Footer */}
-      <div className="p-4 border-t border-white/10">
-        <div className="flex items-center gap-3 px-2 mb-3">
-          <div className="w-9 h-9 rounded-full bg-brand-500/20 text-brand-400 font-bold text-xs flex items-center justify-center shrink-0">
+      <div className="p-3 border-t border-white/10">
+        <div className="flex items-center gap-2 px-2 mb-2">
+          <div className="w-8 h-8 rounded-full bg-brand-500/20 text-brand-400 font-bold text-[10px] flex items-center justify-center shrink-0">
             {initials}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-white truncate">
+            <p className="text-xs font-semibold text-white truncate">
               {user?.name}
             </p>
-            <p className="text-[11px] text-gray-400 capitalize">
+            <p className="text-[10px] text-gray-400 capitalize">
               {user?.role}
             </p>
           </div>
         </div>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 bg-gray-800/60 hover:bg-red-900/40 hover:text-red-400 transition-all duration-200"
+          className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-xs font-medium text-gray-400 hover:bg-red-900/30 hover:text-red-400 transition-all duration-200"
         >
-          <LogOut className="w-5 h-5 shrink-0" />
+          <LogOut className="w-4 h-4 shrink-0" />
           <span>Keluar</span>
         </button>
       </div>
@@ -220,25 +165,23 @@ export default function AdminLayout() {
       {/* Main content */}
       <div className="flex-1 min-w-0">
         {/* Mobile header */}
-        <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-lg border-b border-gray-200 lg:hidden">
-          <div className="px-4 flex items-center gap-3 h-14">
+        <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-sm border-b border-gray-200 lg:hidden">
+          <div className="px-3 flex items-center gap-2.5 h-12">
             <button
               onClick={() => setMobileOpen(true)}
-              className="p-2 -ml-1 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-1.5 -ml-0.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <Menu className="w-5 h-5" />
             </button>
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-2">
               <img
                 src="/assets/logo-bpbd.jpg"
                 alt="Logo BPBD"
-                className="h-8 w-8 rounded-lg object-cover"
+                className="h-7 w-7 rounded-md object-cover"
               />
-              <div className="leading-tight">
-                <p className="font-extrabold text-gray-900 text-sm tracking-tight">
-                  BPBD Kota Semarang
-                </p>
-              </div>
+              <p className="font-bold text-gray-900 text-xs">
+                BPBD Kota Semarang
+              </p>
             </div>
           </div>
         </header>
