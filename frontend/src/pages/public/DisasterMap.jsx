@@ -1,6 +1,6 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { MapContainer, TileLayer, Marker, Popup, Polygon, GeoJSON, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, Polygon, GeoJSON } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import api from "../../services/api";
@@ -14,10 +14,8 @@ const SEMARANG_ZOOM = 11;
 
 // Batas administratif resmi Kota Semarang (BPS/WFP/OCHA via geoBoundaries)
 const KOTA_SEMARANG_GEOJSON = semarangGeojson;
-const SEMARANG_RING = semarangGeojson.features[0].geometry.coordinates[0]; // [[lng, lat], ...]
+const SEMARANG_RING = semarangGeojson.features[0].geometry.coordinates[0];
 const SEMARANG_LATLNG = SEMARANG_RING.map(([lng, lat]) => [lat, lng]);
-const SEMARANG_BOUNDS = L.latLngBounds(SEMARANG_LATLNG);
-const SEMARANG_MAX_BOUNDS = SEMARANG_BOUNDS.pad(0.06);
 
 // Mask yang menutupi seluruh dunia KECUALI wilayah Kota Semarang (lubang)
 const WORLD_RECT = [
@@ -26,31 +24,6 @@ const WORLD_RECT = [
   [85, 180],
   [85, -180],
 ];
-
-// Titik berada di dalam Kota Semarang (ray casting)
-function pointInSemarang(lat, lng) {
-  let inside = false;
-  for (let i = 0, j = SEMARANG_RING.length - 1; i < SEMARANG_RING.length; j = i++) {
-    const [xi, yi] = SEMARANG_RING[i];
-    const [xj, yj] = SEMARANG_RING[j];
-    if (yi > lat !== yj > lat && lng < ((xj - xi) * (lat - yi)) / (yj - yi) + xi) {
-      inside = !inside;
-    }
-  }
-  return inside;
-}
-
-function FitSemarang() {
-  const map = useMap();
-  const fitted = useRef(false);
-  useEffect(() => {
-    if (!fitted.current) {
-      fitted.current = true;
-      map.fitBounds(SEMARANG_BOUNDS, { padding: [12, 12] });
-    }
-  }, [map]);
-  return null;
-}
 
 const STATUS_META = {
   baru: { label: "Baru", color: "#ef4444", bg: "bg-red-100 text-red-700 border-red-200" },
@@ -139,7 +112,7 @@ export default function DisasterMap() {
   const [selectedStatus, setSelectedStatus] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [legendOpen, setLegendOpen] = useState(true);
-  const [mapMode, setMapMode] = useState("bencana"); // bencana | smab | katana
+  const [mapMode, setMapMode] = useState("bencana");
   const [showStats, setShowStats] = useState(false);
 
   useEffect(() => {
@@ -179,7 +152,7 @@ export default function DisasterMap() {
       const lat = parseFloat(r.latitude);
       const lng = parseFloat(r.longitude);
       if (isNaN(lat) || isNaN(lng)) return false;
-      if (!pointInSemarang(lat, lng)) return false;
+      // Removed pointInSemarang filter to allow exploration beyond Semarang
       if (selectedTypes.length > 0 && !selectedTypes.includes(r.disaster_type)) return false;
       if (selectedStatus.length > 0 && !selectedStatus.includes(r.status)) return false;
       return true;
@@ -481,33 +454,30 @@ export default function DisasterMap() {
                   <p className="text-sm text-red-600 mb-2">{error}</p>
                   <button onClick={() => window.location.reload()} className="text-sm font-semibold text-brand-600 hover:text-brand-700">Coba lagi</button>
                 </div>
-               ) : (
-                <MapContainer
-                  center={SEMARANG_CENTER}
-                  zoom={SEMARANG_ZOOM}
-                  minZoom={11}
-                  maxZoom={18}
-                  maxBounds={SEMARANG_MAX_BOUNDS}
-                  maxBoundsViscosity={1.0}
-                  style={{ height: "100%", width: "100%" }}
-                  scrollWheelZoom={true}
-                >
-                  <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  />
-                  <FitSemarang />
-                  {/* Gelapkan area di luar Kota Semarang */}
-                  <Polygon
-                    positions={[WORLD_RECT, SEMARANG_LATLNG]}
-                    pathOptions={{ stroke: false, fillColor: "#0f172a", fillOpacity: 0.35, fillRule: "evenodd" }}
-                  />
-                  {/* Garis batas resmi Kota Semarang */}
-                  <GeoJSON
-                    key="kota-semarang-boundary"
-                    data={KOTA_SEMARANG_GEOJSON}
-                    style={{ color: "#f97316", weight: 3, opacity: 0.9, fill: false }}
-                  />
+) : (
+                 <MapContainer
+                   center={SEMARANG_CENTER}
+                   zoom={SEMARANG_ZOOM}
+                   minZoom={5}
+                   maxZoom={18}
+                   style={{ height: "100%", width: "100%" }}
+                   scrollWheelZoom={true}
+                 >
+                   <TileLayer
+                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                   />
+                   {/* Gelapkan area di luar Kota Semarang */}
+                   <Polygon
+                     positions={[WORLD_RECT, SEMARANG_LATLNG]}
+                     pathOptions={{ stroke: false, fillColor: "#0f172a", fillOpacity: 0.35, fillRule: "evenodd" }}
+                   />
+                   {/* Garis batas resmi Kota Semarang */}
+                   <GeoJSON
+                     key="kota-semarang-boundary"
+                     data={KOTA_SEMARANG_GEOJSON}
+                     style={{ color: "#f97316", weight: 3, opacity: 0.9, fill: false }}
+                   />
                   
                   {/* Markers Bencana */}
                   {mapMode === "bencana" && filteredReports.map((report) => {
