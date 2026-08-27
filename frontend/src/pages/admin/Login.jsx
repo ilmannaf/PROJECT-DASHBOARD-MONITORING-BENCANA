@@ -9,13 +9,11 @@ export default function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showForm, setShowForm] = useState(false);
-  const [showContent, setShowContent] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const t1 = setTimeout(() => setShowContent(true), 80);
-    const t2 = setTimeout(() => setShowForm(true), 100);
-    return () => { clearTimeout(t1); clearTimeout(t2); };
+    const t = setTimeout(() => setShowForm(true), 100);
+    return () => clearTimeout(t);
   }, []);
 
   const handleSubmit = async (e) => {

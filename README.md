@@ -24,7 +24,7 @@ PROJECT-DASHBOARD-MONITORING-BENCANA/
 - **Peta Sebaran** - `/peta` publik tanpa login, filter jenis/status, marker warna per bencana
 
 ### 🔐 Admin/Petugas Features
-- **Admin Sidebar** - Dark sidebar layout (bg-gray-900) dengan sliding gradient indicator, lucide-react icons, mobile drawer, dan user footer dengan logout
+- **Admin Sidebar** - Dark sidebar layout (bg-gray-900) dengan **orange active indicator** (border kiri + bg transparan), lucide-react icons, mobile drawer, dan user footer dengan logout
 - **Dashboard Admin** - Statistik dan charts (Recharts) dengan AnimatedNumber count-up
 - **Kelola Laporan** - Update status, filter, assign petugas, **hapus laporan** (icon 🗑️ dengan konfirmasi), preview foto & koordinat
 - **Pendataan Bencana** - Formulir detail kejadian (kronologi, korban, terdampak, kerugian)
@@ -37,7 +37,7 @@ PROJECT-DASHBOARD-MONITORING-BENCANA/
 ### 🔥 Highlight Features
 - ✅ Logo resmi BPBD (gambar) menggantikan teks logo di seluruh halaman
 - ✅ Landasan hero & login publik pakai foto/logo dari `frontend/public/assets/`
-- ✅ Admin sidebar dark mode (bg-gray-900) dengan lucide-react icons & sliding active indicator
+- ✅ Admin sidebar dark mode (bg-gray-900) dengan lucide-react icons & **orange active indicator** (border kiri oranye + bg transparan)
 - ✅ Mobile drawer sidebar dengan backdrop + animated slide-in/out
 - ✅ Toggle show/hide password + kursor pointer di semua tombol
 - ✅ Formulir pendataan bencana dengan field korban/terdampak terpisah
@@ -46,15 +46,16 @@ PROJECT-DASHBOARD-MONITORING-BENCANA/
 - ✅ Google Maps + Leaflet integration di halaman lacak & peta sebaran
 - ✅ Role-based authorization (admin/petugas/pelapor - fix ENUM pelapor)
 - ✅ Upload **max 5 foto** per laporan (report_photos table) + koordinat opsional dengan map picker presisi
-- ✅ Animasi UI konsisten di semua halaman admin (CSS + vanilla JS)
-  - Landing page: hero stagger entrance, kenburns image effect, scroll-reveal sections
-  - Admin sidebar: sliding gradient indicator yang track menu aktif, stagger menu entrance
-  - Admin dashboard: AnimatedNumber count-up, staggered card/chart entrance, pulse status dots
-  - Login admin: floating animated blobs + form stagger entrance + loading spinner di tombol
-  - ReportForm: form section entrance + bounce-in hasil + checkmark draw animation
-  - TrackStatus: progress step bounce-in + connector line grow + result bounce
-  - DisasterMap: stat card stagger entrance
-  - Semua admin pages: showContent stagger entrance (80ms delay), stat-card animation, pulse dots
+- ✅ **WhatsApp Float Button** — tombol chat WhatsApp di pojok kanan bawah dengan popup bubble (seluruh halaman)
+- ✅ **Clean UI / Natural Design** — styling lebih minimalis, tidak "AI-looking", ikon halus (strokeWidth 1.5), warna natural
+- ✅ Admin sidebar **orange active indicator** — border kiri oranye + background transparan saat menu aktif
+- ✅ Animasi UI konsisten di semua halaman (CSS + vanilla JS, lebih subtle & cepat)
+  - Landing page: hero entrance, scroll-reveal sections (lebih ringkas)
+  - Admin sidebar: orange active indicator, stagger menu entrance
+  - Admin dashboard: AnimatedNumber count-up, stat card clean (white bg + border)
+  - Login admin: floating blobs + form stagger entrance
+  - ReportForm: form section entrance + bounce-in hasil
+  - TrackStatus: progress step bounce-in + result bounce
   - `prefers-reduced-motion` respected untuk accessibility
 
 ---
@@ -255,6 +256,9 @@ Sistem menggunakan tema warna oranye konsisten untuk branding BPBD:
 - [x] Consistent animations across all admin pages (stagger entrance, AnimatedNumber, pulse dots)
 - [x] Login admin split-screen + loading spinner
 - [x] Landing page polish (hero, fitur, CTA, footer) + logo gambar BPBD
+- [x] WhatsApp float button (chat popup di pojok kanan bawah)
+- [x] Clean UI / Natural design (kurangi gradient berlebihan, ikon strokeWidth 1.5)
+- [x] Admin sidebar orange active indicator (border kiri + bg transparan)
 - [x] Kelola laporan admin dengan hapus + preview foto/koordinat
 - [ ] Google OAuth login (backend)
 - [ ] Socket.IO live updates (full real-time)

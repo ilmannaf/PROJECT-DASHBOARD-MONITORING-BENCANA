@@ -12,7 +12,6 @@ import DisasterRecordsManagement from './pages/admin/DisasterRecordsManagement';
 import UsersManagement from './pages/admin/UsersManagement';
 import ReportForm from './pages/public/ReportForm';
 import TrackStatus from './pages/public/TrackStatus';
-import PublicDashboard from './pages/public/PublicDashboard';
 import LandingPage from './pages/public/LandingPage';
 import DisasterMap from './pages/public/DisasterMap';
 import AdminLayout from './layouts/AdminLayout';
