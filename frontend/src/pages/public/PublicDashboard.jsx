@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { MapPin, Camera, X } from 'lucide-react';
 import { login, register, isAuthenticated, getCurrentUser, logout } from '../../services/authService';
 import { getMyReports, trackReport } from '../../services/reportService';
 import { getSocket } from '../../services/socket';
@@ -26,7 +27,7 @@ export default function PublicDashboard() {
     try {
       setRefreshing(true);
       let merged = [];
-      // 1. laporan ter-link ke akun pelapor (via reporter_user_id)
+      // 1. laporan dari user yang login (via reporter_user_id)
       if (isAuthenticated()) {
         try {
           const data = await getMyReports();
@@ -312,8 +313,8 @@ function DashboardView({ reports, selectedReport, setSelectedReport, navigate, o
                         </td>
                         <td className="py-3 px-6 text-gray-500 text-sm">
                           {new Date(r.created_at).toLocaleDateString('id-ID')}
-                          {(r.photos?.length > 0 || r.photo_url) && <span className="ml-2 text-[11px] bg-gray-100 rounded-full px-2 py-0.5">📷 {(r.photos || [r.photo_url]).filter(Boolean).length}</span>}
-                          {r.latitude && r.longitude ? <span className="ml-1 text-[11px] bg-emerald-50 text-emerald-700 rounded-full px-2 py-0.5">📍</span> : <span className="ml-1 text-[11px] bg-amber-50 text-amber-700 rounded-full px-2 py-0.5">tanpa titik</span>}
+                          {(r.photos?.length > 0 || r.photo_url) && <span className="ml-2 inline-flex items-center gap-1 text-[11px] bg-gray-100 rounded-full px-2 py-0.5"><Camera className="w-3 h-3" /> {(r.photos || [r.photo_url]).filter(Boolean).length}</span>}
+                          {r.latitude && r.longitude ? <span className="ml-1 inline-flex items-center gap-1 text-[11px] bg-emerald-50 text-emerald-700 rounded-full px-2 py-0.5"><MapPin className="w-3 h-3" /> lokasi</span> : <span className="ml-1 text-[11px] bg-amber-50 text-amber-700 rounded-full px-2 py-0.5">tanpa titik</span>}
                         </td>
                         <td className="py-3 px-6">
                           <button
@@ -667,7 +668,7 @@ function ReportModal({ report, onClose }) {
         <div className="bg-gradient-to-r from-brand-600 to-brand-700 p-4 text-white flex justify-between items-center">
           <h3 className="font-bold">Detail Laporan</h3>
           <button onClick={onClose} className="text-white/80 hover:text-white">
-            ✕
+            <X className="w-5 h-5" />
           </button>
         </div>
         <div className="p-6">

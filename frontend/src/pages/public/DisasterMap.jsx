@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Popup, Polygon, GeoJSON } from "react-leaflet";
+import { MapPin, AlertTriangle, Camera, X, Check, CloudRain, Mountain, Flame, Tornado, Shield, House, AlertCircle } from "lucide-react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import api from "../../services/api";
@@ -49,45 +50,54 @@ function getColorForType(type) {
   return DISASTER_META[type]?.color || DISASTER_META["Lainnya"].color;
 }
 
+const ICON_PATHS = {
+  Banjir: [
+    "M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242",
+    "M16 14v6", "M8 14v6", "M12 16v6"
+  ],
+  Longsor: ["m8 3 4 8 5-5 5 15H2L8 3z"],
+  Kebakaran: ["M12 3q1 4 4 6.5t3 5.5a1 1 0 0 1-14 0 5 5 0 0 1 1-3 1 1 0 0 0 5 0c0-2-1.5-3-1.5-5q0-2 2.5-4"],
+  "Angin Puting Beliung": ["M21 4H3", "M18 8H6", "M19 12H9", "M16 16h-6", "M11 20H9"],
+  "Gempa Bumi": ["m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3", "M12 9v4", "M12 17h.01"],
+  Lainnya: ["M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"],
+};
+
+function createIconSVG(paths, color) {
+  const d = paths.map(p => `<path d="${p}" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`).join("");
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+}
+
 function createDivIcon(type) {
   const color = getColorForType(type);
+  const paths = ICON_PATHS[type] || ICON_PATHS["Lainnya"];
+  const svg = createIconSVG(paths, color);
   const html = `
     <div style="
-      width:32px;height:32px;
+      width:36px;height:36px;
       background:${color};
       border:3px solid white;
       border-radius:50% 50% 50% 0;
       transform: rotate(-45deg);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.4);
       display:flex;align-items:center;justify-content:center;
     ">
-      <span style="
-        transform: rotate(45deg);
-        color:white;
-        font-size:14px;
-        line-height:1;
-        display:flex;
-      ">${getEmojiForType(type)}</span>
+      <span style="transform: rotate(45deg);display:flex;">${svg}</span>
     </div>
   `;
   return L.divIcon({
     html,
     className: "custom-div-icon",
-    iconSize: [32, 32],
-    iconAnchor: [16, 32],
-    popupAnchor: [0, -32],
+    iconSize: [36, 36],
+    iconAnchor: [18, 36],
+    popupAnchor: [0, -36],
   });
 }
 
-function getEmojiForType(type) {
-  switch (type) {
-    case "Banjir": return "🌊";
-    case "Longsor": return "⛰️";
-    case "Kebakaran": return "🔥";
-    case "Angin Puting Beliung": return "🌪️";
-    case "Gempa Bumi": return "🏚️";
-    default: return "⚠️";
-  }
+function getTypeIcon(type) {
+  const paths = ICON_PATHS[type] || ICON_PATHS["Lainnya"];
+  const color = getColorForType(type);
+  const d = paths.map(p => `<path d="${p}" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`).join("");
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 }
 
 function formatDate(d) {
@@ -402,8 +412,8 @@ export default function DisasterMap() {
                 <p className="text-xs font-bold text-blue-700 mb-2">SMAB - Satuan Pendidikan Aman Bencana</p>
                 <p className="text-xs text-gray-600 leading-relaxed mb-3">Peta menampilkan lokasi sekolah/madrasah yang telah terlatih dan tersertifikasi dalam penanggulangan bencana.</p>
                 <div className="text-xs space-y-1 text-gray-600">
-                  <p>✓ Total SMAB: <span className="font-bold">{smabData.length}</span></p>
-                  <p>✓ Klik marker untuk detail</p>
+                  <p>Total SMAB: <span className="font-bold">{smabData.length}</span></p>
+                  <p>Klik marker untuk detail</p>
                 </div>
               </div>
             )}
@@ -414,8 +424,8 @@ export default function DisasterMap() {
                 <p className="text-xs font-bold text-emerald-700 mb-2">KATANA - FPRB Kelurahan</p>
                 <p className="text-xs text-gray-600 leading-relaxed mb-3">Peta menampilkan lokasi Forum Penanggulangan Risiko Bencana (FPRB) di tingkat kelurahan Kota Semarang.</p>
                 <div className="text-xs space-y-1 text-gray-600">
-                  <p>✓ Total KATANA: <span className="font-bold">{katanaData.length}</span></p>
-                  <p>✓ Klik marker untuk detail</p>
+                  <p>Total KATANA: <span className="font-bold">{katanaData.length}</span></p>
+                  <p>Klik marker untuk detail</p>
                 </div>
                 <div className="mt-4 border-t border-emerald-100 pt-3">
                   <h6 className="text-sm font-bold text-gray-700 mb-2">Daftar Wilayah KATANA:</h6>
@@ -555,13 +565,7 @@ export default function DisasterMap() {
                           box-shadow: 0 2px 6px rgba(0,0,0,0.3);
                           display:flex;align-items:center;justify-content:center;
                         ">
-                          <span style="
-                            transform: rotate(45deg);
-                            color:white;
-                            font-size:13px;
-                            line-height:1;
-                            display:flex;
-                          ">🏫</span>
+                          <span style="transform: rotate(45deg);display:flex;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span>
                         </div>
                       `,
                       className: "custom-div-icon",
@@ -596,7 +600,7 @@ export default function DisasterMap() {
                               <p className="font-mono text-xs text-gray-600">{lat.toFixed(4)}, {lng.toFixed(4)}</p>
                             </div>
                             <div className="bg-blue-50 rounded-lg p-3 border border-blue-100">
-                              <p className="text-xs font-semibold text-blue-700">✓ Status: Sekolah Aman Bencana (SMAB)</p>
+                              <p className="text-xs font-semibold text-blue-700">Status: Sekolah Aman Bencana (SMAB)</p>
                             </div>
                           </div>
                         </Popup>
@@ -620,13 +624,7 @@ export default function DisasterMap() {
                           box-shadow: 0 2px 6px rgba(0,0,0,0.3);
                           display:flex;align-items:center;justify-content:center;
                         ">
-                          <span style="
-                            transform: rotate(45deg);
-                            color:white;
-                            font-size:13px;
-                            line-height:1;
-                            display:flex;
-                          ">🛡️</span>
+                          <span style="transform: rotate(45deg);display:flex;"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></svg></span>
                         </div>
                       `,
                       className: "custom-div-icon",
@@ -665,7 +663,7 @@ export default function DisasterMap() {
                               <p className="font-mono text-xs text-gray-600">{lat.toFixed(4)}, {lng.toFixed(4)}</p>
                             </div>
                             <div className="bg-emerald-50 rounded-lg p-3 border border-emerald-100">
-                              <p className="text-xs font-semibold text-emerald-700">✓ Forum Penanggulangan Risiko Bencana Kelurahan</p>
+                              <p className="text-xs font-semibold text-emerald-700">Forum Penanggulangan Risiko Bencana Kelurahan</p>
                             </div>
                           </div>
                         </Popup>
@@ -704,19 +702,19 @@ export default function DisasterMap() {
                       )}
                       {mapMode === "smab" && (
                         <div className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            <span className="w-6 h-6 flex items-center justify-center text-lg">🏫</span>
-                            <span className="text-xs font-medium text-gray-700">Sekolah/Madrasah Aman Bencana</span>
-                          </div>
+                           <div className="flex items-center gap-2">
+                             <House className="w-5 h-5 text-blue-600" />
+                             <span className="text-xs font-medium text-gray-700">Sekolah/Madrasah Aman Bencana</span>
+                           </div>
                           <p className="text-xs text-gray-500 mt-2">Warna biru menunjukkan lokasi SMAB yang telah tersertifikasi dalam penanggulangan bencana.</p>
                         </div>
                       )}
                       {mapMode === "katana" && (
                         <div className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            <span className="w-6 h-6 flex items-center justify-center text-lg">🛡️</span>
-                            <span className="text-xs font-medium text-gray-700">Forum Penanggulangan Risiko Bencana</span>
-                          </div>
+                           <div className="flex items-center gap-2">
+                             <Shield className="w-5 h-5 text-emerald-600" />
+                             <span className="text-xs font-medium text-gray-700">Forum Penanggulangan Risiko Bencana</span>
+                           </div>
                           <p className="text-xs text-gray-500 mt-2">Warna hijau menunjukkan lokasi KATANA (FPRB Kelurahan) di Kota Semarang.</p>
                         </div>
                       )}
@@ -755,9 +753,14 @@ export default function DisasterMap() {
                   {ALL_TYPES.slice(0, 3).map((type, i) => (
                     <div key={type} className={`map-stat bg-white rounded-2xl p-4 border border-gray-100 shadow-sm hover:shadow-md transition ${showStats ? 'show' : ''}`} style={{ transitionDelay: `${(i + 1) * 0.08}s` }}>
                       <div className="flex items-center justify-between mb-2">
-                        <span className="w-9 h-9 rounded-xl flex items-center justify-center text-white shadow text-sm" style={{ background: getColorForType(type) }}>
-                          {getEmojiForType(type)}
-                        </span>
+                         <span className="w-9 h-9 rounded-xl flex items-center justify-center text-white shadow text-sm" style={{ background: getColorForType(type) }}>
+                           {type === "Banjir" && <CloudRain className="w-5 h-5" />}
+                           {type === "Longsor" && <Mountain className="w-5 h-5" />}
+                           {type === "Kebakaran" && <Flame className="w-5 h-5" />}
+                           {type === "Angin Puting Beliung" && <Tornado className="w-5 h-5" />}
+                           {type === "Gempa Bumi" && <AlertTriangle className="w-5 h-5" />}
+                           {type === "Lainnya" && <AlertCircle className="w-5 h-5" />}
+                         </span>
                         <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400 truncate max-w-[70px]">{type}</span>
                       </div>
                       <p className="text-2xl font-extrabold" style={{ color: getColorForType(type) }}>{stats.perType[type] || 0}</p>

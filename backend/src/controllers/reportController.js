@@ -35,7 +35,7 @@ exports.createReport = async (req, res) => {
     const tracking_code = generateTrackingCode();
     const photo_url = files.length > 0 ? `/uploads/${files[0].filename}` : null;
 
-    const reporter_user_id = req.user?.role === 'pelapor' ? req.user.id : null;
+    const reporter_user_id = null;
 
     // koordinat opsional - jika tidak ada tetap simpan null agar bisa tanpa titik peta
     const lat = latitude && latitude !== '' ? parseFloat(latitude) : null;

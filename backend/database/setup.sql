@@ -32,7 +32,7 @@ CREATE TABLE users (
   name VARCHAR(100) NOT NULL,
   email VARCHAR(100) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
-  role ENUM('admin', 'petugas', 'pelapor') NOT NULL DEFAULT 'pelapor',
+  role ENUM('admin', 'petugas') NOT NULL DEFAULT 'petugas',
   wilayah VARCHAR(100),
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -155,6 +155,17 @@ CREATE TABLE disaster_records (
   FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
 );
 
+-- Tabel LOGIN_HISTORY (histori login admin/petugas)
+CREATE TABLE login_history (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  login_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+  ip_address VARCHAR(45),
+  user_agent VARCHAR(255),
+  success TINYINT(1) DEFAULT 1,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
 -- ============================================================
 -- SEED DATA
 -- ============================================================
@@ -162,8 +173,7 @@ CREATE TABLE disaster_records (
 -- Akun default (semua password: "admin123")
 INSERT INTO users (name, email, password, role, wilayah) VALUES
 ('Admin BPBD',   'admin@bpbdsemarang.go.id',   '$2b$10$mpquimwluN21a/LByqXx/euVylhBz/IoKDLXdk5MnnT2dMJbNNOVm', 'admin',   'Semarang'),
-('Petugas BPBD', 'petugas@bpbdsemarang.go.id', '$2b$10$mpquimwluN21a/LByqXx/euVylhBz/IoKDLXdk5MnnT2dMJbNNOVm', 'petugas', 'Semarang'),
-('Pelapor Demo', 'pelapor@example.com',         '$2b$10$mpquimwluN21a/LByqXx/euVylhBz/IoKDLXdk5MnnT2dMJbNNOVm', 'pelapor', 'Semarang');
+('Petugas BPBD', 'petugas@bpbdsemarang.go.id', '$2b$10$mpquimwluN21a/LByqXx/euVylhBz/IoKDLXdk5MnnT2dMJbNNOVm', 'petugas', 'Semarang');
 
 -- Posko
 INSERT INTO posko (name, address) VALUES
@@ -187,7 +197,7 @@ INSERT INTO vehicles (plate_number, type, status, last_service_date, posko_id) V
 
 -- Contoh laporan bencana
 INSERT INTO reports (tracking_code, reporter_user_id, reporter_name, reporter_phone, disaster_type, description, latitude, longitude, address, status, assigned_to) VALUES
-('BPBD-2026-1234', 3, 'Pelapor Demo', '081234567890', 'Banjir', 'Air masuk ke pemukiman sekitar 50cm', -6.9932, 110.4203, 'Kaligawe, Semarang Utara', 'baru', NULL),
+('BPBD-2026-1234', NULL, 'Pelapor Demo', '081234567890', 'Banjir', 'Air masuk ke pemukiman sekitar 50cm', -6.9932, 110.4203, 'Kaligawe, Semarang Utara', 'baru', NULL),
 ('BPBD-2026-5678', NULL, 'Siti Aminah', '082345678901', 'Longsor', 'Tanah longsor menutup akses jalan', -7.0512, 110.4381, 'Gunungpati, Semarang', 'diverifikasi', 2);
 
 -- Contoh kegiatan
@@ -199,5 +209,4 @@ INSERT INTO activities (title, description, activity_date, location, created_by)
 -- SELESAI! Akun yang bisa digunakan:
 -- Admin  : admin@bpbdsemarang.go.id  / admin123
 -- Petugas: petugas@bpbdsemarang.go.id / admin123
--- Publik : pelapor@example.com        / admin123
 -- ============================================================

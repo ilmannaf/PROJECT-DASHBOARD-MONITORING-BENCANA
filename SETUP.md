@@ -1,4 +1,4 @@
-# 🚀 Setup & Running Guide - BPBD Dashboard Monitoring Bencana
+# 🚀 Setup & Panduan Menjalankan - BPBD Dashboard Monitoring Bencana
 
 ## 📋 Prerequisites
 
@@ -33,11 +33,13 @@ mysql -u root -p sistem_kebencanaan < backend/database/seed.sql
 
 ### 2b. Jika Database Sudah Ada (Migration)
 
-Jika database sudah pernah dibuat sebelumnya, jalankan migration:
+Jika database sudah pernah dibuat sebelumnya, jalankan migration yang tersedia:
 
 ```bash
 mysql -u root -p sistem_kebencanaan < backend/database/migration_role_pelapor_reporter_user.sql
 ```
+
+> **Catatan**: Migration ini sudah termasuk role `pelapor` dan kolom `reporter_user_id`. Jika role `pelapor` sudah tidak digunakan, role dapat dihapus dari database secara manual.
 
 ### 3. User Default (Seed Data)
 
@@ -45,7 +47,6 @@ mysql -u root -p sistem_kebencanaan < backend/database/migration_role_pelapor_re
 |-------|----------|------|
 | `admin@bpbdsemarang.go.id` | `admin123` | admin |
 | `petugas@bpbdsemarang.go.id` | `admin123` | petugas |
-| `pelapor@example.com` | `admin123` | pelapor |
 
 ---
 
@@ -132,14 +133,14 @@ Frontend jalan di: `http://localhost:5173`
 | `http://localhost:5173/lapor` | Form laporan bencana publik |
 | `http://localhost:5173/lacak` | Lacak status laporan dengan kode tracking |
 
-### Login Public (Pelapor)
+### Halaman Publik (Tanpa Login)
 
 | URL | Deskripsi |
 |-----|-----------|
-| `http://localhost:5173/dashboard` | Login/register untuk pelapor |
-|  | Lihat laporan pribadi & tracking |
+| `http://localhost:5173/dashboard` | Dashboard publik |
+|  | Lihat laporan & tracking |
 
-> **Note**: Fitur login pelapor saat ini dinonaktifkan dari routing untuk mempercepat proses pelaporan bencana. Pelapor dapat mengirim laporan langsung tanpa login di `/lapor`.
+> **Note**: Fitur login publik saat ini dinonaktifkan dari routing untuk mempercepat proses pelaporan bencana. Pengguna dapat mengirim laporan langsung tanpa login di `/lapor`.
 
 ### Login Admin/Petugas
 
@@ -173,10 +174,10 @@ Frontend jalan di: `http://localhost:5173`
 2. Masukkan tracking code
 3. Lihat status + peta lokasi (jika ada GPS)
 
-### 4. Login Pelapor
-1. Buka `http://localhost:5173/dashboard`
-2. Register akun baru
-3. Lihat semua laporan pribadi
+### 4. Cek Laporan Anonim
+1. Buka `http://localhost:5173/lacak`
+2. Masukkan tracking code `BPBD-2026-XXXX`
+3. Lihat status laporan + peta lokasi
 
 ---
 
@@ -229,7 +230,7 @@ Hasil build ada di `frontend/dist/`
 ✅ Toggle show/hide password di semua form login  
 ✅ Peta Google Maps di halaman lacak (jika ada GPS)  
 ✅ Split-screen login admin dengan sidebar gambar  
-✅ Public dashboard untuk pelapor (login/register)  
+✅ Public dashboard (tanpa login)  
 ✅ Admin dashboard dengan charts (Recharts)  
 ✅ Upload foto laporan & dokumentasi kegiatan  
 ✅ Real-time tracking dengan kode unik  

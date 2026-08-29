@@ -127,7 +127,7 @@ export default function VehicleManagement() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
             )}
-            {showForm ? 'Tutup Form' : '+ Tambah Kendaraan'}
+            {showForm ? 'Tutup Form' : 'Tambah Kendaraan'}
           </button>
         )}
       </div>

@@ -10,6 +10,7 @@ import {
   Car,
   Building2,
   Calendar,
+  Clock,
   LogOut,
   Menu,
   X,
@@ -24,6 +25,7 @@ const MENU_ITEMS = [
   { path: "/admin/vehicles", label: "Kendaraan", icon: Car },
   { path: "/admin/posko", label: "Posko", icon: Building2 },
   { path: "/admin/activities", label: "Kegiatan", icon: Calendar },
+  { path: "/admin/login-history", label: "History Login", icon: Clock },
 ];
 
 export default function AdminLayout() {

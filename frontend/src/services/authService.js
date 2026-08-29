@@ -38,6 +38,15 @@ export const isAdmin = () => {
   return getCurrentUser('admin')?.role === 'admin';
 };
 
+export const getLoginHistory = async (params = {}) => {
+  const { page = 1, limit = 20 } = params;
+  const { data } = await api.get('/auth/history', {
+    params: { page, limit },
+    headers: { Authorization: `Bearer ${localStorage.getItem('adminToken')}` },
+  });
+  return data;
+};
+
 export const getMyReports = async () => {
   const token = localStorage.getItem(tokenKey(getScope()));
   const { data } = await api.get('/reports/my-reports', {

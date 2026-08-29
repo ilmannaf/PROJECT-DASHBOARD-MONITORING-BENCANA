@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { CheckCircle, AlertTriangle, Info, X } from "lucide-react";
+import React from "react";
 
 let toastId = 0;
 let listeners = [];
@@ -10,9 +12,9 @@ export function showToast(message, type = "info") {
 }
 
 const TYPE_STYLE = {
-  success: { bg: "bg-emerald-50 border-emerald-200", text: "text-emerald-800", icon: "✓" },
-  info: { bg: "bg-sky-50 border-sky-200", text: "text-sky-800", icon: "ℹ" },
-  warning: { bg: "bg-amber-50 border-amber-200", text: "text-amber-800", icon: "⚠" },
+  success: { bg: "bg-emerald-50 border-emerald-200", text: "text-emerald-800", icon: CheckCircle },
+  info: { bg: "bg-sky-50 border-sky-200", text: "text-sky-800", icon: Info },
+  warning: { bg: "bg-amber-50 border-amber-200", text: "text-amber-800", icon: AlertTriangle },
 };
 
 function ToastItem({ toast, onRemove }) {
@@ -34,7 +36,7 @@ function ToastItem({ toast, onRemove }) {
         exiting ? 'toast-exit' : 'animate-[slideInRight_0.3s_cubic-bezier(0.22,1,0.36,1)]'
       } ${style.bg}`}
     >
-      <span className={`text-base font-bold shrink-0 ${style.text}`}>{style.icon}</span>
+      {React.createElement(style.icon, { className: `shrink-0 ${style.text}` })}
       <p className={`text-sm font-medium flex-1 ${style.text}`}>{toast.message}</p>
       <button
         onClick={() => {
@@ -43,7 +45,7 @@ function ToastItem({ toast, onRemove }) {
         }}
         className={`text-xs opacity-50 hover:opacity-100 shrink-0 ${style.text} transition-opacity hover:scale-110`}
       >
-        ✕
+        <X className="w-4 h-4" />
       </button>
     </div>
   );

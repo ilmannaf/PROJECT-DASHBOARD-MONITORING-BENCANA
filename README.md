@@ -44,7 +44,7 @@ PROJECT-DASHBOARD-MONITORING-BENCANA/
 - ✅ Privasi sumber info — nama & no. HP bisa dikosongkan (opsional)
 - ✅ Export PDF formulir pendataan (pdfkit)
 - ✅ Google Maps + Leaflet integration di halaman lacak & peta sebaran
-- ✅ Role-based authorization (admin/petugas/pelapor - fix ENUM pelapor)
+- ✅ Role-based authorization (admin/petugas)
 - ✅ Upload **max 5 foto** per laporan (report_photos table) + koordinat opsional dengan map picker presisi
 - ✅ **WhatsApp Float Button** — tombol chat WhatsApp di pojok kanan bawah dengan popup bubble (seluruh halaman)
 - ✅ **Clean UI / Natural Design** — styling lebih minimalis, tidak "AI-looking", ikon halus (strokeWidth 1.5), warna natural
@@ -140,7 +140,6 @@ npm run dev
 |-------|----------|------|
 | admin@bpbdsemarang.go.id | admin123 | admin |
 | petugas@bpbdsemarang.go.id | admin123 | petugas |
-| pelapor@example.com | admin123 | pelapor |
 
 > Jika password pernah diganti di database, reset dengan query berikut:
 > ```sql
@@ -175,7 +174,7 @@ npm run dev
 
 | Table | Deskripsi |
 |-------|-----------|
-| `users` | Admin, petugas & pelapor BPBD (ENUM fix pelapor) |
+| `users` | Admin & petugas BPBD |
 | `reports` | Laporan bencana dari publik (koordinat opsional, photo_url legacy) |
 | `report_photos` | Foto multiple max 5 per laporan (FK reports) |
 | `report_logs` | History perubahan status laporan |
@@ -197,11 +196,11 @@ Data korban disimpan dalam field terpisah dan otomatis dirangkum ke kolom teks `
 ## 📡 API Endpoints
 
 ### Auth
-- `POST /api/auth/register` - Register user baru (role pelapor)
+- `POST /api/auth/register` - Register user baru (role petugas)
 - `POST /api/auth/login` - Login
 
 ### Reports
-- `POST /api/reports` - Submit laporan baru (publik, `multipart` max 5 foto `photos`/`photo`, koordinat opsional, `optionalVerifyToken` link `reporter_user_id` jika pelapor login)
+- `POST /api/reports` - Submit laporan baru (publik, `multipart` max 5 foto `photos`/`photo`, koordinat opsional, `optionalVerifyToken` link `reporter_user_id` jika user login)
 - `GET /api/reports/public` - List untuk peta sebaran (publik, tanpa data sensitif, include `photos[]`)
 - `GET /api/reports` - List semua laporan (admin/petugas)
 - `GET /api/reports/my-reports` - List laporan user yang login (merge `report_photos`, fallback localStorage di frontend)
@@ -255,7 +254,7 @@ Sistem menggunakan tema warna oranye konsisten untuk branding BPBD:
 - [x] Laporan bencana publik (map picker presisi + max 5 foto + koordinat opsional)
 - [x] Tracking status dengan peta + galeri foto
 - [x] Peta sebaran publik `/peta` tanpa login
-- [x] Role-based authorization (fix ENUM pelapor + reporter_user_id)
+- [x] Role-based authorization (admin/petugas)
 - [x] Pendataan bencana + export PDF
 - [x] Admin sidebar dark mode (lucide-react icons + sliding indicator + mobile drawer)
 - [x] Consistent animations across all admin pages (stagger entrance, AnimatedNumber, pulse dots)

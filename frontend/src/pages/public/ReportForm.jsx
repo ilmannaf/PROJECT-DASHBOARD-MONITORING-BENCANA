@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { MapContainer, TileLayer, Marker, Polygon, GeoJSON, useMapEvents, useMap } from "react-leaflet";
+import { MapPin } from "lucide-react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { submitReport } from "../../services/reportService";
@@ -393,7 +394,7 @@ export default function ReportForm() {
                     )}
                   </div>
                   {location ? (
-                    <p className="text-xs text-gray-500 font-mono bg-gray-50 border border-gray-100 rounded-lg px-3 py-2 mt-2 animate-fade-in">📍 {location.latitude.toFixed(6)}, {location.longitude.toFixed(6)} — akan tampil di peta bencana</p>
+                    <p className="text-xs text-gray-500 font-mono bg-gray-50 border border-gray-100 rounded-lg px-3 py-2 mt-2 animate-fade-in flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" /> {location.latitude.toFixed(6)}, {location.longitude.toFixed(6)} — akan tampil di peta bencana</p>
                   ) : (
                     <p className="text-xs text-amber-600 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2 mt-2">Belum ada titik peta — laporan tetap bisa dikirim, tapi tidak muncul di peta sebaran</p>
                   )}

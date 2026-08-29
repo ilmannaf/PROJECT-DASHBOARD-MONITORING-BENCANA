@@ -11,6 +11,7 @@ import PoskoManagement from './pages/admin/PoskoManagement';
 import ActivityManagement from './pages/admin/ActivityManagement';
 import DisasterRecordsManagement from './pages/admin/DisasterRecordsManagement';
 import UsersManagement from './pages/admin/UsersManagement';
+import LoginHistory from './pages/admin/LoginHistory';
 import ReportForm from './pages/public/ReportForm';
 import TrackStatus from './pages/public/TrackStatus';
 import LandingPage from './pages/public/LandingPage';
@@ -79,6 +80,7 @@ function AnimatedRoutes() {
           <Route path="/admin/activities" element={<PageWrapper><ActivityManagement /></PageWrapper>} />
           <Route path="/admin/disaster-records" element={<PageWrapper><DisasterRecordsManagement /></PageWrapper>} />
           <Route path="/admin/users" element={<PageWrapper><UsersManagement /></PageWrapper>} />
+          <Route path="/admin/login-history" element={<PageWrapper><LoginHistory /></PageWrapper>} />
         </Route>
       </Routes>
     </AnimatePresence>
