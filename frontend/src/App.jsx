@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import ToastContainer from './components/Toast';
 import Login from './pages/admin/Login';
 import Dashboard from './pages/admin/Dashboard';
@@ -26,18 +27,38 @@ function ScrollToTop() {
   return null;
 }
 
+const pageVariants = {
+  initial: { opacity: 0, y: 8 },
+  animate: { opacity: 1, y: 0 },
+  exit: { opacity: 0, y: -8 },
+};
+
+const pageTransition = {
+  type: 'tween',
+  ease: [0.22, 1, 0.36, 1],
+  duration: 0.25,
+};
+
 function PageWrapper({ children }) {
-  return <div className="page-enter">{children}</div>;
+  return (
+    <motion.div
+      variants={pageVariants}
+      initial="initial"
+      animate="animate"
+      exit="exit"
+      transition={pageTransition}
+    >
+      {children}
+    </motion.div>
+  );
 }
 
-function App() {
+function AnimatedRoutes() {
+  const location = useLocation();
   return (
-    <BrowserRouter>
-      <ScrollToTop />
-      <ToastContainer />
-      <WhatsAppFloat />
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<PageWrapper><LandingPage /></PageWrapper>} />
         <Route path="/lapor" element={<PageWrapper><ReportForm /></PageWrapper>} />
         <Route path="/lacak" element={<PageWrapper><TrackStatus /></PageWrapper>} />
         <Route path="/peta" element={<PageWrapper><DisasterMap /></PageWrapper>} />
@@ -60,6 +81,17 @@ function App() {
           <Route path="/admin/users" element={<PageWrapper><UsersManagement /></PageWrapper>} />
         </Route>
       </Routes>
+    </AnimatePresence>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <ScrollToTop />
+      <ToastContainer />
+      <WhatsAppFloat />
+      <AnimatedRoutes />
     </BrowserRouter>
   );
 }

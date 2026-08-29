@@ -49,13 +49,17 @@ PROJECT-DASHBOARD-MONITORING-BENCANA/
 - ✅ **WhatsApp Float Button** — tombol chat WhatsApp di pojok kanan bawah dengan popup bubble (seluruh halaman)
 - ✅ **Clean UI / Natural Design** — styling lebih minimalis, tidak "AI-looking", ikon halus (strokeWidth 1.5), warna natural
 - ✅ Admin sidebar **orange active indicator** — border kiri oranye + background transparan saat menu aktif
-- ✅ Animasi UI konsisten di semua halaman (CSS + vanilla JS, lebih subtle & cepat)
-  - Landing page: hero entrance, scroll-reveal sections (lebih ringkas)
-  - Admin sidebar: orange active indicator, stagger menu entrance
-  - Admin dashboard: AnimatedNumber count-up, stat card clean (white bg + border)
-  - Login admin: floating blobs + form stagger entrance
-  - ReportForm: form section entrance + bounce-in hasil
-  - TrackStatus: progress step bounce-in + result bounce
+- ✅ Animasi UI konsisten di semua halaman (CSS + vanilla JS + Framer Motion)
+  - **Page Transitions**: Framer Motion AnimatePresence — fade transition antar halaman (250ms)
+  - **Landing page**: hero entrance, scroll-reveal sections dengan stagger delays
+  - **Admin sidebar**: orange active indicator, stagger menu entrance
+  - **Admin dashboard**: AnimatedNumber count-up, stat card clean (white bg + border)
+  - **Skeleton loading**: Placeholder abu-abu berdenyut di semua halaman admin (pengganti "Memuat data...")
+  - **Login admin**: floating blobs + form stagger entrance
+  - **ReportForm**: Staggered field entrance + photo scale-in + GPS spinner + submit spinner + scale-bounce-in tracking code
+  - **TrackStatus**: Fade-in form + slide-up results + staggered history + loading spinner + shake error
+  - **Toast**: Slide-in masuk + slide-out keluar
+  - **Micro-interactions**: Hover:scale[1.02] active:scale[0.98] di semua tombol utama
   - `prefers-reduced-motion` respected untuk accessibility
 
 ---
@@ -78,7 +82,8 @@ PROJECT-DASHBOARD-MONITORING-BENCANA/
 - Recharts (data visualization)
 - Leaflet (peta interaktif)
 - Lucide React (icons)
-- Pure CSS + JS animations (tanpa library tambahan)
+- Framer Motion (page transitions)
+- Pure CSS + JS animations (stagger, skeleton, bounce, shake)
 
 ---
 
@@ -260,6 +265,7 @@ Sistem menggunakan tema warna oranye konsisten untuk branding BPBD:
 - [x] Clean UI / Natural design (kurangi gradient berlebihan, ikon strokeWidth 1.5)
 - [x] Admin sidebar orange active indicator (border kiri + bg transparan)
 - [x] Kelola laporan admin dengan hapus + preview foto/koordinat
+- [x] Peningkatan animasi global v1.2.0 — page transitions, skeleton loading, micro-interactions
 - [ ] Google OAuth login (backend)
 - [ ] Socket.IO live updates (full real-time)
 - [ ] Mobile app (React Native)

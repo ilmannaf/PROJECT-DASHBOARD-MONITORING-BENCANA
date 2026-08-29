@@ -156,6 +156,7 @@ cd frontend
 npm install
 cp .env.example .env
 npm run dev
+npm install framer-motion
 ```
 
 Buka: `http://localhost:5173`

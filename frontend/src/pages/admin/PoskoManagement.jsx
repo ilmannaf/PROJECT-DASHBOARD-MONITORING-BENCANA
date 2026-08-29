@@ -3,6 +3,7 @@ import { getPosko, createPosko } from "../../services/poskoService";
 import { isAdmin } from "../../services/authService";
 import { Building2, Plus, X } from "lucide-react";
 import AnimatedNumber from '../../components/AnimatedNumber';
+import { SkeletonTable } from '../../components/Skeleton';
 
 const inputClass =
   "w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition shadow-sm bg-white";
@@ -134,10 +135,7 @@ export default function PoskoManagement() {
         </div>
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20">
-            <div className="w-14 h-14 rounded-full border-4 border-brand-100 border-t-brand-500 animate-spin mb-4"></div>
-            <p className="text-gray-500 font-medium">Memuat data...</p>
-          </div>
+          <SkeletonTable rows={4} cols={3} />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left">

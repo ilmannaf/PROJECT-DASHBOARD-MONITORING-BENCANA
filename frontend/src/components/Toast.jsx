@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 let toastId = 0;
 let listeners = [];
@@ -17,21 +17,31 @@ const TYPE_STYLE = {
 
 function ToastItem({ toast, onRemove }) {
   const style = TYPE_STYLE[toast.type] || TYPE_STYLE.info;
+  const [exiting, setExiting] = useState(false);
+  const timerRef = useRef(null);
 
   useEffect(() => {
-    const t = setTimeout(() => onRemove(toast.id), 5000);
-    return () => clearTimeout(t);
+    timerRef.current = setTimeout(() => {
+      setExiting(true);
+      setTimeout(() => onRemove(toast.id), 280);
+    }, 5000);
+    return () => clearTimeout(timerRef.current);
   }, [toast.id, onRemove]);
 
   return (
     <div
-      className={`flex items-start gap-3 px-4 py-3 rounded-xl border shadow-lg backdrop-blur-sm animate-[slideInRight_0.3s_cubic-bezier(0.22,1,0.36,1)] ${style.bg}`}
+      className={`flex items-start gap-3 px-4 py-3 rounded-xl border shadow-lg backdrop-blur-sm ${
+        exiting ? 'toast-exit' : 'animate-[slideInRight_0.3s_cubic-bezier(0.22,1,0.36,1)]'
+      } ${style.bg}`}
     >
       <span className={`text-base font-bold shrink-0 ${style.text}`}>{style.icon}</span>
       <p className={`text-sm font-medium flex-1 ${style.text}`}>{toast.message}</p>
       <button
-        onClick={() => onRemove(toast.id)}
-        className={`text-xs opacity-50 hover:opacity-100 shrink-0 ${style.text}`}
+        onClick={() => {
+          setExiting(true);
+          setTimeout(() => onRemove(toast.id), 280);
+        }}
+        className={`text-xs opacity-50 hover:opacity-100 shrink-0 ${style.text} transition-opacity hover:scale-110`}
       >
         ✕
       </button>

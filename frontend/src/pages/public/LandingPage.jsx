@@ -299,13 +299,27 @@ export default function LandingPage() {
           }
         });
       },
-      { threshold: 0.15 }
+      { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
     );
 
-    document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+    const timer2 = setTimeout(() => {
+      document.querySelectorAll(".reveal").forEach((el, i) => {
+        if (!el.dataset.delaySet) {
+          el.dataset.delaySet = '1';
+          const parent = el.closest('[data-stagger-group]');
+          if (parent) {
+            const siblings = Array.from(parent.querySelectorAll('.reveal'));
+            const idx = siblings.indexOf(el);
+            el.style.transitionDelay = `${idx * 0.1}s`;
+          }
+        }
+        observer.observe(el);
+      });
+    }, 50);
 
     return () => {
       clearTimeout(timer);
+      clearTimeout(timer2);
       observer.disconnect();
     };
   }, []);
@@ -355,13 +369,13 @@ export default function LandingPage() {
             </button>
             <button
               onClick={() => navigate("/lapor")}
-              className="rounded-lg border border-white/50 px-4 py-2 text-sm font-semibold text-white transition hover:border-white hover:bg-white/10"
+              className="rounded-lg border border-white/50 px-4 py-2 text-sm font-semibold text-white transition-all duration-200 hover:border-white hover:bg-white/10 hover:scale-[1.02] active:scale-[0.98]"
             >
               Lapor Bencana
             </button>
             <button
               onClick={() => navigate("/admin/login")}
-              className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-brand-600/30 transition hover:bg-brand-700"
+              className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-brand-600/30 transition-all duration-200 hover:bg-brand-700 hover:scale-[1.02] active:scale-[0.98]"
             >
               Login Admin
             </button>
@@ -456,19 +470,19 @@ export default function LandingPage() {
             <div className="hero-btn flex flex-wrap gap-3 mt-4">
               <button
                 onClick={() => navigate("/lapor")}
-                className="rounded-lg bg-brand-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-brand-700"
+                className="rounded-lg bg-brand-600 px-6 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-brand-700 hover:scale-[1.02] active:scale-[0.98]"
               >
                 Laporkan Bencana
               </button>
               <button
                 onClick={() => navigate("/peta")}
-                className="rounded-lg border border-white/40 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/10"
+                className="rounded-lg border border-white/40 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur transition-all duration-200 hover:bg-white/10 hover:scale-[1.02] active:scale-[0.98]"
               >
                 Peta Bencana
               </button>
               <button
                 onClick={() => navigate("/lacak")}
-                className="rounded-lg border border-white/40 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+                className="rounded-lg border border-white/40 px-6 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-white/10 hover:scale-[1.02] active:scale-[0.98]"
               >
                 Lacak Status
               </button>
@@ -490,7 +504,7 @@ export default function LandingPage() {
               Sistem monitoring kebencanaan yang mudah dan cepat untuk warga Kota Semarang.
             </p>
           </div>
-          <div className="grid gap-5 md:grid-cols-3">
+          <div className="grid gap-5 md:grid-cols-3" data-stagger-group>
             <div className="reveal">
               <FeatureCard
                 icon={
@@ -572,13 +586,13 @@ export default function LandingPage() {
           <div className="flex flex-wrap justify-center gap-3 mt-6">
             <button
               onClick={() => navigate("/lapor")}
-              className="rounded-lg bg-white px-6 py-3 font-semibold text-brand-600 transition hover:bg-gray-50"
+              className="rounded-lg bg-white px-6 py-3 font-semibold text-brand-600 transition-all duration-200 hover:bg-gray-50 hover:scale-[1.02] active:scale-[0.98]"
             >
               Buat Laporan
             </button>
             <button
               onClick={() => navigate("/peta")}
-              className="rounded-lg border border-white/40 px-6 py-3 font-semibold text-white transition hover:bg-white/10"
+              className="rounded-lg border border-white/40 px-6 py-3 font-semibold text-white transition-all duration-200 hover:bg-white/10 hover:scale-[1.02] active:scale-[0.98]"
             >
               Lihat Peta
             </button>
@@ -687,7 +701,7 @@ export default function LandingPage() {
 
 function FeatureCard({ icon, title, description }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-6 transition hover:shadow-md hover:border-gray-300">
+    <div className="bg-white border border-gray-200 rounded-xl p-6 transition-all duration-300 hover:shadow-md hover:border-gray-300 hover:scale-[1.02] active:scale-[0.98]">
       <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-50 text-brand-600 mb-4">
         {icon}
       </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { trackReport } from '../../services/reportService';
 
@@ -20,39 +20,48 @@ export default function TrackStatus() {
   const [showMap, setShowMap] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [showSteps, setShowSteps] = useState(false);
+  const [showContent, setShowContent] = useState(false);
+  const [shakeForm, setShakeForm] = useState(false);
+  const [showHistoryItems, setShowHistoryItems] = useState(false);
+  const formRef = useRef(null);
 
   useEffect(() => {
+    const t = setTimeout(() => setShowContent(true), 80);
     const history = JSON.parse(localStorage.getItem('trackHistory') || '[]');
     setSearchHistory(history);
-    
-    // Auto-search jika ada code di URL
+
     const codeFromUrl = searchParams.get('code');
     if (codeFromUrl) {
       setCode(codeFromUrl);
       performSearch(codeFromUrl);
     }
+    return () => clearTimeout(t);
   }, []);
 
   const performSearch = async (searchCode) => {
     setError('');
     setResult(null);
+    setShowResult(false);
+    setShowSteps(false);
+    setShowHistoryItems(false);
     setLoading(true);
     try {
       const data = await trackReport(searchCode.trim());
       setResult(data);
-      setShowResult(false);
-      setShowSteps(false);
       requestAnimationFrame(() => {
         setShowResult(true);
-        setTimeout(() => setShowSteps(true), 200);
+        setTimeout(() => setShowSteps(true), 250);
+        setTimeout(() => setShowHistoryItems(true), 450);
       });
-      
+
       const history = JSON.parse(localStorage.getItem('trackHistory') || '[]');
       const newHistory = [searchCode.trim(), ...history.filter(c => c !== searchCode.trim())].slice(0, 5);
       localStorage.setItem('trackHistory', JSON.stringify(newHistory));
       setSearchHistory(newHistory);
     } catch (err) {
       setError(err.response?.data?.message || 'Laporan tidak ditemukan');
+      setShakeForm(true);
+      setTimeout(() => setShakeForm(false), 500);
     } finally {
       setLoading(false);
     }
@@ -73,12 +82,17 @@ export default function TrackStatus() {
   return (
     <div className="min-h-screen bg-gray-50 py-10 px-4">
       <div className="max-w-md mx-auto">
-        <div className="text-center mb-5">
+        <div className={`text-center mb-5 transition-all duration-500 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'}`}>
           <h1 className="text-lg font-extrabold text-gray-900">Lacak Laporan Bencana</h1>
           <p className="text-xs text-gray-500 mt-0.5">Masukkan kode tracking untuk melihat status</p>
         </div>
 
-        <form onSubmit={handleSearch} className="bg-white shadow-sm border border-gray-200 rounded-lg p-3 mb-5 flex gap-2">
+        <form
+          ref={formRef}
+          onSubmit={handleSearch}
+          className={`bg-white shadow-sm border border-gray-200 rounded-lg p-3 mb-5 flex gap-2 transition-all duration-500 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'} ${shakeForm ? 'shake-form' : ''}`}
+          style={{ transitionDelay: '0.08s' }}
+        >
           <input
             value={code}
             onChange={(e) => setCode(e.target.value)}
@@ -89,21 +103,30 @@ export default function TrackStatus() {
           <button
             type="submit"
             disabled={loading}
-            className="bg-brand-600 hover:bg-brand-700 text-white rounded-lg px-3 py-2 text-sm font-semibold transition disabled:opacity-50"
+            className="bg-brand-600 hover:bg-brand-700 text-white rounded-lg px-3 py-2 text-sm font-semibold transition flex items-center gap-1.5 disabled:opacity-60 hover:scale-[1.02] active:scale-[0.98]"
           >
-            {loading ? '...' : 'Cari'}
+            {loading ? (
+              <>
+                <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                <span>Mencari...</span>
+              </>
+            ) : 'Cari'}
           </button>
         </form>
 
         {searchHistory.length > 0 && (
-          <div className="mb-4">
+          <div className={`mb-4 transition-all duration-500 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'}`} style={{ transitionDelay: '0.16s' }}>
             <p className="text-[11px] text-gray-400 mb-1.5">Riwayat</p>
             <div className="flex flex-wrap gap-1.5">
               {searchHistory.map((c, i) => (
                 <button
                   key={i}
                   onClick={() => handleHistoryClick(c)}
-                  className="bg-gray-100 hover:bg-gray-200 text-gray-600 text-[11px] px-2.5 py-1 rounded-md transition"
+                  className="bg-gray-100 hover:bg-gray-200 text-gray-600 text-[11px] px-2.5 py-1 rounded-md transition hover:scale-105 active:scale-95"
+                  style={{ transitionDelay: `${0.16 + i * 0.04}s` }}
                 >
                   {c}
                 </button>
@@ -113,13 +136,13 @@ export default function TrackStatus() {
         )}
 
         {error && (
-          <p className="text-red-600 text-xs text-center bg-red-50 border border-red-100 rounded-lg py-2.5 mb-5">
+          <div className="text-red-600 text-xs text-center bg-red-50 border border-red-100 rounded-lg py-2.5 mb-5 animate-fade-in">
             {error}
-          </p>
+          </div>
         )}
 
         {result && (
-          <div className={`${showResult ? 'result-bounce' : 'opacity-0'} bg-white shadow-sm border border-gray-200 rounded-xl p-4`}>
+          <div className={`${showResult ? 'result-slide-up show' : 'result-slide-up'} bg-white shadow-sm border border-gray-200 rounded-xl p-4`}>
             <div className="flex justify-between items-start mb-3">
               <div>
                 <p className="text-[10px] text-gray-400 uppercase tracking-wide">Kode</p>
@@ -139,7 +162,13 @@ export default function TrackStatus() {
             {(result.report.photos?.length > 0 || result.report.photo_url) && (
               <div className="grid grid-cols-3 gap-1.5 mb-4">
                 {(result.report.photos || [result.report.photo_url]).filter(Boolean).slice(0,3).map((url, idx) => (
-                  <img key={idx} src={`${(import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace('/api','')}${url}`} alt={`foto ${idx}`} className="w-full h-20 object-cover rounded-lg border" />
+                  <img
+                    key={idx}
+                    src={`${(import.meta.env.VITE_API_URL || 'http://localhost:5000/api').replace('/api','')}${url}`}
+                    alt={`foto ${idx}`}
+                    className={`w-full h-20 object-cover rounded-lg border photo-enter ${showResult ? 'show' : ''}`}
+                    style={{ transitionDelay: `${0.1 + idx * 0.08}s` }}
+                  />
                 ))}
               </div>
             )}
@@ -148,7 +177,7 @@ export default function TrackStatus() {
               <div className="mb-4">
                 <button
                   onClick={() => setShowMap(!showMap)}
-                  className="w-full flex items-center justify-center gap-1.5 bg-brand-50 hover:bg-brand-100 text-brand-700 font-medium text-xs rounded-lg py-1.5 transition"
+                  className="w-full flex items-center justify-center gap-1.5 bg-brand-50 hover:bg-brand-100 text-brand-700 font-medium text-xs rounded-lg py-1.5 transition hover:scale-[1.01] active:scale-[0.99]"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -157,7 +186,7 @@ export default function TrackStatus() {
                   {showMap ? 'Tutup Peta' : 'Lihat di Peta'}
                 </button>
                 {showMap && (
-                  <div className="mt-2 rounded-lg overflow-hidden border">
+                  <div className="mt-2 rounded-lg overflow-hidden border animate-fade-in">
                     <iframe
                       title="Peta Lokasi Bencana"
                       width="100%"
@@ -178,13 +207,15 @@ export default function TrackStatus() {
                     className={`tracking-step w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0 ${
                       i <= currentStepIndex ? 'bg-brand-600 text-white' : 'bg-gray-200 text-gray-400'
                     } ${showSteps ? 'show' : ''}`}
-                    style={{ transitionDelay: `${i * 0.1}s` }}
+                    style={{ transitionDelay: `${i * 0.12}s` }}
                   >
                     {i + 1}
                   </div>
                   {i < STATUS_STEPS.length - 1 && (
-                    <div className={`tracking-line flex-1 h-0.5 ${i < currentStepIndex ? 'bg-brand-600' : 'bg-gray-200'} ${showSteps ? 'show' : ''}`}
-                      style={{ transitionDelay: `${i * 0.1 + 0.08}s` }} />
+                    <div
+                      className={`tracking-line flex-1 h-0.5 ${i < currentStepIndex ? 'bg-brand-600' : 'bg-gray-200'} ${showSteps ? 'show' : ''}`}
+                      style={{ transitionDelay: `${i * 0.12 + 0.1}s` }}
+                    />
                   )}
                 </div>
               ))}
@@ -192,10 +223,14 @@ export default function TrackStatus() {
 
             {result.history.length > 0 && (
               <div>
-                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1.5">Riwayat</p>
+                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-1.5">Riwayat Penanganan</p>
                 <div className="space-y-1.5">
-                  {result.history.map((log) => (
-                    <div key={log.id} className="text-[11px] text-gray-600 border-l-2 border-brand-200 pl-2.5 py-0.5">
+                  {result.history.map((log, idx) => (
+                    <div
+                      key={log.id}
+                      className={`history-item text-[11px] text-gray-600 border-l-2 border-brand-200 pl-2.5 py-0.5 ${showHistoryItems ? 'show' : ''}`}
+                      style={{ transitionDelay: `${idx * 0.1}s` }}
+                    >
                       <p className="font-medium text-gray-800">{STATUS_LABELS[log.status_to] || log.status_to}</p>
                       {log.note && <p className="text-gray-500">{log.note}</p>}
                       <p className="text-gray-400">{new Date(log.created_at).toLocaleString('id-ID')}</p>

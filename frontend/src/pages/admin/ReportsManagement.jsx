@@ -3,6 +3,7 @@ import { getReports, updateReportStatus, deleteReport, exportReportsExcel, getRe
 import { getSocket } from '../../services/socket';
 import { showToast } from '../../components/Toast';
 import AnimatedNumber from '../../components/AnimatedNumber';
+import { SkeletonTable, SkeletonPulse } from '../../components/Skeleton';
 
 const STATUS_OPTIONS = ['baru', 'diverifikasi', 'ditindaklanjuti', 'selesai'];
 const DISASTER_TYPES = ['Banjir', 'Longsor', 'Kebakaran', 'Angin Puting Beliung', 'Gempa Bumi', 'Lainnya'];
@@ -248,10 +249,7 @@ export default function ReportsManagement() {
         </div>
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20">
-            <div className="w-14 h-14 rounded-full border-4 border-brand-100 border-t-brand-500 animate-spin mb-4"></div>
-            <p className="text-gray-500 font-medium">Memuat data...</p>
-          </div>
+          <SkeletonTable rows={8} cols={5} />
         ) : (
           <>
             <div className="overflow-x-auto">

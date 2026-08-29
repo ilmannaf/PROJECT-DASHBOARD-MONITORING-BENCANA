@@ -8,6 +8,7 @@ import {
 import { getPosko } from "../../services/poskoService";
 import { isAdmin } from "../../services/authService";
 import AnimatedNumber from '../../components/AnimatedNumber';
+import { SkeletonTable } from '../../components/Skeleton';
 
 const STATUS_OPTIONS = ["siap", "maintenance", "rusak"];
 const STATUS_BG = {
@@ -252,10 +253,7 @@ export default function VehicleManagement() {
         </div>
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20">
-            <div className="w-14 h-14 rounded-full border-4 border-purple-100 border-t-purple-500 animate-spin mb-4"></div>
-            <p className="text-gray-500 font-medium">Memuat data...</p>
-          </div>
+          <SkeletonTable rows={6} cols={4} />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left">

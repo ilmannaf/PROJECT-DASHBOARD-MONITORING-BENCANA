@@ -46,23 +46,23 @@ button:disabled {
 }
 
 .btn {
-  @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 active:scale-[0.98];
+  @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 active:scale-[0.98] hover:scale-[1.02];
 }
 
 .btn-primary {
-  @apply bg-brand-600 text-white hover:bg-brand-700 hover:shadow-md transition-all;
+  @apply bg-brand-600 text-white hover:bg-brand-700 hover:shadow-md transition-all duration-200 hover:scale-[1.02] active:scale-[0.98];
 }
 
 .btn-secondary {
-  @apply bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300;
+  @apply bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 hover:scale-[1.02] active:scale-[0.98];
 }
 
 .btn-danger {
-  @apply bg-red-500 text-white hover:bg-red-600 hover:shadow-md transition-all;
+  @apply bg-red-500 text-white hover:bg-red-600 hover:shadow-md transition-all duration-200 hover:scale-[1.02] active:scale-[0.98];
 }
 
 .btn-success {
-  @apply bg-emerald-500 text-white hover:bg-emerald-600 hover:shadow-md transition-all;
+  @apply bg-emerald-500 text-white hover:bg-emerald-600 hover:shadow-md transition-all duration-200 hover:scale-[1.02] active:scale-[0.98];
 }
 
 .animate-fade-in {
@@ -164,7 +164,11 @@ button:disabled {
   .stagger-item,
   .stat-card,
   .form-section,
-  .tracking-step {
+  .tracking-step,
+  .field-stagger,
+  .history-item,
+  .result-slide-up,
+  .photo-enter {
     opacity: 1;
     transform: none;
     transition: none;
@@ -174,6 +178,11 @@ button:disabled {
   }
   .blob {
     animation: none !important;
+  }
+  .shake-form,
+  .scale-bounce-in,
+  .gps-success {
+    animation: none;
   }
 }
 
@@ -376,4 +385,128 @@ button:disabled {
 @keyframes slideInRight {
   from { opacity: 0; transform: translateX(100%); }
   to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideOutRight {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(100%); }
+}
+.toast-exit {
+  animation: slideOutRight 0.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* ===== SHAKE ANIMATION (form error feedback) ===== */
+@keyframes shakeForm {
+  0%, 100% { transform: translateX(0); }
+  15% { transform: translateX(-6px); }
+  30% { transform: translateX(5px); }
+  45% { transform: translateX(-4px); }
+  60% { transform: translateX(3px); }
+  75% { transform: translateX(-2px); }
+  90% { transform: translateX(1px); }
+}
+.shake-form {
+  animation: shakeForm 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+/* ===== SKELETON LOADING PULSE ===== */
+.skeleton {
+  background: linear-gradient(90deg, #e9ecef 25%, #f1f3f5 37%, #e9ecef 63%);
+  background-size: 200% 100%;
+  animation: skeletonPulse 1.4s ease-in-out infinite;
+  border-radius: 0.5rem;
+}
+@keyframes skeletonPulse {
+  0% { background-position: 100% 50%; }
+  100% { background-position: 0 50%; }
+}
+
+/* ===== PHOTO SCALE-IN ===== */
+.photo-enter {
+  opacity: 0;
+  transform: scale(0.85);
+}
+.photo-enter.show {
+  opacity: 1;
+  transform: scale(1);
+  transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ===== FORM FIELD STAGGER ===== */
+.field-stagger {
+  opacity: 0;
+  transform: translateY(10px);
+}
+.field-stagger.show {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ===== TRACKING HISTORY ITEM STAGGER ===== */
+.history-item {
+  opacity: 0;
+  transform: translateX(-8px);
+}
+.history-item.show {
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ===== RESULT SLIDE-UP ===== */
+.result-slide-up {
+  opacity: 0;
+  transform: translateY(16px);
+}
+.result-slide-up.show {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ===== SCALE-IN WITH BOUNCE (success tracking code) ===== */
+@keyframes scaleBounceIn {
+  0% { opacity: 0; transform: scale(0.8); }
+  60% { opacity: 1; transform: scale(1.05); }
+  80% { transform: scale(0.97); }
+  100% { transform: scale(1); }
+}
+.scale-bounce-in {
+  animation: scaleBounceIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* ===== GPS BUTTON SUCCESS CHECK ===== */
+@keyframes gpsSuccess {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+.gps-success {
+  animation: gpsSuccess 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ===== FRAMER-MOTION PAGE TRANSITION WRAPPER ===== */
+.page-motion-wrapper {
+  min-height: 100vh;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shake-form,
+  .skeleton,
+  .photo-enter,
+  .field-stagger,
+  .history-item,
+  .result-slide-up,
+  .scale-bounce-in,
+  .gps-success,
+  .toast-exit {
+    animation: none;
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
 }

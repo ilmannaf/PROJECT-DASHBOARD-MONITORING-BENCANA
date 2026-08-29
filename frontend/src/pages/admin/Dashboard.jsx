@@ -4,6 +4,7 @@ import { getReportStats } from '../../services/reportService';
 import { getSocket } from '../../services/socket';
 import { showToast } from '../../components/Toast';
 import AnimatedNumber from '../../components/AnimatedNumber';
+import { SkeletonStatCards, SkeletonPulse } from '../../components/Skeleton';
 import {
   PieChart, Pie, Cell, Tooltip, ResponsiveContainer,
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend,
@@ -101,9 +102,18 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-32">
-        <div className="w-14 h-14 rounded-full border-4 border-brand-100 border-t-brand-500 animate-spin mb-4"></div>
-        <p className="text-gray-500 font-medium">Memuat data...</p>
+      <div className="p-6 lg:p-8 animate-fade-in">
+        <SkeletonStatCards />
+        <div className="grid lg:grid-cols-2 gap-6">
+          <div className="bg-white rounded-xl border border-gray-100 p-5">
+            <SkeletonPulse className="h-4 w-40 mb-4" />
+            <SkeletonPulse className="h-64 w-full rounded-lg" />
+          </div>
+          <div className="bg-white rounded-xl border border-gray-100 p-5">
+            <SkeletonPulse className="h-4 w-40 mb-4" />
+            <SkeletonPulse className="h-64 w-full rounded-lg" />
+          </div>
+        </div>
       </div>
     );
   }

@@ -85,12 +85,14 @@ export default function ReportForm() {
   const [photos, setPhotos] = useState([]); // [{file, preview}]
   const [location, setLocation] = useState(null);
   const [locating, setLocating] = useState(false);
+  const [gpsSuccess, setGpsSuccess] = useState(false);
   const [result, setResult] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const mapRef = useRef(null);
   const fileInputRef = useRef(null);
   const [showForm, setShowForm] = useState(false);
+  const [photoAnimKey, setPhotoAnimKey] = useState(0);
 
   useEffect(() => {
     const t = setTimeout(() => setShowForm(true), 80);
@@ -127,7 +129,7 @@ export default function ReportForm() {
       setError("");
     }
     setPhotos((prev) => [...prev, ...valid].slice(0, MAX_PHOTOS));
-    // reset input
+    setPhotoAnimKey((k) => k + 1);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
@@ -151,7 +153,8 @@ export default function ReportForm() {
         const loc = { latitude: pos.coords.latitude, longitude: pos.coords.longitude };
         setLocation(loc);
         setLocating(false);
-        // pan map if exists
+        setGpsSuccess(true);
+        setTimeout(() => setGpsSuccess(false), 400);
         if (mapRef.current) {
           mapRef.current.setView([loc.latitude, loc.longitude], 15);
         }
@@ -229,11 +232,11 @@ export default function ReportForm() {
             <div className="p-5">
               <p className="text-xs text-gray-500 mb-2">Simpan kode ini untuk melacak status:</p>
               <div className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-4 text-center mb-5">
-                <p className="font-mono text-xl font-extrabold tracking-widest text-gray-900">{result.tracking_code}</p>
+                <p className="font-mono text-xl font-extrabold tracking-widest text-gray-900 scale-bounce-in" style={{ animationDelay: '0.3s' }}>{result.tracking_code}</p>
               </div>
               <div className="space-y-2">
-                <a href={`/lacak?code=${result.tracking_code}`} className="w-full flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg py-2.5 font-semibold text-sm transition">Lacak Status</a>
-                <button onClick={resetAll} className="w-full text-sm text-gray-500 hover:text-gray-700 font-medium py-2 transition">Kirim laporan lain</button>
+                <a href={`/lacak?code=${result.tracking_code}`} className="w-full flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg py-2.5 font-semibold text-sm transition hover:scale-[1.02] active:scale-[0.98]">Lacak Status</a>
+                <button onClick={resetAll} className="w-full text-sm text-gray-500 hover:text-gray-700 font-medium py-2 transition hover:scale-[1.02] active:scale-[0.98]">Kirim laporan lain</button>
               </div>
             </div>
           </div>
@@ -309,9 +312,9 @@ export default function ReportForm() {
             </div>
 
             <div className="p-5 space-y-5">
-              {error && <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-4 py-3">{error}</p>}
+              {error && <p className="text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl px-4 py-3 animate-fade-in">{error}</p>}
 
-              <div className="grid sm:grid-cols-2 gap-4">
+              <div className={`grid sm:grid-cols-2 gap-4 field-stagger ${showForm ? 'show' : ''}`} style={{ transitionDelay: '0.28s' }}>
                 <Field label="Nama Pelapor" required>
                   <div className="relative"><FieldIcon name="user" /><input name="reporter_name" value={form.reporter_name} onChange={handleChange} required placeholder="Nama lengkap Anda" className={inputClass} /></div>
                 </Field>
@@ -320,77 +323,97 @@ export default function ReportForm() {
                 </Field>
               </div>
 
-              <Field label="Jenis Bencana" required>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
-                  {DISASTER_TYPES.map((t) => {
-                    const active = form.disaster_type === t.id;
-                    return (
-                      <button key={t.id} type="button" onClick={() => setForm({ ...form, disaster_type: t.id })} className={`flex flex-col items-center gap-2 rounded-xl border px-3 py-3.5 text-sm font-medium transition-all ${active ? "border-brand-600 bg-brand-50 text-brand-700 ring-2 ring-brand-500/20" : "border-gray-200 bg-white text-gray-600 hover:border-brand-300 hover:bg-brand-50/40"}`}>
-                        <DisasterIcon name={t.icon} active={active} /><span className="text-center leading-tight">{t.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </Field>
+              <div className={`field-stagger ${showForm ? 'show' : ''}`} style={{ transitionDelay: '0.36s' }}>
+                <Field label="Jenis Bencana" required>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                    {DISASTER_TYPES.map((t) => {
+                      const active = form.disaster_type === t.id;
+                      return (
+                        <button key={t.id} type="button" onClick={() => setForm({ ...form, disaster_type: t.id })} className={`flex flex-col items-center gap-2 rounded-xl border px-3 py-3.5 text-sm font-medium transition-all hover:scale-[1.02] active:scale-[0.98] ${active ? "border-brand-600 bg-brand-50 text-brand-700 ring-2 ring-brand-500/20" : "border-gray-200 bg-white text-gray-600 hover:border-brand-300 hover:bg-brand-50/40"}`}>
+                          <DisasterIcon name={t.icon} active={active} /><span className="text-center leading-tight">{t.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </Field>
+              </div>
 
-              <Field label="Deskripsi Kejadian" optional>
-                <textarea name="description" value={form.description} onChange={handleChange} rows={4} placeholder="Contoh: air mulai naik sekitar 50 cm, warga terdampak ±20 KK di RT 03/RW 02..." className={textareaClass} />
-              </Field>
+              <div className={`field-stagger ${showForm ? 'show' : ''}`} style={{ transitionDelay: '0.44s' }}>
+                <Field label="Deskripsi Kejadian" optional>
+                  <textarea name="description" value={form.description} onChange={handleChange} rows={4} placeholder="Contoh: air mulai naik sekitar 50 cm, warga terdampak ±20 KK di RT 03/RW 02..." className={textareaClass} />
+                </Field>
+              </div>
 
-              <Field label="Alamat / Lokasi" required>
-                <div className="relative"><FieldIcon name="pin" /><input name="address" value={form.address} onChange={handleChange} required placeholder="Jalan, RT/RW, kelurahan, kecamatan" className={inputClass} /></div>
-              </Field>
+              <div className={`field-stagger ${showForm ? 'show' : ''}`} style={{ transitionDelay: '0.52s' }}>
+                <Field label="Alamat / Lokasi" required>
+                  <div className="relative"><FieldIcon name="pin" /><input name="address" value={form.address} onChange={handleChange} required placeholder="Jalan, RT/RW, kelurahan, kecamatan" className={inputClass} /></div>
+                </Field>
+              </div>
 
               {/* MAP PICKER - koordinat opsional tapi presisi */}
-              <Field label="Titik Lokasi di Peta" optional>
-                <p className="text-xs text-gray-500 mb-2">Klik pada peta untuk menandai lokasi, geser marker untuk presisi. Boleh kosong jika tidak tahu koordinat — alamat tetap wajib.</p>
-                <div className="rounded-xl overflow-hidden border border-gray-200">
-                  <MapContainer
-                    center={SEMARANG_CENTER}
-                    zoom={SEMARANG_ZOOM}
-                    minZoom={11}
-                    maxBounds={SEMARANG_MAX_BOUNDS}
-                    maxBoundsViscosity={1.0}
-                    style={{ height: "300px", width: "100%" }}
-                    ref={mapRef}
-                    whenReady={(e) => { mapRef.current = e.target; }}
-                  >
-                    <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                    <FitSemarang />
-                    <Polygon positions={[WORLD_RECT, SEMARANG_LATLNG]} pathOptions={{ stroke: false, fillColor: "#0f172a", fillOpacity: 0.55, fillRule: "evenodd" }} />
-                    <GeoJSON key="kota-semarang-boundary" data={KOTA_SEMARANG_GEOJSON} style={{ color: "#f97316", weight: 3, opacity: 0.9, fill: false }} />
-                    <LocationPicker location={location} setLocation={setLocation} />
-                  </MapContainer>
-                </div>
-                <div className="flex flex-wrap gap-2 mt-3">
-                  <button type="button" onClick={handleGetLocation} disabled={locating} className="inline-flex items-center gap-2 text-sm font-medium text-brand-700 hover:text-brand-800 bg-brand-50 hover:bg-brand-100 border border-brand-100 rounded-lg px-3.5 py-2 transition disabled:opacity-50">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                    {locating ? "Mendeteksi..." : location ? "Update lokasi GPS" : "Pakai lokasi saya"}
-                  </button>
-                  {location && (
-                    <button type="button" onClick={() => setLocation(null)} className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-800 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg px-3.5 py-2 transition">Hapus titik</button>
+              <div className={`field-stagger ${showForm ? 'show' : ''}`} style={{ transitionDelay: '0.60s' }}>
+                <Field label="Titik Lokasi di Peta" optional>
+                  <p className="text-xs text-gray-500 mb-2">Klik pada peta untuk menandai lokasi, geser marker untuk presisi. Boleh kosong jika tidak tahu koordinat — alamat tetap wajib.</p>
+                  <div className="rounded-xl overflow-hidden border border-gray-200">
+                    <MapContainer
+                      center={SEMARANG_CENTER}
+                      zoom={SEMARANG_ZOOM}
+                      minZoom={11}
+                      maxBounds={SEMARANG_MAX_BOUNDS}
+                      maxBoundsViscosity={1.0}
+                      style={{ height: "300px", width: "100%" }}
+                      ref={mapRef}
+                      whenReady={(e) => { mapRef.current = e.target; }}
+                    >
+                      <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                      <FitSemarang />
+                      <Polygon positions={[WORLD_RECT, SEMARANG_LATLNG]} pathOptions={{ stroke: false, fillColor: "#0f172a", fillOpacity: 0.55, fillRule: "evenodd" }} />
+                      <GeoJSON key="kota-semarang-boundary" data={KOTA_SEMARANG_GEOJSON} style={{ color: "#f97316", weight: 3, opacity: 0.9, fill: false }} />
+                      <LocationPicker location={location} setLocation={setLocation} />
+                    </MapContainer>
+                  </div>
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    <button type="button" onClick={handleGetLocation} disabled={locating} className="inline-flex items-center gap-2 text-sm font-medium text-brand-700 hover:text-brand-800 bg-brand-50 hover:bg-brand-100 border border-brand-100 rounded-lg px-3.5 py-2 transition disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98]">
+                      {locating ? (
+                        <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                      ) : gpsSuccess ? (
+                        <svg className={`w-4 h-4 text-emerald-600 ${gpsSuccess ? 'gps-success' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                      ) : (
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                      )}
+                      {locating ? "Mendeteksi..." : location ? "Update lokasi GPS" : "Pakai lokasi saya"}
+                    </button>
+                    {location && (
+                      <button type="button" onClick={() => setLocation(null)} className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-gray-800 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg px-3.5 py-2 transition hover:scale-[1.02] active:scale-[0.98]">Hapus titik</button>
+                    )}
+                  </div>
+                  {location ? (
+                    <p className="text-xs text-gray-500 font-mono bg-gray-50 border border-gray-100 rounded-lg px-3 py-2 mt-2 animate-fade-in">📍 {location.latitude.toFixed(6)}, {location.longitude.toFixed(6)} — akan tampil di peta bencana</p>
+                  ) : (
+                    <p className="text-xs text-amber-600 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2 mt-2">Belum ada titik peta — laporan tetap bisa dikirim, tapi tidak muncul di peta sebaran</p>
                   )}
-                </div>
-                {location ? (
-                  <p className="text-xs text-gray-500 font-mono bg-gray-50 border border-gray-100 rounded-lg px-3 py-2 mt-2">📍 {location.latitude.toFixed(6)}, {location.longitude.toFixed(6)} — akan tampil di peta bencana</p>
-                ) : (
-                  <p className="text-xs text-amber-600 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2 mt-2">Belum ada titik peta — laporan tetap bisa dikirim, tapi tidak muncul di peta sebaran</p>
-                )}
-              </Field>
+                </Field>
+              </div>
 
-              <Field label={`Foto Kejadian (maks ${MAX_PHOTOS})`} optional>
-                <div className="space-y-3">
-                  {photos.length > 0 && (
-                    <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
-                      {photos.map((p, idx) => (
-                        <div key={idx} className="relative group">
-                          <img src={p.preview} alt={`preview ${idx}`} className="h-24 w-full object-cover rounded-xl border border-gray-200" />
-                          <button type="button" onClick={() => removePhoto(idx)} className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 shadow">×</button>
-                          <span className="absolute bottom-1 left-1 text-[10px] bg-black/60 text-white px-1.5 py-0.5 rounded">{idx + 1}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+              <div className={`field-stagger ${showForm ? 'show' : ''}`} style={{ transitionDelay: '0.68s' }}>
+                <Field label={`Foto Kejadian (maks ${MAX_PHOTOS})`} optional>
+                  <div className="space-y-3">
+                    {photos.length > 0 && (
+                      <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
+                        {photos.map((p, idx) => (
+                          <div key={idx} className={`relative group photo-enter ${idx === photos.length - 1 && photoAnimKey > 0 ? '' : 'show'}`}>
+                            <img src={p.preview} alt={`preview ${idx}`} className="h-24 w-full object-cover rounded-xl border border-gray-200" />
+                            <button type="button" onClick={() => removePhoto(idx)} className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 shadow hover:scale-110 transition">×</button>
+                            <span className="absolute bottom-1 left-1 text-[10px] bg-black/60 text-white px-1.5 py-0.5 rounded">{idx + 1}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   {photos.length < MAX_PHOTOS ? (
                     <label className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/60 hover:border-brand-300 hover:bg-brand-50/30 transition cursor-pointer py-6 px-4 text-center">
                       <div className="w-11 h-11 rounded-full bg-white border border-gray-200 flex items-center justify-center"><svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" /></svg></div>
@@ -402,11 +425,24 @@ export default function ReportForm() {
                   )}
                 </div>
               </Field>
+              </div>
 
-              <div className="pt-2">
-                <button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white rounded-lg py-3 font-semibold text-sm transition">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
-                  {loading ? "Mengirim..." : "Kirim Laporan"}
+              <div className={`pt-2 field-stagger ${showForm ? 'show' : ''}`} style={{ transitionDelay: '0.76s' }}>
+                <button type="submit" disabled={loading} className="w-full flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white rounded-lg py-3 font-semibold text-sm transition hover:scale-[1.02] active:scale-[0.98]">
+                  {loading ? (
+                    <>
+                      <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                      <span>Mengirim...</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
+                      <span>Kirim Laporan</span>
+                    </>
+                  )}
                 </button>
                 <p className="text-[11px] text-gray-400 text-center mt-2">Dengan mengirim, Anda menyatakan informasi yang diberikan benar.</p>
               </div>

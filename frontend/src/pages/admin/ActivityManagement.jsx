@@ -7,6 +7,7 @@ import {
 import { isAdmin } from "../../services/authService";
 import { Calendar, Plus, X, Trash2 } from "lucide-react";
 import AnimatedNumber from '../../components/AnimatedNumber';
+import { SkeletonCards, SkeletonPulse } from '../../components/Skeleton';
 
 const inputClass =
   "w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition shadow-sm bg-white";
@@ -176,9 +177,17 @@ export default function ActivityManagement() {
       )}
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-20">
-          <div className="w-14 h-14 rounded-full border-4 border-brand-100 border-t-brand-500 animate-spin mb-4"></div>
-          <p className="text-gray-500 font-medium">Memuat data...</p>
+        <div className="space-y-4">
+          <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+            <div className="flex items-center gap-4">
+              <SkeletonPulse className="h-12 w-12 rounded-xl" />
+              <div className="space-y-2">
+                <SkeletonPulse className="h-4 w-48" />
+                <SkeletonPulse className="h-3 w-32" />
+              </div>
+            </div>
+          </div>
+          <SkeletonCards count={6} />
         </div>
       ) : (
         <>

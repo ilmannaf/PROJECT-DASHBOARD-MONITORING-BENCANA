@@ -9,6 +9,7 @@ import { getPosko } from "../../services/poskoService";
 import { isAdmin } from "../../services/authService";
 import { Package, Search, Plus, X, Trash2, Pencil } from "lucide-react";
 import AnimatedNumber from '../../components/AnimatedNumber';
+import { SkeletonTable } from '../../components/Skeleton';
 
 const CATEGORIES = ["logistik", "peralatan", "p3k"];
 const CONDITIONS = ["baik", "rusak", "perlu_maintenance"];
@@ -321,10 +322,7 @@ export default function InventoryManagement() {
         </div>
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-20">
-            <div className="w-14 h-14 rounded-full border-4 border-brand-100 border-t-brand-500 animate-spin mb-4"></div>
-            <p className="text-gray-500 font-medium">Memuat data...</p>
-          </div>
+          <SkeletonTable rows={6} cols={5} />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left">
