@@ -33,6 +33,8 @@ PROJECT-DASHBOARD-MONITORING-BENCANA/
 - **Kendaraan** - Fleet management dengan status service
 - **Posko** - Kelola titik posko pengungsian
 - **Kegiatan** - Laporan kegiatan lapangan dengan dokumentasi
+- **Manajemen Akun** - Kelola akun admin/petugas dengan konfirmasi password
+- **Histori Login** - Riwayat login admin dengan info perangkat yang readable
 
 ### 🔥 Highlight Features
 - ✅ Logo resmi BPBD (gambar) menggantikan teks logo di seluruh halaman
@@ -138,12 +140,12 @@ npm run dev
 
 | Email | Password | Role |
 |-------|----------|------|
-| admin@bpbdsemarang.go.id | admin123 | admin |
+| admin@ilmannafia.go.id | admin123 | admin |
 | petugas@bpbdsemarang.go.id | admin123 | petugas |
 
 > Jika password pernah diganti di database, reset dengan query berikut:
 > ```sql
-> UPDATE users SET password = '$2b$10$mpquimwluN21a/LByqXx/euVylhBz/IoKDLXdk5MnnT2dMJbNNOVm' WHERE email = 'admin@bpbdsemarang.go.id';
+> UPDATE users SET password = '$2b$10$mpquimwluN21a/LByqXx/euVylhBz/IoKDLXdk5MnnT2dMJbNNOVm' WHERE email = 'admin@ilmannafia.go.id';
 > ```
 
 ---
@@ -175,6 +177,7 @@ npm run dev
 | Table | Deskripsi |
 |-------|-----------|
 | `users` | Admin & petugas BPBD |
+| `login_history` | Histori login admin (device_info) |
 | `reports` | Laporan bencana dari publik (koordinat opsional, photo_url legacy) |
 | `report_photos` | Foto multiple max 5 per laporan (FK reports) |
 | `report_logs` | History perubahan status laporan |
@@ -198,6 +201,7 @@ Data korban disimpan dalam field terpisah dan otomatis dirangkum ke kolom teks `
 ### Auth
 - `POST /api/auth/register` - Register user baru (role petugas)
 - `POST /api/auth/login` - Login
+- `GET /api/auth/history` - Histori login admin (admin only)
 
 ### Reports
 - `POST /api/reports` - Submit laporan baru (publik, `multipart` max 5 foto `photos`/`photo`, koordinat opsional, `optionalVerifyToken` link `reporter_user_id` jika user login)
@@ -265,6 +269,8 @@ Sistem menggunakan tema warna oranye konsisten untuk branding BPBD:
 - [x] Admin sidebar orange active indicator (border kiri + bg transparan)
 - [x] Kelola laporan admin dengan hapus + preview foto/koordinat
 - [x] Peningkatan animasi global v1.2.0 — page transitions, skeleton loading, micro-interactions
+- [x] Manajemen akun admin/petugas dengan role selection & password confirmation
+- [x] Histori login admin — info perangkat yang readable (nama, inisial, wilayah)
 - [ ] Google OAuth login (backend)
 - [ ] Socket.IO live updates (full real-time)
 - [ ] Mobile app (React Native)

@@ -13,7 +13,7 @@ export default function UsersManagement() {
   const [loading, setLoading] = useState(true);
   const [showContent, setShowContent] = useState(false);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ name: '', email: '', password: '' });
+  const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '', role: 'petugas' });
   const [message, setMessage] = useState('');
 
   const loadUsers = () => {
@@ -37,11 +37,16 @@ export default function UsersManagement() {
   const handleCreate = async (e) => {
     e.preventDefault();
     setMessage('');
+    if (form.password !== form.confirmPassword) {
+      setMessage('Password dan konfirmasi password tidak cocok.');
+      return;
+    }
     try {
-      await createUser(form);
-      setForm({ name: '', email: '', password: '' });
+      const payload = { name: form.name, email: form.email, password: form.password, role: form.role };
+      await createUser(payload);
+      setForm({ name: '', email: '', password: '', confirmPassword: '', role: 'petugas' });
       setShowForm(false);
-      setMessage('Akun petugas berhasil dibuat.');
+      setMessage(`Akun ${form.role} berhasil dibuat.`);
       loadUsers();
     } catch (err) {
       alert(err.response?.data?.message || 'Gagal membuat akun');
@@ -90,7 +95,7 @@ export default function UsersManagement() {
             </div>
             <div>
               <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Manajemen Akun</h1>
-              <p className="text-gray-500 text-sm mt-0.5">Kelola akun petugas BPBD</p>
+              <p className="text-gray-500 text-sm mt-0.5">Kelola akun admin & petugas BPBD</p>
             </div>
           </div>
         </div>
@@ -101,7 +106,7 @@ export default function UsersManagement() {
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={showForm ? "M6 18L18 6M6 6l12 12" : "M12 4v16m8-8H4"} />
           </svg>
-          {showForm ? 'Tutup Form' : 'Tambah Petugas'}
+          {showForm ? 'Tutup Form' : 'Tambah Akun'}
         </button>
       </div>
 
@@ -119,20 +124,31 @@ export default function UsersManagement() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
               </svg>
             </div>
-            <h2 className="text-xl font-bold text-gray-900">Buat Akun Petugas Baru</h2>
+            <h2 className="text-xl font-bold text-gray-900">Buat Akun Baru</h2>
           </div>
           <form onSubmit={handleCreate} className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Nama Lengkap <span className="text-red-500">*</span></label>
-              <input name="name" value={form.name} onChange={handleChange} required placeholder="Nama petugas" className={inputClass} />
+              <input name="name" value={form.name} onChange={handleChange} required placeholder="Nama lengkap" className={inputClass} />
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Email <span className="text-red-500">*</span></label>
-              <input name="email" type="email" value={form.email} onChange={handleChange} required placeholder="email@example.com" className={inputClass} />
+              <input name="email" type="email" value={form.email} onChange={handleChange} required placeholder="contoh@gmail.com" className={inputClass} />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Password Awal <span className="text-red-500">*</span></label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Role <span className="text-red-500">*</span></label>
+              <select name="role" value={form.role} onChange={handleChange} required className={inputClass}>
+                <option value="petugas">Petugas</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Password <span className="text-red-500">*</span></label>
               <input name="password" type="password" value={form.password} onChange={handleChange} required minLength={6} placeholder="Minimal 6 karakter" className={inputClass} />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Konfirmasi Password <span className="text-red-500">*</span></label>
+              <input name="confirmPassword" type="password" value={form.confirmPassword} onChange={handleChange} required minLength={6} placeholder="Ulangi password" className={inputClass} />
             </div>
             <div className="md:col-span-3 flex gap-3">
               <button type="submit" className="btn btn-primary flex-1 py-3.5">Simpan Akun</button>

@@ -36,9 +36,9 @@ export default function LoginHistory() {
     });
   };
 
-  const truncateUA = (ua) => {
-    if (!ua || ua === '-') return '-';
-    return ua.length > 60 ? ua.slice(0, 60) + '...' : ua;
+  const truncateInfo = (info) => {
+    if (!info || info === '-') return '-';
+    return info.length > 60 ? info.slice(0, 60) + '...' : info;
   };
 
   return (
@@ -46,7 +46,7 @@ export default function LoginHistory() {
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div>
           <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight mb-1">History Login</h1>
-          <p className="text-sm text-gray-500">Riwayat login admin dan petugas</p>
+          <p className="text-sm text-gray-500">Riwayat login admin</p>
         </div>
       </div>
 
@@ -70,7 +70,7 @@ export default function LoginHistory() {
                     <th className="py-3 px-5 text-[11px] font-semibold uppercase tracking-wide text-gray-500">Waktu Login</th>
                     <th className="py-3 px-5 text-[11px] font-semibold uppercase tracking-wide text-gray-500">Status</th>
                     <th className="py-3 px-5 text-[11px] font-semibold uppercase tracking-wide text-gray-500">IP Address</th>
-                    <th className="py-3 px-5 text-[11px] font-semibold uppercase tracking-wide text-gray-500 max-w-xs">User Agent</th>
+                    <th className="py-3 px-5 text-[11px] font-semibold uppercase tracking-wide text-gray-500">Informasi</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
@@ -104,8 +104,8 @@ export default function LoginHistory() {
                           )}
                         </td>
                         <td className="py-3 px-5 text-xs text-gray-500 font-mono">{row.ip_address || '-'}</td>
-                        <td className="py-3 px-5 text-xs text-gray-500 truncate" title={row.user_agent}>
-                          {truncateUA(row.user_agent)}
+                        <td className="py-3 px-5 text-xs text-gray-500 truncate" title={row.device_info}>
+                          {truncateInfo(row.device_info)}
                         </td>
                       </tr>
                     ))

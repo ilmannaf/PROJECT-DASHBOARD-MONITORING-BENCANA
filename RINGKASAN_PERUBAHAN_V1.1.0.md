@@ -73,7 +73,7 @@ Sebelumnya user yang register dari publik langsung jadi `petugas` (bisa akses se
 ### Seed Data (User Default)
 | Email | Password | Role |
 |-------|----------|------|
-| admin@bpbdsemarang.go.id | admin123 | admin |
+| admin@ilmannafia.go.id | admin123 | admin |
 | petugas@bpbdsemarang.go.id | admin123 | petugas |
 | pelapor@example.com | admin123 | pelapor |
 

@@ -15,7 +15,7 @@ exports.getUsers = async (req, res) => {
 
 exports.createUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({ message: 'Nama, email, dan password wajib diisi' });
@@ -29,6 +29,9 @@ exports.createUser = async (req, res) => {
       return res.status(400).json({ message: 'Password minimal 6 karakter' });
     }
 
+    const validRoles = ['admin', 'petugas'];
+    const userRole = role && validRoles.includes(role) ? role : 'petugas';
+
     const [existing] = await pool.query('SELECT id FROM users WHERE email = ?', [email]);
     if (existing.length > 0) {
       return res.status(409).json({ message: 'Email sudah terdaftar' });
@@ -38,12 +41,12 @@ exports.createUser = async (req, res) => {
 
     const [result] = await pool.query(
       'INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
-      [name, email, hashedPassword, 'petugas']
+      [name, email, hashedPassword, userRole]
     );
 
     res.status(201).json({
-      message: 'Akun petugas berhasil dibuat',
-      user: { id: result.insertId, name, email, role: 'petugas' },
+      message: userRole === 'admin' ? 'Akun admin berhasil dibuat' : 'Akun petugas berhasil dibuat',
+      user: { id: result.insertId, name, email, role: userRole },
     });
   } catch (err) {
     console.error(err);

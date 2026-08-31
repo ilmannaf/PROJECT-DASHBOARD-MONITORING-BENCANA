@@ -5,7 +5,7 @@ USE sistem_kebencanaan;
 
 -- User default (password: "admin123" sudah di-hash dengan bcrypt)
 INSERT INTO users (name, email, password, role, wilayah) VALUES
-('Admin BPBD', 'admin@bpbdsemarang.go.id', '$2b$10$mpquimwluN21a/LByqXx/euVylhBz/IoKDLXdk5MnnT2dMJbNNOVm', 'admin', 'Semarang'),
+('Admin BPBD', 'admin@ilmannafia.go.id', '$2b$10$mpquimwluN21a/LByqXx/euVylhBz/IoKDLXdk5MnnT2dMJbNNOVm', 'admin', 'Semarang'),
 ('Petugas BPBD', 'petugas@bpbdsemarang.go.id', '$2b$10$mpquimwluN21a/LByqXx/euVylhBz/IoKDLXdk5MnnT2dMJbNNOVm', 'petugas', 'Semarang');
 
 -- Posko
@@ -40,6 +40,6 @@ INSERT INTO activities (title, description, activity_date, location, created_by)
 
 -- ============================================================
 -- SELESAI! Akun yang bisa digunakan:
--- Admin  : admin@bpbdsemarang.go.id  / admin123
+-- Admin  : admin@ilmannafia.go.id   / admin123
 -- Petugas: petugas@bpbdsemarang.go.id / admin123
 -- ============================================================

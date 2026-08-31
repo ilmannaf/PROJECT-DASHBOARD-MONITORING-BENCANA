@@ -133,13 +133,13 @@ CREATE TABLE disaster_records (
   FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
 );
 
--- Tabel LOGIN_HISTORY (histori login admin/petugas)
+-- Tabel LOGIN_HISTORY (histori login admin)
 CREATE TABLE login_history (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
   login_time DATETIME DEFAULT CURRENT_TIMESTAMP,
   ip_address VARCHAR(45),
-  user_agent VARCHAR(255),
+  device_info VARCHAR(255),
   success TINYINT(1) DEFAULT 1,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );

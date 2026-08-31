@@ -6,8 +6,14 @@ const getClientIp = (req) => {
   return req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.connection?.remoteAddress || req.ip || '-';
 };
 
-const getClientUA = (req) => {
-  return req.headers['user-agent'] || '-';
+const getLoginIdentifier = (user) => {
+  const initials = user.name
+    .split(' ')
+    .map((w) => w[0])
+    .join('')
+    .toUpperCase();
+  const identifier = user.wilayah || user.email?.split('@')[0] || '';
+  return identifier ? `${user.name} (${initials}) - ${identifier}` : `${user.name} (${initials})`;
 };
 
 // REGISTER
@@ -49,13 +55,12 @@ exports.login = async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      // Log failed login attempt
       try {
-        const [userByEmail] = await pool.query('SELECT id FROM users WHERE email = ?', [email]);
-        if (userByEmail.length > 0) {
+        const [userByEmail] = await pool.query('SELECT id, role FROM users WHERE email = ?', [email]);
+        if (userByEmail.length > 0 && userByEmail[0].role === 'admin') {
           await pool.query(
-            'INSERT INTO login_history (user_id, ip_address, user_agent, success) VALUES (?, ?, ?, 0)',
-            [userByEmail[0].id, getClientIp(req), getClientUA(req)]
+            'INSERT INTO login_history (user_id, ip_address, device_info, success) VALUES (?, ?, ?, 0)',
+            [userByEmail[0].id, getClientIp(req), getLoginIdentifier(userByEmail[0])]
           );
         }
       } catch (_) {}
@@ -70,18 +75,21 @@ exports.login = async (req, res) => {
     const user = rows[0];
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      await pool.query(
-        'INSERT INTO login_history (user_id, ip_address, user_agent, success) VALUES (?, ?, ?, 0)',
-        [user.id, getClientIp(req), getClientUA(req)]
-      );
+      if (user.role === 'admin') {
+        await pool.query(
+          'INSERT INTO login_history (user_id, ip_address, device_info, success) VALUES (?, ?, ?, 0)',
+          [user.id, getClientIp(req), getLoginIdentifier(user)]
+        );
+      }
       return res.status(401).json({ message: 'Email atau password salah' });
     }
 
-    // Log successful login
-    await pool.query(
-      'INSERT INTO login_history (user_id, ip_address, user_agent, success) VALUES (?, ?, ?, 1)',
-      [user.id, getClientIp(req), getClientUA(req)]
-    );
+    if (user.role === 'admin') {
+      await pool.query(
+        'INSERT INTO login_history (user_id, ip_address, device_info, success) VALUES (?, ?, ?, 1)',
+        [user.id, getClientIp(req), getLoginIdentifier(user)]
+      );
+    }
 
     const token = jwt.sign(
       { id: user.id, role: user.role, name: user.name },
@@ -107,7 +115,7 @@ exports.getLoginHistory = async (req, res) => {
     const offset = (page - 1) * limit;
 
     const [rows] = await pool.query(`
-      SELECT lh.id, lh.login_time, lh.ip_address, lh.user_agent, lh.success,
+      SELECT lh.id, lh.login_time, lh.ip_address, lh.device_info, lh.success,
              u.name, u.email, u.role, u.wilayah
       FROM login_history lh
       LEFT JOIN users u ON lh.user_id = u.id

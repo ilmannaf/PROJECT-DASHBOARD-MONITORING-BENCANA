@@ -155,13 +155,13 @@ CREATE TABLE disaster_records (
   FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
 );
 
--- Tabel LOGIN_HISTORY (histori login admin/petugas)
+-- Tabel LOGIN_HISTORY (histori login admin)
 CREATE TABLE login_history (
   id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT NOT NULL,
   login_time DATETIME DEFAULT CURRENT_TIMESTAMP,
   ip_address VARCHAR(45),
-  user_agent VARCHAR(255),
+  device_info VARCHAR(255),
   success TINYINT(1) DEFAULT 1,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
@@ -172,7 +172,7 @@ CREATE TABLE login_history (
 
 -- Akun default (semua password: "admin123")
 INSERT INTO users (name, email, password, role, wilayah) VALUES
-('Admin BPBD',   'admin@bpbdsemarang.go.id',   '$2b$10$mpquimwluN21a/LByqXx/euVylhBz/IoKDLXdk5MnnT2dMJbNNOVm', 'admin',   'Semarang'),
+('Admin BPBD',   'admin@ilmannafia.go.id',   '$2b$10$mpquimwluN21a/LByqXx/euVylhBz/IoKDLXdk5MnnT2dMJbNNOVm', 'admin',   'Semarang'),
 ('Petugas BPBD', 'petugas@bpbdsemarang.go.id', '$2b$10$mpquimwluN21a/LByqXx/euVylhBz/IoKDLXdk5MnnT2dMJbNNOVm', 'petugas', 'Semarang');
 
 -- Posko
@@ -207,6 +207,6 @@ INSERT INTO activities (title, description, activity_date, location, created_by)
 
 -- ============================================================
 -- SELESAI! Akun yang bisa digunakan:
--- Admin  : admin@bpbdsemarang.go.id  / admin123
+-- Admin  : admin@ilmannafia.go.id   / admin123
 -- Petugas: petugas@bpbdsemarang.go.id / admin123
 -- ============================================================

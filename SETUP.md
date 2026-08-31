@@ -36,16 +36,29 @@ mysql -u root -p sistem_kebencanaan < backend/database/seed.sql
 Jika database sudah pernah dibuat sebelumnya, jalankan migration yang tersedia:
 
 ```bash
+# Migration role pelapor
 mysql -u root -p sistem_kebencanaan < backend/database/migration_role_pelapor_reporter_user.sql
+
+# Migration rename user_agent → device_info di login_history
+mysql -u root -p sistem_kebencanaan < backend/database/migration_login_history_device_info.sql
 ```
 
 > **Catatan**: Migration ini sudah termasuk role `pelapor` dan kolom `reporter_user_id`. Jika role `pelapor` sudah tidak digunakan, role dapat dihapus dari database secara manual.
+
+### 2c. Update Email Admin
+
+Jika database sudah ada dari versi sebelumnya, update email admin:
+
+```sql
+USE sistem_kebencanaan;
+UPDATE users SET email = 'admin@ilmannafia.go.id' WHERE role = 'admin';
+```
 
 ### 3. User Default (Seed Data)
 
 | Email | Password | Role |
 |-------|----------|------|
-| `admin@bpbdsemarang.go.id` | `admin123` | admin |
+| `admin@ilmannafia.go.id` | `admin123` | admin |
 | `petugas@bpbdsemarang.go.id` | `admin123` | petugas |
 
 ---
@@ -146,13 +159,16 @@ Frontend jalan di: `http://localhost:5173`
 
 | URL | Deskripsi | Credentials |
 |-----|-----------|-------------|
-| `http://localhost:5173/admin/login` | Login admin/petugas | `admin@bpbdsemarang.go.id` / `admin123` |
+| `http://localhost:5173/admin/login` | Login admin/petugas | `admin@ilmannafia.go.id` / `admin123` |
 | `http://localhost:5173/admin/dashboard` | Dashboard admin (setelah login) | - |
 | `http://localhost:5173/admin/reports` | Kelola laporan bencana | - |
+| `http://localhost:5173/admin/disaster-records` | Pendataan bencana + download PDF | - |
 | `http://localhost:5173/admin/inventory` | Kelola inventaris logistik | - |
 | `http://localhost:5173/admin/vehicles` | Kelola kendaraan | - |
 | `http://localhost:5173/admin/posko` | Kelola posko | - |
 | `http://localhost:5173/admin/activities` | Kelola kegiatan lapangan | - |
+| `http://localhost:5173/admin/users` | Manajemen akun admin/petugas | - |
+| `http://localhost:5173/admin/login-history` | Histori login admin | - |
 
 ---
 
@@ -160,7 +176,7 @@ Frontend jalan di: `http://localhost:5173`
 
 ### 1. Login Admin
 1. Buka `http://localhost:5173/admin/login`
-2. Login: `admin@bpbdsemarang.go.id` / `admin123`
+2. Login: `admin@ilmannafia.go.id` / `admin123`
 3. Dashboard admin terbuka
 
 ### 2. Laporan Bencana (Public)
@@ -237,6 +253,8 @@ Hasil build ada di `frontend/dist/`
 ✅ Role-based access (admin/petugas - tidak bisa registrasi admin via public)  
 ✅ Error handling & 404 handler di backend  
 ✅ Manajemen inventaris CRUD lengkap (tambah, edit, hapus, ubah kondisi)  
+✅ Manajemen akun admin/petugas dengan role selection & password confirmation  
+✅ Histori login admin — info perangkat yang readable (nama, inisial, wilayah)  
 
 ---
 
