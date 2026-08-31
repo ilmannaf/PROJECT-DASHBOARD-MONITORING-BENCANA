@@ -15,10 +15,10 @@ const pool = mysql.createPool({
 (async () => {
   try {
     const conn = await pool.getConnection();
-    console.log('✅ Database terkoneksi:', process.env.DB_NAME);
+    console.log('Database terkoneksi:', process.env.DB_NAME);
     conn.release();
   } catch (err) {
-    console.error('❌ Gagal konek database:', err.message);
+    console.error('Gagal konek database:', err.message);
   }
 })();
 

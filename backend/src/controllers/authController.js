@@ -7,13 +7,28 @@ const getClientIp = (req) => {
 };
 
 const getLoginIdentifier = (user) => {
-  const initials = user.name
+  const name = user?.name || 'Admin';
+  const initials = String(name)
     .split(' ')
     .map((w) => w[0])
+    .filter(Boolean)
     .join('')
     .toUpperCase();
-  const identifier = user.wilayah || user.email?.split('@')[0] || '';
-  return identifier ? `${user.name} (${initials}) - ${identifier}` : `${user.name} (${initials})`;
+  const identifier = user?.wilayah || user?.email?.split('@')[0] || '';
+  return identifier ? `${name} (${initials || 'A'}) - ${identifier}` : `${name} (${initials || 'A'})`;
+};
+
+const getLoginHistoryColumn = async () => {
+  try {
+    const [columns] = await pool.query('SHOW COLUMNS FROM login_history');
+    const fieldNames = columns.map((column) => column.Field);
+
+    if (fieldNames.includes('device_info')) return 'device_info';
+    if (fieldNames.includes('user_agent')) return 'user_agent';
+    return 'device_info';
+  } catch (error) {
+    return 'device_info';
+  }
 };
 
 // REGISTER
@@ -56,7 +71,7 @@ exports.login = async (req, res) => {
 
     if (!email || !password) {
       try {
-        const [userByEmail] = await pool.query('SELECT id, role FROM users WHERE email = ?', [email]);
+        const [userByEmail] = await pool.query('SELECT id, role, name, wilayah, email FROM users WHERE email = ?', [email]);
         if (userByEmail.length > 0 && userByEmail[0].role === 'admin') {
           await pool.query(
             'INSERT INTO login_history (user_id, ip_address, device_info, success) VALUES (?, ?, ?, 0)',
@@ -113,9 +128,10 @@ exports.getLoginHistory = async (req, res) => {
   try {
     const { page = 1, limit = 20 } = req.query;
     const offset = (page - 1) * limit;
+    const loginHistoryColumn = await getLoginHistoryColumn();
 
     const [rows] = await pool.query(`
-      SELECT lh.id, lh.login_time, lh.ip_address, lh.device_info, lh.success,
+      SELECT lh.id, lh.login_time, lh.ip_address, lh.${loginHistoryColumn}, lh.success,
              u.name, u.email, u.role, u.wilayah
       FROM login_history lh
       LEFT JOIN users u ON lh.user_id = u.id
