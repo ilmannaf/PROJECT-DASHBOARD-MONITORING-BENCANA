@@ -59,7 +59,7 @@ export const katanaData = [
     pembentukan: 2018,
     ancaman_bencana: "BANJIR & ROB",
     sumber_dana: "APBD",
-    latitude: -	-6.95088,
+    latitude: -6.95088,
     longitude: 110.47927,
   },
   {
