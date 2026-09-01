@@ -1,5 +1,9 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { Phone, Mail, MapPin, Clock, BarChart3, FileText, CheckCircle, Loader2, Shield } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import AnimatedNumber from "../../components/AnimatedNumber";
+import api from "../../services/api";
 
 const GALERI_IMAGES = [
   { src: "/assets/dokumentasi1.jpeg", alt: "Dokumentasi Kegiatan 1" },
@@ -10,6 +14,13 @@ const GALERI_IMAGES = [
   { src: "/assets/dokumentasi6.jpeg", alt: "Dokumentasi Kegiatan 6" },
   { src: "/assets/BPBD KOTA SEMARANG.jpeg", alt: "BPBD Kota Semarang" },
 ];
+
+const MONTH_LABELS = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+
+function scrollToSection(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: "smooth" });
+}
 
 function FotoHighlight() {
   const [current, setCurrent] = useState(0);
@@ -356,22 +367,22 @@ export default function LandingPage() {
 
           <div className="hidden items-center gap-6 md:flex">
             <button
-              onClick={() => navigate("/peta")}
+              onClick={() => navigate("/tentang")}
               className="text-sm font-semibold text-white transition hover:text-orange-300"
             >
-              Peta Bencana
+              Tentang Kami
             </button>
             <button
-              onClick={() => navigate("/lacak")}
+              onClick={() => scrollToSection("statistik")}
               className="text-sm font-semibold text-white transition hover:text-orange-300"
             >
-              Lacak Laporan
+              Statistik
             </button>
             <button
-              onClick={() => navigate("/lapor")}
-              className="rounded-lg border border-white/50 px-4 py-2 text-sm font-semibold text-white transition-all duration-200 hover:border-white hover:bg-white/10 hover:scale-[1.02] active:scale-[0.98]"
+              onClick={() => scrollToSection("kontak")}
+              className="text-sm font-semibold text-white transition hover:text-orange-300"
             >
-              Lapor Bencana
+              Kontak
             </button>
             <button
               onClick={() => navigate("/admin/login")}
@@ -421,25 +432,25 @@ export default function LandingPage() {
         {mobileMenuOpen && (
           <div className="absolute inset-x-4 top-20 z-30 space-y-3 rounded-xl border border-white/20 bg-gray-900/95 p-4 shadow-2xl backdrop-blur md:hidden">
             <button
-              onClick={() => navigate("/peta")}
+              onClick={() => { navigate("/tentang"); setMobileMenuOpen(false); }}
               className="block w-full rounded-lg px-4 py-2.5 text-left text-sm font-semibold text-white transition hover:bg-white/10"
             >
-              Peta Bencana
+              Tentang Kami
             </button>
             <button
-              onClick={() => navigate("/lacak")}
+              onClick={() => { scrollToSection("statistik"); setMobileMenuOpen(false); }}
               className="block w-full rounded-lg px-4 py-2.5 text-left text-sm font-semibold text-white transition hover:bg-white/10"
             >
-              Lacak Laporan
+              Statistik
             </button>
             <button
-              onClick={() => navigate("/lapor")}
-              className="block w-full rounded-lg border border-white/40 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white hover:text-brand-600"
+              onClick={() => { scrollToSection("kontak"); setMobileMenuOpen(false); }}
+              className="block w-full rounded-lg px-4 py-2.5 text-left text-sm font-semibold text-white transition hover:bg-white/10"
             >
-              Lapor Bencana
+              Kontak
             </button>
             <button
-              onClick={() => navigate("/admin/login")}
+              onClick={() => { navigate("/admin/login"); setMobileMenuOpen(false); }}
               className="block w-full rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700"
             >
               Login Admin
@@ -606,6 +617,100 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* ===== SECTION: STATISTIK ===== */}
+      <section id="statistik" className="relative bg-gray-50 py-20">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="reveal mb-14 text-center">
+            <span className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-brand-100 bg-white px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-brand-600">
+              <BarChart3 className="h-3 w-3" />
+              Statistik
+            </span>
+            <h2 className="mb-2 text-2xl font-extrabold tracking-tight text-gray-900 lg:text-3xl">
+              Statistik Penanganan Bencana
+            </h2>
+            <p className="mx-auto max-w-lg text-sm text-gray-500">
+              Data real-time kejadian bencana di Kota Semarang
+            </p>
+          </div>
+
+          <StatistikSection />
+
+          <div className="reveal mt-14">
+            <StatistikChart />
+          </div>
+        </div>
+      </section>
+
+      {/* ===== SECTION: KONTAK ===== */}
+      <section id="kontak" className="relative bg-gray-900 py-20 text-white">
+        <div className="mx-auto max-w-6xl px-6">
+          <div className="reveal mb-14 text-center">
+            <span className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-brand-300">
+              <Phone className="h-3 w-3" />
+              Kontak
+            </span>
+            <h2 className="mb-2 text-2xl font-extrabold tracking-tight lg:text-3xl">
+              Hubungi Kami
+            </h2>
+            <p className="mx-auto max-w-lg text-sm text-gray-400">
+              Kontak darurat dan informasi BPBD Kota Semarang
+            </p>
+          </div>
+
+          <div className="grid items-start gap-10 lg:grid-cols-2">
+            <div className="reveal space-y-6">
+              {/* Emergency Contact Card */}
+              <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-6 backdrop-blur-sm">
+                <div className="mb-2 flex items-center gap-2 text-red-400">
+                  <Phone className="h-4 w-4" />
+                  <span className="text-xs font-bold uppercase tracking-wider">Kontak Darurat</span>
+                </div>
+                <p className="text-3xl font-extrabold tracking-tight text-white">112</p>
+                <p className="mt-1 text-sm text-gray-400">Nomor darurat nasional — hubungi segera saat bencana</p>
+                <p className="mt-2 text-lg font-bold text-white">0812-3456-7890</p>
+                <p className="text-xs text-gray-400">Hotline BPBD Kota Semarang</p>
+              </div>
+
+              <div className="space-y-4">
+                <ContactItem
+                  icon={<Phone className="h-5 w-5" />}
+                  label="Telepon"
+                  value="(024) 355-1234"
+                />
+                <ContactItem
+                  icon={<Mail className="h-5 w-5" />}
+                  label="Email"
+                  value="bpbd@semarangkota.go.id"
+                />
+                <ContactItem
+                  icon={<MapPin className="h-5 w-5" />}
+                  label="Alamat"
+                  value="Kompleks Terminal Penggaron, Jl. Brigjen Sudiarto No.KM. 11, Penggaron Kidul, Pedurungan, Semarang 50194"
+                />
+                <ContactItem
+                  icon={<Clock className="h-5 w-5" />}
+                  label="Jam Operasional"
+                  value="24/7 — Tanggap Darurat Siaga"
+                />
+              </div>
+            </div>
+
+            <div className="reveal overflow-hidden rounded-xl border border-white/10" style={{ minHeight: 380 }}>
+              <iframe
+                src="https://maps.google.com/maps?q=-7.017402,110.493722&z=15&output=embed"
+                width="100%"
+                height="380"
+                style={{ border: 0, filter: "grayscale(0.6) contrast(1.1) brightness(0.8)" }}
+                allowFullScreen=""
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Lokasi BPBD Kota Semarang"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
       <FotoHighlight />
 
       <footer className="bg-gray-900 text-gray-400">
@@ -631,8 +736,18 @@ export default function LandingPage() {
               </h4>
               <ul className="space-y-1.5 text-xs">
                 <li>
-                  <button onClick={() => navigate("/")} className="transition hover:text-white">
-                    Beranda
+                  <button onClick={() => navigate("/tentang")} className="transition hover:text-white">
+                    Tentang Kami
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => scrollToSection("statistik")} className="transition hover:text-white">
+                    Statistik
+                  </button>
+                </li>
+                <li>
+                  <button onClick={() => scrollToSection("kontak")} className="transition hover:text-white">
+                    Kontak
                   </button>
                 </li>
                 <li>
@@ -643,11 +758,6 @@ export default function LandingPage() {
                 <li>
                   <button onClick={() => navigate("/lacak")} className="transition hover:text-white">
                     Lacak Laporan
-                  </button>
-                </li>
-                <li>
-                  <button onClick={() => navigate("/lapor")} className="transition hover:text-white">
-                    Laporkan Bencana
                   </button>
                 </li>
               </ul>
@@ -663,7 +773,7 @@ export default function LandingPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  Jl. Menoreh Tengah I No.22, Semarang
+                  Jl. Brigjen Sudiarto No.KM. 11, Penggaron Kidul, Semarang
                 </li>
                 <li className="flex items-center gap-2">
                   <svg className="w-3 h-3 shrink-0 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
@@ -695,6 +805,314 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+    </div>
+  );
+}
+
+function StatistikSection() {
+  const [stats, setStats] = useState({ total: 0, byStatus: {}, byType: [] });
+  const [loading, setLoading] = useState(true);
+  const sectionRef = useRef(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) setVisible(true); },
+      { threshold: 0.1 }
+    );
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const { data } = await api.get("/public/stats");
+        setStats({
+          total: data.laporan || 0,
+          byStatus: data.byStatus || {},
+          byType: data.byType || [],
+        });
+      } catch (err) {
+        console.error("Failed to load stats:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStats();
+  }, []);
+
+  if (loading) {
+    return (
+      <div ref={sectionRef} className="flex items-center justify-center py-16">
+        <Loader2 className="h-6 w-6 animate-spin text-brand-500" />
+      </div>
+    );
+  }
+
+  const topTypes = (stats.byType || [])
+    .sort((a, b) => b.jumlah - a.jumlah)
+    .slice(0, 4);
+
+  return (
+    <div ref={sectionRef} className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" data-stagger-group>
+      <StatCard
+        icon={<FileText className="h-5 w-5" />}
+        label="Total Laporan"
+        value={stats.total}
+        color="brand"
+        visible={visible}
+      />
+      <StatCard
+        icon={<CheckCircle className="h-5 w-5" />}
+        label="Selesai Ditangani"
+        value={stats.byStatus?.selesai || 0}
+        color="green"
+        visible={visible}
+      />
+      <StatCard
+        icon={<Loader2 className="h-5 w-5" />}
+        label="Sedang Diproses"
+        value={(stats.byStatus?.ditindaklanjuti || 0) + (stats.byStatus?.diverifikasi || 0)}
+        color="blue"
+        visible={visible}
+      />
+      {topTypes.length > 0 && (
+        <StatCard
+          icon={<Shield className="h-5 w-5" />}
+          label={`Terbanyak: ${topTypes[0].name}`}
+          value={topTypes[0].jumlah}
+          color="orange"
+          visible={visible}
+        />
+      )}
+    </div>
+  );
+}
+
+function StatCard({ icon, label, value, color, visible }) {
+  const colorMap = {
+    brand: { bg: "bg-brand-50", text: "text-brand-600", border: "border-brand-100" },
+    green: { bg: "bg-green-50", text: "text-green-600", border: "border-green-100" },
+    blue: { bg: "bg-blue-50", text: "text-blue-600", border: "border-blue-100" },
+    orange: { bg: "bg-orange-50", text: "text-orange-600", border: "border-orange-100" },
+  };
+  const c = colorMap[color] || colorMap.brand;
+
+  return (
+    <div
+      className={`rounded-xl border ${c.border} bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-lg hover:scale-[1.02]`}
+    >
+      <div className={`mb-3 inline-flex h-10 w-10 items-center justify-center rounded-lg ${c.bg} ${c.text}`}>
+        {icon}
+      </div>
+      <p className="text-sm font-medium text-gray-500">{label}</p>
+      <p className="mt-1 text-3xl font-extrabold tracking-tight text-gray-900">
+        {visible ? <AnimatedNumber value={value} duration={1400} /> : 0}
+      </p>
+    </div>
+  );
+}
+
+function StatistikChart() {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedMonth, setSelectedMonth] = useState(null);
+  const [monthTypes, setMonthTypes] = useState([]);
+  const [monthTotal, setMonthTotal] = useState(0);
+  const [loadingDetail, setLoadingDetail] = useState(false);
+
+  useEffect(() => {
+    const fetchMonthly = async () => {
+      try {
+        const currentYear = new Date().getFullYear();
+        const { data: res } = await api.get("/public/stats/monthly", { params: { year: currentYear } });
+        const monthlyRaw = res.monthly || [];
+        setData(
+          monthlyRaw.slice(0, new Date().getMonth() + 1).map((count, idx) => ({
+            name: MONTH_LABELS[idx],
+            jumlah: count,
+            monthIndex: idx + 1,
+          }))
+        );
+      } catch {
+        const currentMonth = new Date().getMonth();
+        setData(
+          MONTH_LABELS.slice(0, currentMonth + 1).map((m, idx) => ({
+            name: m,
+            jumlah: 0,
+            monthIndex: idx + 1,
+          }))
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMonthly();
+  }, []);
+
+  const handleBarClick = async (monthIndex, monthName) => {
+    if (selectedMonth === monthIndex) {
+      setSelectedMonth(null);
+      setMonthTypes([]);
+      setMonthTotal(0);
+      return;
+    }
+
+    setSelectedMonth(monthIndex);
+    setLoadingDetail(true);
+    try {
+      const currentYear = new Date().getFullYear();
+      const { data: res } = await api.get("/public/stats/monthly/by-type", {
+        params: { year: currentYear, month: monthIndex },
+      });
+      setMonthTypes(res.byType || []);
+      setMonthTotal(res.total || 0);
+    } catch {
+      setMonthTypes([]);
+      setMonthTotal(0);
+    } finally {
+      setLoadingDetail(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center rounded-xl border border-gray-200 bg-white p-6" style={{ height: 280 }}>
+        <Loader2 className="h-5 w-5 animate-spin text-brand-400" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-lg">
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="text-sm font-bold text-gray-700">Tren Laporan per Bulan ({new Date().getFullYear()})</h3>
+        {!selectedMonth && (
+          <span className="flex items-center gap-1.5 rounded-full bg-orange-50 px-3 py-1 text-[10px] font-semibold text-orange-600">
+            <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+            </svg>
+            Klik bar untuk lihat detail bencana
+          </span>
+        )}
+      </div>
+      <ResponsiveContainer width="100%" height={240}>
+        <BarChart data={data} barSize={28}>
+          <XAxis
+            dataKey="name"
+            axisLine={false}
+            tickLine={false}
+            tick={{ fontSize: 11, fill: "#9ca3af" }}
+          />
+          <YAxis
+            axisLine={false}
+            tickLine={false}
+            tick={{ fontSize: 11, fill: "#9ca3af" }}
+            allowDecimals={false}
+          />
+          <Tooltip
+            contentStyle={{
+              borderRadius: 8,
+              border: "1px solid #e5e7eb",
+              boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)",
+              fontSize: 12,
+            }}
+            formatter={(val) => [`${val} laporan`, "Jumlah"]}
+            cursor={{ fill: "rgba(249,115,22,0.08)" }}
+          />
+          <Bar
+            dataKey="jumlah"
+            radius={[4, 4, 0, 0]}
+            onClick={(entry) => handleBarClick(entry.monthIndex, entry.name)}
+            style={{ cursor: "pointer" }}
+          >
+            {data.map((entry, idx) => (
+              <Cell
+                key={idx}
+                fill={
+                  selectedMonth === entry.monthIndex
+                    ? "#ea580c"
+                    : entry.jumlah > 0
+                    ? "#f97316"
+                    : "#e5e7eb"
+                }
+                opacity={
+                  selectedMonth === entry.monthIndex
+                    ? 1
+                    : entry.jumlah > 0
+                    ? 0.85
+                    : 0.4
+                }
+              />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+
+      {/* Detail breakdown when a month is clicked */}
+      {selectedMonth && (
+        <div className="mt-5 border-t border-gray-100 pt-5">
+          {loadingDetail ? (
+            <div className="flex items-center justify-center py-6">
+              <Loader2 className="h-5 w-5 animate-spin text-brand-400" />
+            </div>
+          ) : (
+            <>
+              <div className="mb-3 flex items-center justify-between">
+                <h4 className="text-sm font-bold text-gray-800">
+                  Jenis Bencana — {MONTH_LABELS[selectedMonth - 1]}
+                </h4>
+                <span className="text-xs text-gray-400">
+                  Total: <span className="font-semibold text-gray-600">{monthTotal}</span> laporan
+                </span>
+              </div>
+              {monthTypes.length === 0 ? (
+                <p className="py-4 text-center text-xs text-gray-400">
+                  Tidak ada laporan pada bulan ini.
+                </p>
+              ) : (
+                <div className="space-y-2.5">
+                  {monthTypes.map((item, idx) => {
+                    const pct = monthTotal > 0 ? Math.round((item.jumlah / monthTotal) * 100) : 0;
+                    return (
+                      <div key={idx} className="flex items-center gap-3">
+                        <span className="w-28 shrink-0 truncate text-xs font-medium text-gray-700">
+                          {item.name}
+                        </span>
+                        <div className="relative h-2.5 flex-1 overflow-hidden rounded-full bg-gray-100">
+                          <div
+                            className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-brand-500 to-orange-500 transition-all duration-500"
+                            style={{ width: `${pct}%` }}
+                          />
+                        </div>
+                        <span className="w-12 shrink-0 text-right text-xs font-bold text-gray-800">
+                          {item.jumlah}
+                        </span>
+                        <span className="w-10 shrink-0 text-right text-[11px] text-gray-400">
+                          {pct}%
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ContactItem({ icon, label, value }) {
+  return (
+    <div className="flex items-start gap-4 rounded-lg border border-white/10 bg-white/5 p-4 backdrop-blur-sm">
+      <div className="mt-0.5 text-brand-400">{icon}</div>
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">{label}</p>
+        <p className="mt-0.5 text-sm font-semibold text-white">{value}</p>
+      </div>
     </div>
   );
 }

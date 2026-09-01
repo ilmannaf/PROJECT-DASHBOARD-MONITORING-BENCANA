@@ -1,10 +1,10 @@
 # BPBD Dashboard Monitoring Bencana
 
-Sistem dashboard monitoring kebencanaan untuk BPBD Kota Semarang. Sistem ini memungkinkan pelaporan bencana dari masyarakat publik dan pengelolaan laporan oleh petugas/admin BPBD — mulai dari laporan masuk, pendataan bencana, hingga ekspor dokumen PDF resmi.
+Sistem dashboard monitoring kebencanaan untuk BPBD Kota Semarang. Memungkinkan pelaporan bencana dari masyarakat dan pengelolaan laporan oleh petugas/admin — mulai dari laporan masuk, pendataan bencana, hingga ekspor dokumen PDF resmi.
 
 ---
 
-## 📁 Struktur Project
+## Struktur Project
 
 ```
 PROJECT-DASHBOARD-MONITORING-BENCANA/
@@ -15,58 +15,7 @@ PROJECT-DASHBOARD-MONITORING-BENCANA/
 
 ---
 
-## ✨ Fitur Utama
-
-### 🌐 Public Features
-- **Landing Page Modern** - Full-bleed hero foto kantor (≈90vh) dengan overlay gradient, navbar transparan, dan judul besar "BPBD KOTA SEMARANG"
-- **Laporan Bencana** - Form pelaporan dengan peta interaktif (klik/drag marker, GPS opsional), koordinat opsional (laporan tetap terkirim tanpa titik), dan upload **max 5 foto** (JPG/PNG/WEBP 5MB). Akses langsung tanpa login publik
-- **Lacak Status** - Tracking laporan dengan kode unik `BPBD-2026-XXXX` + peta lokasi & galeri foto
-- **Peta Sebaran** - `/peta` publik tanpa login, filter jenis/status, marker warna per bencana
-
-### 🔐 Admin/Petugas Features
-- **Admin Sidebar** - Dark sidebar layout (bg-gray-900) dengan **orange active indicator** (border kiri + bg transparan), lucide-react icons, mobile drawer, dan user footer dengan logout
-- **Dashboard Admin** - Statistik dan charts (Recharts) dengan AnimatedNumber count-up
-- **Kelola Laporan** - Update status, filter, assign petugas, **hapus laporan** (icon 🗑️ dengan konfirmasi), preview foto & koordinat
-- **Pendataan Bencana** - Formulir detail kejadian (kronologi, korban, terdampak, kerugian)
-- **Download PDF** - Ekspor formulir pendataan bencana sebagai dokumen resmi BPBD
-- **Inventaris** - Manajemen logistik dan peralatan (CRUD lengkap: tambah, edit, hapus, ubah kondisi)
-- **Kendaraan** - Fleet management dengan status service
-- **Posko** - Kelola titik posko pengungsian
-- **Kegiatan** - Laporan kegiatan lapangan dengan dokumentasi
-- **Manajemen Akun** - Kelola akun admin/petugas dengan konfirmasi password
-- **Histori Login** - Riwayat login admin dengan info perangkat yang readable
-
-### 🔥 Highlight Features
-- ✅ Logo resmi BPBD (gambar) menggantikan teks logo di seluruh halaman
-- ✅ Landasan hero & login publik pakai foto/logo dari `frontend/public/assets/`
-- ✅ Admin sidebar dark mode (bg-gray-900) dengan lucide-react icons & **orange active indicator** (border kiri oranye + bg transparan)
-- ✅ Mobile drawer sidebar dengan backdrop + animated slide-in/out
-- ✅ Toggle show/hide password + kursor pointer di semua tombol
-- ✅ Formulir pendataan bencana dengan field korban/terdampak terpisah
-- ✅ Privasi sumber info — nama & no. HP bisa dikosongkan (opsional)
-- ✅ Export PDF formulir pendataan (pdfkit)
-- ✅ Google Maps + Leaflet integration di halaman lacak & peta sebaran
-- ✅ Role-based authorization (admin/petugas)
-- ✅ Upload **max 5 foto** per laporan (report_photos table) + koordinat opsional dengan map picker presisi
-- ✅ **WhatsApp Float Button** — tombol chat WhatsApp di pojok kanan bawah dengan popup bubble (seluruh halaman)
-- ✅ **Clean UI / Natural Design** — styling lebih minimalis, tidak "AI-looking", ikon halus (strokeWidth 1.5), warna natural
-- ✅ Admin sidebar **orange active indicator** — border kiri oranye + background transparan saat menu aktif
-- ✅ Animasi UI konsisten di semua halaman (CSS + vanilla JS + Framer Motion)
-  - **Page Transitions**: Framer Motion AnimatePresence — fade transition antar halaman (250ms)
-  - **Landing page**: hero entrance, scroll-reveal sections dengan stagger delays
-  - **Admin sidebar**: orange active indicator, stagger menu entrance
-  - **Admin dashboard**: AnimatedNumber count-up, stat card clean (white bg + border)
-  - **Skeleton loading**: Placeholder abu-abu berdenyut di semua halaman admin (pengganti "Memuat data...")
-  - **Login admin**: floating blobs + form stagger entrance
-  - **ReportForm**: Staggered field entrance + photo scale-in + GPS spinner + submit spinner + scale-bounce-in tracking code
-  - **TrackStatus**: Fade-in form + slide-up results + staggered history + loading spinner + shake error
-  - **Toast**: Slide-in masuk + slide-out keluar
-  - **Micro-interactions**: Hover:scale[1.02] active:scale[0.98] di semua tombol utama
-  - `prefers-reduced-motion` respected untuk accessibility
-
----
-
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Backend
 - Node.js + Express 5
@@ -85,15 +34,18 @@ PROJECT-DASHBOARD-MONITORING-BENCANA/
 - Leaflet (peta interaktif)
 - Lucide React (icons)
 - Framer Motion (page transitions)
-- Pure CSS + JS animations (stagger, skeleton, bounce, shake)
 
 ---
 
-## 🚀 Quick Start
+## Setup & Installation
 
-**Lihat panduan lengkap di [SETUP.md](./SETUP.md)**
+### Prerequisites
+- Node.js 18+ & npm
+- MySQL 8.0+
+- Git
 
 ### 1. Database Setup
+
 ```bash
 mysql -u root -p
 CREATE DATABASE sistem_kebencanaan;
@@ -102,203 +54,247 @@ SOURCE backend/database/schema.sql;
 SOURCE backend/database/seed.sql;
 ```
 
-Jika database sudah pernah dibuat sebelumnya, jalankan migration yang ada di `backend/database/` sesuai urutan:
-```bash
-SOURCE backend/database/migration_role_pelapor_reporter_user.sql;
-SOURCE backend/database/migration_disaster_records_sumber_info_optional.sql;
-SOURCE backend/database/migration_disaster_records_korban_terdampak.sql;
-SOURCE backend/database/migration_report_photos.sql;
-```
+Jika database sudah ada sebelumnya, jalankan migration di `backend/database/` sesuai urutan.
 
 ### 2. Backend
+
 ```bash
 cd backend
 npm install
 cp .env.example .env
-# Edit .env sesuai konfigurasi (DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, JWT_SECRET)
+```
+
+Edit `.env`:
+```env
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=your_mysql_password
+DB_NAME=sistem_kebencanaan
+JWT_SECRET=your_jwt_secret_key_here
+PORT=5000
+```
+
+```bash
 npm run dev
 ```
 
 ### 3. Frontend
+
 ```bash
 cd frontend
 npm install
 cp .env.example .env
-# VITE_API_URL=http://localhost:5000/api
+```
+
+Edit `.env`:
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+```bash
 npm run dev
 ```
 
-### 4. Akses Aplikasi
-- **Landing**: http://localhost:5173/
-- **Login Admin**: http://localhost:5173/admin/login
-- **Lapor Bencana**: http://localhost:5173/lapor
-- **Lacak Status**: http://localhost:5173/lacak
+### 4. Build Production
+
+```bash
+# Backend
+cd backend && npm start
+
+# Frontend
+cd frontend && npm run build && npm run preview
+```
 
 ---
 
-## 🔑 Default Credentials (Seed Data)
+## Default Credentials
 
 | Email | Password | Role |
 |-------|----------|------|
 | admin@ilmannafia.go.id | admin123 | admin |
 | petugas@bpbdsemarang.go.id | admin123 | petugas |
 
-> Jika password pernah diganti di database, reset dengan query berikut:
-> ```sql
-> UPDATE users SET password = '$2b$10$mpquimwluN21a/LByqXx/euVylhBz/IoKDLXdk5MnnT2dMJbNNOVm' WHERE email = 'admin@ilmannafia.go.id';
-> ```
-
 ---
 
-## 🔗 URL Mapping
+## URL Mapping
 
-### Public
-- `/` - Landing page
-- `/lapor` - Form pelaporan bencana (tanpa login, map picker, max 5 foto)
-- `/lacak` - Cek status laporan via tracking code
-- `/peta` - Peta sebaran bencana publik (tanpa login, filter & marker warna)
+### Public (Tanpa Login)
+| URL | Deskripsi |
+|-----|-----------|
+| `/` | Landing page — hero, statistik, dokumentasi |
+| `/tentang` | Halaman Tentang Kami (profil BPBD) |
+| `/lapor` | Form pelaporan bencana (max 5 foto, GPS opsional) |
+| `/lacak` | Tracking laporan dengan kode unik |
+| `/peta` | Peta sebaran bencana publik (filter & marker warna) |
 
 ### Admin
-- `/admin/login` - Login admin/petugas (split-screen)
-- `/admin/dashboard` - Dashboard admin
-- `/admin/reports` - Kelola laporan
-- `/admin/disaster-records` - Pendataan bencana + download PDF
-- `/admin/inventory` - Manajemen inventaris
-- `/admin/vehicles` - Manajemen kendaraan
-- `/admin/posko` - Manajemen posko
-- `/admin/activities` - Laporan kegiatan
+| URL | Deskripsi |
+|-----|-----------|
+| `/admin/login` | Login admin/petugas |
+| `/admin/dashboard` | Dashboard admin |
+| `/admin/reports` | Kelola laporan |
+| `/admin/disaster-records` | Pendataan bencana + download PDF |
+| `/admin/inventory` | Manajemen inventaris |
+| `/admin/vehicles` | Manajemen kendaraan |
+| `/admin/posko` | Manajemen posko |
+| `/admin/activities` | Laporan kegiatan lapangan |
+| `/admin/users` | Manajemen akun |
+| `/admin/login-history` | Histori login |
 
 ---
 
-## 🗄️ Database Schema
+## Fitur Utama
 
-**9 Tables:**
+### Public
+- Landing page modern — hero full-bleed, section statistik (AnimatedNumber + recharts), dokumentasi galeri 3D coverflow
+- Halaman Tentang Kami — profil BPBD, visi misi, nilai & komitmen
+- Laporan bencana — form dengan peta interaktif (klik/drag marker), GPS opsional, upload max 5 foto
+- Tracking status — kode unik `BPBD-2026-XXXX` + peta lokasi & galeri foto
+- Peta sebaran — filter jenis/status, marker warna per bencana
+- Section Kontak — Google Maps embed, nomor darurat 24/7
+
+### Admin
+- Admin sidebar — dark mode (bg-gray-900), orange active indicator, mobile drawer
+- Dashboard — statistik & charts (Recharts) dengan AnimatedNumber count-up
+- Kelola laporan — update status, filter, assign petugas, hapus, preview foto & koordinat
+- Pendataan bencana — formulir detail (kronologi, korban, terdampak, kerugian)
+- Download PDF — ekspor formulir pendataan sebagai dokumen resmi BPBD
+- Inventaris — CRUD lengkap (tambah, edit, hapus, ubah kondisi)
+- Kendaraan — fleet management dengan status service
+- Posko — kelola titik posko pengungsian
+- Kegiatan — laporan kegiatan lapangan dengan dokumentasi
+- Manajemen akun — role selection & password confirmation
+- Histori login — info perangkat yang readable
+
+### Highlight
+- WhatsApp Float Button — tombol chat di pojok kanan bawah (seluruh halaman)
+- Clean UI / Natural Design — styling minimalis, ikon halus (strokeWidth 1.5)
+- Animasi konsisten — page transitions (Framer Motion), stagger entrance, skeleton loading, micro-interactions
+- `prefers-reduced-motion` respected untuk accessibility
+- Role-based authorization (admin/petugas)
+
+---
+
+## Database Schema
 
 | Table | Deskripsi |
 |-------|-----------|
 | `users` | Admin & petugas BPBD |
-| `login_history` | Histori login admin (device_info) |
-| `reports` | Laporan bencana dari publik (koordinat opsional, photo_url legacy) |
-| `report_photos` | Foto multiple max 5 per laporan (FK reports) |
-| `report_logs` | History perubahan status laporan |
+| `login_history` | Histori login admin |
+| `reports` | Laporan bencana dari publik |
+| `report_photos` | Foto multiple max 5 per laporan |
+| `report_logs` | History perubahan status |
 | `posko` | Lokasi posko pengungsian |
 | `inventory_items` | Logistik & peralatan |
 | `vehicles` | Kendaraan BPBD |
 | `activities` | Laporan kegiatan lapangan |
 | `disaster_records` | Pendataan bencana (kronologi, korban, terdampak, kerugian) |
 
-### `disaster_records` — Field Korban & Terdampak
-Data korban disimpan dalam field terpisah dan otomatis dirangkum ke kolom teks `korban` untuk kompatibilitas tampilan:
-
-- **Korban**: `korban_ps` (Pengungsi), `korban_md` (Meninggal Dunia), `korban_lb` (Luka Berat), `korban_lr` (Luka Ringan)
-- **Terdampak**: `terdampak_laki`, `terdampak_perempuan`, `terdampak_anak`, `terdampak_diffable`, `terdampak_lansia`, `terdampak_kk`
-- **Lainnya**: `pemilik`, `pemilik_phone`, `kerugian`, `sumber_info_nama`, `sumber_info_phone` (nama & HP sumber info opsional untuk privasi)
-
 ---
 
-## 📡 API Endpoints
+## API Endpoints
 
 ### Auth
-- `POST /api/auth/register` - Register user baru (role petugas)
+- `POST /api/auth/register` - Register user baru
 - `POST /api/auth/login` - Login
-- `GET /api/auth/history` - Histori login admin (admin only)
+- `GET /api/auth/history` - Histori login (admin)
 
 ### Reports
-- `POST /api/reports` - Submit laporan baru (publik, `multipart` max 5 foto `photos`/`photo`, koordinat opsional, `optionalVerifyToken` link `reporter_user_id` jika user login)
-- `GET /api/reports/public` - List untuk peta sebaran (publik, tanpa data sensitif, include `photos[]`)
+- `POST /api/reports` - Submit laporan (publik, multipart max 5 foto, koordinat opsional)
+- `GET /api/reports/public` - List untuk peta sebaran (publik)
 - `GET /api/reports` - List semua laporan (admin/petugas)
-- `GET /api/reports/my-reports` - List laporan user yang login (merge `report_photos`, fallback localStorage di frontend)
-- `GET /api/reports/track/:code` - Cek status via tracking code (publik, include `photos[]`)
-- `PATCH /api/reports/:id/status` - Update status laporan (admin/petugas)
+- `GET /api/reports/my-reports` - Laporan user yang login
+- `GET /api/reports/track/:code` - Cek status via tracking code (publik)
+- `PATCH /api/reports/:id/status` - Update status (admin/petugas)
 - `DELETE /api/reports/:id` - Hapus laporan + foto (admin/petugas)
 
-### Disaster Records (Pendataan Bencana)
-- `GET /api/disaster-records` - List pendataan bencana (auth required)
-- `GET /api/disaster-records/:id` - Detail pendataan (auth required)
-- `GET /api/disaster-records/:id/pdf` - Download PDF formulir pendataan (auth required)
-- `POST /api/disaster-records` - Tambah pendataan bencana (auth required)
+### Disaster Records
+- `GET /api/disaster-records` - List pendataan
+- `GET /api/disaster-records/:id` - Detail pendataan
+- `GET /api/disaster-records/:id/pdf` - Download PDF
+- `POST /api/disaster-records` - Tambah pendataan
 - `PUT /api/disaster-records/:id` - Update pendataan (admin)
 - `DELETE /api/disaster-records/:id` - Hapus pendataan (admin)
 
+### Public Stats
+- `GET /api/public/stats` - Statistik ringkasan (total, byStatus, byType)
+- `GET /api/public/stats/monthly` - Jumlah laporan per bulan
+- `GET /api/public/stats/monthly/by-type` - Breakdown jenis bencana per bulan
+
 ### Inventory
 - `GET /api/inventory` - List inventory
-- `POST /api/inventory` - Tambah inventory (admin)
-- `PATCH /api/inventory/:id` - Update inventory
-- `DELETE /api/inventory/:id` - Hapus inventory
+- `POST /api/inventory` - Tambah (admin)
+- `PATCH /api/inventory/:id` - Update
+- `DELETE /api/inventory/:id` - Hapus
 
 ### Vehicles
 - `GET /api/vehicles` - List kendaraan
-- `POST /api/vehicles` - Tambah kendaraan (admin)
-- `PATCH /api/vehicles/:id` - Update kendaraan
-- `DELETE /api/vehicles/:id` - Hapus kendaraan
+- `POST /api/vehicles` - Tambah (admin)
+- `PATCH /api/vehicles/:id` - Update
+- `DELETE /api/vehicles/:id` - Hapus
 
 ### Activities
 - `GET /api/activities` - List kegiatan
-- `POST /api/activities` - Tambah kegiatan (admin/petugas)
-- `PATCH /api/activities/:id` - Update kegiatan
-- `DELETE /api/activities/:id` - Hapus kegiatan
+- `POST /api/activities` - Tambah (admin/petugas)
+- `PATCH /api/activities/:id` - Update
+- `DELETE /api/activities/:id` - Hapus
 
 ---
 
-## 🎨 Brand Colors
-
-Sistem menggunakan tema warna oranye konsisten untuk branding BPBD:
+## Brand Colors
 
 - **Brand Primary**: `bg-brand-600` / `text-brand-600` (oranye utama)
 - **Brand Light**: `bg-brand-50` / `border-brand-100` (oranye muda)
 - **Brand Dark**: `bg-brand-700` (oranye gelap)
-- **Public Accent**: `sky-*` (biru) dipakai sebagai penanda khusus portal publik vs admin
 
 ---
 
-## 🎯 Roadmap
+## Troubleshooting
 
-- [x] Landing page dengan hero section
+| Masalah | Solusi |
+|---------|--------|
+| `Cannot find module 'bcrypt'` | `cd backend && npm install` |
+| Port 5173 sudah dipakai | Ganti port di `vite.config.js` |
+| `Access denied for user` | Cek `.env` → pastikan `DB_PASSWORD` benar |
+| Login gagal | Pastikan sudah import `seed.sql` yang baru |
+
+---
+
+## Roadmap
+
+- [x] Landing page dengan hero section & gambar
+- [x] Landing page: section Tentang Kami, Statistik, Dokumentasi, Kontak
+- [x] Halaman Tentang Kami (`/tentang`) — profil, visi misi, nilai BPBD
+- [x] Statistik publik dengan bar chart interaktif + breakdown per bulan
 - [x] Admin dashboard dengan charts
-- [x] Laporan bencana publik (map picker presisi + max 5 foto + koordinat opsional)
+- [x] Laporan bencana publik (map picker + max 5 foto + koordinat opsional)
 - [x] Tracking status dengan peta + galeri foto
-- [x] Peta sebaran publik `/peta` tanpa login
+- [x] Peta sebaran publik tanpa login
 - [x] Role-based authorization (admin/petugas)
 - [x] Pendataan bencana + export PDF
-- [x] Admin sidebar dark mode (lucide-react icons + sliding indicator + mobile drawer)
-- [x] Consistent animations across all admin pages (stagger entrance, AnimatedNumber, pulse dots)
-- [x] Login admin split-screen + loading spinner
-- [x] Landing page polish (hero, fitur, CTA, footer) + logo gambar BPBD
-- [x] WhatsApp float button (chat popup di pojok kanan bawah)
-- [x] Clean UI / Natural design (kurangi gradient berlebihan, ikon strokeWidth 1.5)
-- [x] Admin sidebar orange active indicator (border kiri + bg transparan)
-- [x] Kelola laporan admin dengan hapus + preview foto/koordinat
-- [x] Peningkatan animasi global v1.2.0 — page transitions, skeleton loading, micro-interactions
-- [x] Manajemen akun admin/petugas dengan role selection & password confirmation
-- [x] Histori login admin — info perangkat yang readable (nama, inisial, wilayah)
-- [ ] Google OAuth login (backend)
-- [ ] Socket.IO live updates (full real-time)
+- [x] Admin sidebar dark mode dengan orange active indicator
+- [x] Animasi konsisten (page transitions, skeleton, micro-interactions)
+- [x] WhatsApp float button
+- [x] Manajemen akun admin/petugas + histori login
+- [ ] Google OAuth login
+- [ ] Socket.IO live updates
 - [ ] Mobile app (React Native)
 
 ---
 
-## 📞 Emergency Contact
+## Emergency Contact
 
 **BPBD Kota Semarang**
 - Call Center: **112**
 - WhatsApp: 0812-3456-7890
+- Alamat: Kompleks Terminal Penggaron, Jl. Brigjen Sudiarto No.KM. 11, Penggaron Kidul, Pedurungan, Semarang 50194
 
 ---
 
-## 📄 License
+## License
 
 ISC License
 
----
-
-## 👥 Author
+## Author
 
 **Ilman Nafidia** - BPBD Monitoring System Project
-
----
-
-## 🙏 Acknowledgments
-
-- BPBD Kota Semarang
-- Tech stack providers
-- All contributors
