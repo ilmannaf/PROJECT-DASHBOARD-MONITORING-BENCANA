@@ -17,6 +17,7 @@ import TrackStatus from './pages/public/TrackStatus';
 import LandingPage from './pages/public/LandingPage';
 import DisasterMap from './pages/public/DisasterMap';
 import TentangKami from './pages/public/TentangKami';
+import StatisticPage from './pages/public/StatisticPage';
 import AdminLayout from './layouts/AdminLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 import WhatsAppFloat from './components/WhatsAppFloat';
@@ -65,6 +66,7 @@ function AnimatedRoutes() {
         <Route path="/lacak" element={<PageWrapper><TrackStatus /></PageWrapper>} />
         <Route path="/peta" element={<PageWrapper><DisasterMap /></PageWrapper>} />
         <Route path="/tentang" element={<PageWrapper><TentangKami /></PageWrapper>} />
+        <Route path="/statistik" element={<PageWrapper><StatisticPage /></PageWrapper>} />
         <Route path="/admin/login" element={<PageWrapper><Login /></PageWrapper>} />
 
         <Route
