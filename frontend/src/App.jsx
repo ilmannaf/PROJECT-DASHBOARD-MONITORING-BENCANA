@@ -9,6 +9,7 @@ import InventoryManagement from './pages/admin/InventoryManagement';
 import VehicleManagement from './pages/admin/VehicleManagement';
 import PoskoManagement from './pages/admin/PoskoManagement';
 import ActivityManagement from './pages/admin/ActivityManagement';
+import InfoBoardManagement from './pages/admin/InfoBoardManagement';
 import DisasterRecordsManagement from './pages/admin/DisasterRecordsManagement';
 import UsersManagement from './pages/admin/UsersManagement';
 import LoginHistory from './pages/admin/LoginHistory';
@@ -18,6 +19,7 @@ import LandingPage from './pages/public/LandingPage';
 import DisasterMap from './pages/public/DisasterMap';
 import TentangKami from './pages/public/TentangKami';
 import StatisticPage from './pages/public/StatisticPage';
+import PapanInformasi from './pages/admin/PapanInformasi';
 import AdminLayout from './layouts/AdminLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 import WhatsAppFloat from './components/WhatsAppFloat';
@@ -67,7 +69,13 @@ function AnimatedRoutes() {
         <Route path="/peta" element={<PageWrapper><DisasterMap /></PageWrapper>} />
         <Route path="/tentang" element={<PageWrapper><TentangKami /></PageWrapper>} />
         <Route path="/statistik" element={<PageWrapper><StatisticPage /></PageWrapper>} />
+        {/* Papan Informasi sudah dipindah ke admin (protected route) */}
         <Route path="/admin/login" element={<PageWrapper><Login /></PageWrapper>} />
+        <Route path="/admin/papan-informasi" element={
+          <ProtectedRoute>
+            <PageWrapper><PapanInformasi /></PageWrapper>
+          </ProtectedRoute>
+        } />
 
         <Route
           element={
@@ -82,6 +90,7 @@ function AnimatedRoutes() {
           <Route path="/admin/vehicles" element={<PageWrapper><VehicleManagement /></PageWrapper>} />
           <Route path="/admin/posko" element={<PageWrapper><PoskoManagement /></PageWrapper>} />
           <Route path="/admin/activities" element={<PageWrapper><ActivityManagement /></PageWrapper>} />
+          <Route path="/admin/info-board" element={<PageWrapper><InfoBoardManagement /></PageWrapper>} />
           <Route path="/admin/disaster-records" element={<PageWrapper><DisasterRecordsManagement /></PageWrapper>} />
           <Route path="/admin/users" element={<PageWrapper><UsersManagement /></PageWrapper>} />
           <Route path="/admin/login-history" element={<PageWrapper><LoginHistory /></PageWrapper>} />

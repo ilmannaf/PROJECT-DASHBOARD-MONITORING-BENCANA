@@ -58,11 +58,11 @@ exports.updateActivity = async (req, res) => {
         title = COALESCE(?, title),
         description = COALESCE(?, description),
         activity_date = COALESCE(?, activity_date),
-        activity_time = COALESCE(?, activity_time),
+        activity_time = ?,
         location = COALESCE(?, location),
         documentation_url = ?
        WHERE id = ?`,
-      [title, description, activity_date, activity_time, location, documentation_url, id]
+      [title, description, activity_date, activity_time !== undefined ? activity_time : existing[0].activity_time, location, documentation_url, id]
     );
 
     res.json({ message: 'Kegiatan berhasil diperbarui' });

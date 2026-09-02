@@ -12,6 +12,13 @@ export const createActivity = async (formData) => {
   return data;
 };
 
+export const updateActivity = async (id, formData) => {
+  const { data } = await api.patch(`/activities/${id}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return data;
+};
+
 export const deleteActivity = async (id) => {
   const { data } = await api.delete(`/activities/${id}`);
   return data;
