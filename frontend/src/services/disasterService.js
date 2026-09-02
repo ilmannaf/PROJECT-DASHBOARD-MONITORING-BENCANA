@@ -11,12 +11,20 @@ export const getDisasterRecordById = async (id) => {
 };
 
 export const createDisasterRecord = async (formData) => {
-  const { data } = await api.post('/disaster-records', formData);
+  const { data } = await api.post('/disaster-records', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
   return data;
 };
 
 export const updateDisasterRecord = async (id, payload) => {
-  const { data } = await api.put(`/disaster-records/${id}`, payload);
+  const { data } = await api.put(`/disaster-records/${id}`, payload, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
   return data;
 };
 

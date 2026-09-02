@@ -550,7 +550,7 @@ export default function LandingPage() {
                 onClick={() => navigate("/admin/login")}
                 className="rounded-lg bg-brand-600 px-5 py-1.5 text-[13px] font-semibold text-white shadow-sm transition-all duration-200 hover:bg-brand-700 hover:shadow-md"
               >
-                Login
+                Login Admin
               </button>
             </div>
 
@@ -627,7 +627,7 @@ export default function LandingPage() {
                 }}
                 className="mt-2 block w-full rounded-lg bg-brand-600 py-2.5 text-sm font-semibold text-white"
               >
-                Login
+                Login Admin
               </button>
             </div>
           )}

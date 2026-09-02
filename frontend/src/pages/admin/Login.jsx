@@ -50,10 +50,10 @@ export default function Login() {
           alt="Logo BPBD"
           className="w-24 h-24 rounded-full object-cover shadow-md mb-4 border-4 border-white"
         />
-        <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">
+        <h1 className="text-2xl font-extrabold text-[#17417d] tracking-tight">
           BPBD KOTA SEMARANG
         </h1>
-        <p className="text-[15px] text-orange-400 font-medium mb-8">
+        <p className="text-[15px] text-[#154991] font-medium mb-8">
           Sistem Informasi Penanggulangan Bencana
         </p>
 
@@ -135,17 +135,19 @@ export default function Login() {
               </button>
             </div>
 
-            {/* Lupa Password */}
-            <div className="text-center pt-1">
-              <a
-                href="/lupa-password"
-                className="text-[13px] text-orange-500 underline hover:text-orange-600 font-medium"
-              >
-                Lupa Password?
-              </a>
-            </div>
           </form>
         </div>
+
+        {/* Kembali ke Beranda */}
+        <a
+          href="/"
+          className="mt-6 inline-flex items-center gap-2 text-[13px] text-[#17417d] hover:text-orange-500 font-medium transition-colors"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+          </svg>
+          Kembali ke Beranda
+        </a>
       </div>
 
       {/* ===== Footer oranye ===== */}

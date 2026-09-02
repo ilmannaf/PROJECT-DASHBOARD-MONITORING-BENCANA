@@ -10,6 +10,10 @@ exports.createDisasterRecord = async (req, res) => {
       return res.status(400).json({ message: 'Tanggal, jam, lokasi, kelurahan, kecamatan, dan kronologi wajib diisi' });
     }
 
+    // Handle photo uploads
+    const photos = req.files ? req.files.map(f => `/uploads/${f.filename}`) : [];
+    const photosJson = JSON.stringify(photos);
+
     const num = (v) => (v === '' || v === null || v === undefined ? null : Number(v));
     const dash = (v) => (v === '' || v === null || v === undefined ? '-' : v);
     const korbanData = [korban_ps, korban_md, korban_lb, korban_lr, terdampak_laki, terdampak_perempuan, terdampak_anak, terdampak_diffable, terdampak_lansia, terdampak_kk];
@@ -19,9 +23,9 @@ exports.createDisasterRecord = async (req, res) => {
       : null;
 
     const [result] = await pool.query(
-      `INSERT INTO disaster_records (disaster_date, disaster_time, location, kelurahan, kecamatan, pemilik, pemilik_phone, kronologi, korban, korban_ps, korban_md, korban_lb, korban_lr, terdampak_laki, terdampak_perempuan, terdampak_anak, terdampak_diffable, terdampak_lansia, terdampak_kk, kerugian, sumber_info_nama, sumber_info_phone, created_by)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [disaster_date, disaster_time, location, kelurahan, kecamatan, pemilik || null, pemilik_phone || null, kronologi, korban, num(korban_ps), num(korban_md), num(korban_lb), num(korban_lr), num(terdampak_laki), num(terdampak_perempuan), num(terdampak_anak), num(terdampak_diffable), num(terdampak_lansia), num(terdampak_kk), kerugian || null, sumber_info_nama || null, sumber_info_phone || null, req.user.id]
+      `INSERT INTO disaster_records (disaster_date, disaster_time, location, kelurahan, kecamatan, pemilik, pemilik_phone, kronologi, korban, korban_ps, korban_md, korban_lb, korban_lr, terdampak_laki, terdampak_perempuan, terdampak_anak, terdampak_diffable, terdampak_lansia, terdampak_kk, kerugian, sumber_info_nama, sumber_info_phone, photos, created_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [disaster_date, disaster_time, location, kelurahan, kecamatan, pemilik || null, pemilik_phone || null, kronologi, korban, num(korban_ps), num(korban_md), num(korban_lb), num(korban_lr), num(terdampak_laki), num(terdampak_perempuan), num(terdampak_anak), num(terdampak_diffable), num(terdampak_lansia), num(terdampak_kk), kerugian || null, sumber_info_nama || null, sumber_info_phone || null, photosJson, req.user.id]
     );
 
     res.status(201).json({ message: 'Pendataan bencana berhasil ditambahkan', id: result.insertId });
@@ -77,6 +81,28 @@ exports.updateDisasterRecord = async (req, res) => {
       return res.status(404).json({ message: 'Data tidak ditemukan' });
     }
 
+    // Handle photo uploads - merge with existing photos
+    let existingPhotos = [];
+    try {
+      existingPhotos = JSON.parse(existing[0].photos || '[]');
+    } catch {}
+    
+    // Check if there are photos to remove (sent as JSON string)
+    let photosToRemove = [];
+    if (req.body.photos_to_remove) {
+      try {
+        photosToRemove = JSON.parse(req.body.photos_to_remove);
+      } catch {}
+    }
+    
+    // Filter out removed photos
+    existingPhotos = existingPhotos.filter(p => !photosToRemove.includes(p));
+    
+    // Add new uploaded photos
+    const newPhotos = req.files ? req.files.map(f => `/uploads/${f.filename}`) : [];
+    const allPhotos = [...existingPhotos, ...newPhotos].slice(0, 5); // max 5
+    const photosJson = JSON.stringify(allPhotos);
+
     const num = (v) => (v === '' || v === null || v === undefined ? null : Number(v));
     const dash = (v) => (v === '' || v === null || v === undefined ? '-' : v);
     const korbanData = [korban_ps, korban_md, korban_lb, korban_lr, terdampak_laki, terdampak_perempuan, terdampak_anak, terdampak_diffable, terdampak_lansia, terdampak_kk];
@@ -108,9 +134,10 @@ exports.updateDisasterRecord = async (req, res) => {
         terdampak_kk = COALESCE(?, terdampak_kk),
         kerugian = COALESCE(?, kerugian),
         sumber_info_nama = COALESCE(?, sumber_info_nama),
-        sumber_info_phone = COALESCE(?, sumber_info_phone)
+        sumber_info_phone = COALESCE(?, sumber_info_phone),
+        photos = ?
        WHERE id = ?`,
-      [disaster_date, disaster_time, location, kelurahan, kecamatan, pemilik, pemilik_phone, kronologi, korban, num(korban_ps), num(korban_md), num(korban_lb), num(korban_lr), num(terdampak_laki), num(terdampak_perempuan), num(terdampak_anak), num(terdampak_diffable), num(terdampak_lansia), num(terdampak_kk), kerugian, sumber_info_nama, sumber_info_phone, id]
+      [disaster_date, disaster_time, location, kelurahan, kecamatan, pemilik, pemilik_phone, kronologi, korban, num(korban_ps), num(korban_md), num(korban_lb), num(korban_lr), num(terdampak_laki), num(terdampak_perempuan), num(terdampak_anak), num(terdampak_diffable), num(terdampak_lansia), num(terdampak_kk), kerugian, sumber_info_nama, sumber_info_phone, photosJson, id]
     );
 
     res.json({ message: 'Data pendataan bencana berhasil diperbarui' });

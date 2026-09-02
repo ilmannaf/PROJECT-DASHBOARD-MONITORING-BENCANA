@@ -1,8 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { getDisasterRecords, createDisasterRecord, updateDisasterRecord, deleteDisasterRecord, downloadDisasterPdf, exportDisasterRecordsExcel } from '../../services/disasterService';
 import { isAdmin } from '../../services/authService';
 import AnimatedNumber from '../../components/AnimatedNumber';
 import { SkeletonTable } from '../../components/Skeleton';
+
+const MAX_PHOTOS = 5;
 
 const inputClass =
   "w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition shadow-sm bg-white";
@@ -39,6 +41,8 @@ export default function DisasterRecordsManagement() {
     sumber_info_nama: '',
     sumber_info_phone: ''
   });
+  const [photos, setPhotos] = useState([]); // [{file, preview}]
+  const fileInputRef = useRef(null);
 
   const loadRecords = () => {
     setLoading(true);
@@ -51,6 +55,40 @@ export default function DisasterRecordsManagement() {
   useEffect(() => { loadRecords(); }, []);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
+
+  const handlePhotos = (e) => {
+    const selected = Array.from(e.target.files || []);
+    if (selected.length === 0) return;
+    const remaining = MAX_PHOTOS - photos.length;
+    if (remaining <= 0) {
+      alert(`Maksimal ${MAX_PHOTOS} foto`);
+      return;
+    }
+    const toAdd = selected.slice(0, remaining);
+    const valid = [];
+    for (const f of toAdd) {
+      if (!["image/jpeg", "image/png", "image/jpg", "image/webp"].includes(f.type)) {
+        alert("Format harus JPG/PNG/WEBP");
+        continue;
+      }
+      if (f.size > 5 * 1024 * 1024) {
+        alert(`Foto ${f.name} melebihi 5MB`);
+        continue;
+      }
+      valid.push({ file: f, preview: URL.createObjectURL(f) });
+    }
+    setPhotos((prev) => [...prev, ...valid].slice(0, MAX_PHOTOS));
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const removePhoto = (idx) => {
+    setPhotos((prev) => {
+      const copy = [...prev];
+      URL.revokeObjectURL(copy[idx].preview);
+      copy.splice(idx, 1);
+      return copy;
+    });
+  };
 
   const resetForm = () => {
     setForm({
@@ -76,6 +114,8 @@ export default function DisasterRecordsManagement() {
       sumber_info_nama: '',
       sumber_info_phone: ''
     });
+    photos.forEach((p) => URL.revokeObjectURL(p.preview));
+    setPhotos([]);
     setEditingId(null);
     setShowForm(false);
   };
@@ -83,10 +123,18 @@ export default function DisasterRecordsManagement() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const formData = new FormData();
+      Object.entries(form).forEach(([key, value]) => {
+        if (value !== '' && value !== null && value !== undefined) {
+          formData.append(key, value);
+        }
+      });
+      photos.forEach((p) => formData.append('photos', p.file));
+      
       if (editingId) {
-        await updateDisasterRecord(editingId, form);
+        await updateDisasterRecord(editingId, formData);
       } else {
-        await createDisasterRecord(form);
+        await createDisasterRecord(formData);
       }
       resetForm();
       loadRecords();
@@ -119,6 +167,17 @@ export default function DisasterRecordsManagement() {
       sumber_info_nama: record.sumber_info_nama || '',
       sumber_info_phone: record.sumber_info_phone || ''
     });
+    // Load existing photos if available
+    if (record.photos && Array.isArray(record.photos)) {
+      const existingPhotos = record.photos.map((url) => ({
+        file: null,
+        preview: url,
+        existing: true
+      }));
+      setPhotos(existingPhotos);
+    } else {
+      setPhotos([]);
+    }
     setEditingId(record.id);
     setShowForm(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -337,6 +396,49 @@ export default function DisasterRecordsManagement() {
                   <input name="sumber_info_phone" value={form.sumber_info_phone} onChange={handleChange} placeholder="Opsional: 0812-XXXX-XXXX" className="w-full border border-orange-200 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none bg-white" />
                 </div>
                 <p className="text-[11px] text-gray-400 mt-2">Kosongkan jika sumber info tidak ingin dicantumkan (privasi)</p>
+              </div>
+
+              {/* Foto Kejadian */}
+              <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-2xl p-5 border border-purple-100">
+                <label className="block text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                  <span className="w-7 h-7 rounded-lg bg-white border border-purple-200 flex items-center justify-center">
+                    <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </span>
+                  Foto Kejadian <span className="text-gray-400 font-normal text-xs">(maks {MAX_PHOTOS})</span>
+                </label>
+                
+                {photos.length > 0 && (
+                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 mb-3">
+                    {photos.map((p, idx) => (
+                      <div key={idx} className="relative group">
+                        <img src={p.preview} alt={`foto ${idx + 1}`} className="h-24 w-full object-cover rounded-xl border border-purple-200" />
+                        <button type="button" onClick={() => removePhoto(idx)} className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 shadow transition opacity-0 group-hover:opacity-100">×</button>
+                        <span className="absolute bottom-1 left-1 text-[10px] bg-black/60 text-white px-1.5 py-0.5 rounded">{idx + 1}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                
+                {photos.length < MAX_PHOTOS ? (
+                  <label className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-purple-200 bg-white/60 hover:border-purple-400 hover:bg-purple-50/50 transition cursor-pointer py-5 px-4 text-center">
+                    <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+                      <svg className="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-700">
+                        {photos.length === 0 ? "Klik untuk unggah foto" : `Tambah foto (${photos.length}/${MAX_PHOTOS})`}
+                      </p>
+                      <p className="text-xs text-gray-400 mt-0.5">JPG / PNG / WEBP, maks 5MB per foto</p>
+                    </div>
+                    <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/jpg,image/webp" multiple onChange={handlePhotos} className="hidden" />
+                  </label>
+                ) : (
+                  <p className="text-xs text-gray-500 text-center py-3">Maksimal {MAX_PHOTOS} foto tercapai</p>
+                )}
               </div>
             </div>
 
