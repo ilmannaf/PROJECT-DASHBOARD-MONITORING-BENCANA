@@ -27,12 +27,12 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden bg-white font-sans">
-      {/* ===== Gradient background — oranye di tengah, putih di sisi ===== */}
+      {/* ===== Gradient background — setengah putih, setengah oranye ===== */}
       <div
         className="absolute inset-0 z-0"
         style={{
           background:
-            "radial-gradient(ellipse at center, rgba(255,140,50,0.95) 0%, rgba(255,170,80,0.75) 25%, rgba(255,200,130,0.5) 45%, rgba(255,235,210,0.25) 65%, rgba(255,255,255,0) 80%)",
+            "linear-gradient(to right, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 30%, rgba(255,248,240,0.9) 40%, rgba(255,230,190,0.7) 45%, rgba(255,180,100,0.85) 50%, rgba(255,155,65,0.95) 55%, rgba(255,140,50,1) 65%, rgba(255,140,50,1) 100%)",
         }}
       ></div>
 
