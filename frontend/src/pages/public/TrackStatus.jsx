@@ -200,25 +200,50 @@ export default function TrackStatus() {
               </div>
             )}
 
-            <div className="flex items-center mb-4">
-              {STATUS_STEPS.map((step, i) => (
-                <div key={step} className="flex-1 flex items-center">
-                  <div
-                    className={`tracking-step w-5 h-5 rounded-full flex items-center justify-center text-[9px] font-bold shrink-0 ${
-                      i <= currentStepIndex ? 'bg-brand-600 text-white' : 'bg-gray-200 text-gray-400'
-                    } ${showSteps ? 'show' : ''}`}
-                    style={{ transitionDelay: `${i * 0.12}s` }}
-                  >
-                    {i + 1}
-                  </div>
-                  {i < STATUS_STEPS.length - 1 && (
-                    <div
-                      className={`tracking-line flex-1 h-0.5 ${i < currentStepIndex ? 'bg-brand-600' : 'bg-gray-200'} ${showSteps ? 'show' : ''}`}
-                      style={{ transitionDelay: `${i * 0.12 + 0.1}s` }}
-                    />
-                  )}
-                </div>
-              ))}
+            <div className="mb-4 rounded-xl border border-gray-100 bg-gray-50 p-3">
+              <div className="flex items-start justify-between gap-1.5">
+                {STATUS_STEPS.map((step, i) => {
+                  const isActive = i <= currentStepIndex;
+                  const isLineActive = i <= currentStepIndex;
+
+                  return (
+                    <div key={step} className="flex-1 flex flex-col items-center text-center">
+                      <div className="flex w-full items-center justify-center">
+                        {i > 0 && (
+                          <div
+                            className={`h-0.5 flex-1 rounded-full ${isLineActive ? 'bg-brand-600' : 'bg-gray-200'}`}
+                            style={{ transitionDelay: `${i * 0.12 + 0.1}s` }}
+                          />
+                        )}
+
+                        <div
+                          className={`tracking-step relative z-10 flex h-7 w-7 items-center justify-center rounded-full border-2 text-[9px] font-bold transition-all duration-300 ${
+                            isActive
+                              ? 'border-brand-600 bg-brand-600 text-white shadow-sm shadow-brand-100'
+                              : 'border-gray-200 bg-gray-100 text-gray-400'
+                          } ${showSteps ? 'show' : ''}`}
+                          style={{ transitionDelay: `${i * 0.12}s` }}
+                        >
+                          {i + 1}
+                        </div>
+
+                        {i < STATUS_STEPS.length - 1 && (
+                          <div
+                            className={`h-0.5 flex-1 rounded-full ${i < currentStepIndex ? 'bg-brand-600' : 'bg-gray-200'}`}
+                            style={{ transitionDelay: `${i * 0.12 + 0.1}s` }}
+                          />
+                        )}
+                      </div>
+
+                      <p
+                        className={`mt-2 text-[7.5px] leading-tight font-medium ${isActive ? 'text-brand-700' : 'text-gray-400'}`}
+                      >
+                        {STATUS_LABELS[step]}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
 
             {result.history.length > 0 && (
