@@ -186,17 +186,17 @@ export default function TrackStatus() {
                   {showMap ? 'Tutup Peta' : 'Lihat di Peta'}
                 </button>
                 {showMap && (
-                  <div className="mt-2 rounded-lg overflow-hidden border animate-fade-in">
-                    <iframe
-                      title="Peta Lokasi Bencana"
-                      width="100%"
-                      height="200"
-                      frameBorder="0"
-                      loading="lazy"
-                      src={`https://maps.google.com/maps?q=${result.report.latitude},${result.report.longitude}&z=15&output=embed`}
-                    />
-                  </div>
-                )}
+                   <div className="mt-2 rounded-lg overflow-hidden border animate-fade-in">
+                     <iframe
+                       title="Peta Lokasi Bencana"
+                       width="100%"
+                       height="400"
+                       frameBorder="0"
+                       loading="lazy"
+                       src={`https://maps.google.com/maps?q=${result.report.latitude},${result.report.longitude}&z=15&output=embed`}
+                     />
+                   </div>
+                 )}
               </div>
             )}
 
