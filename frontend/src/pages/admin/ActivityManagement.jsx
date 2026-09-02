@@ -22,6 +22,7 @@ export default function ActivityManagement() {
     title: "",
     description: "",
     activity_date: "",
+    activity_time: "",
     location: "",
   });
   const [doc, setDoc] = useState(null);
@@ -41,7 +42,7 @@ export default function ActivityManagement() {
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const resetForm = () => {
-    setForm({ title: "", description: "", activity_date: "", location: "" });
+    setForm({ title: "", description: "", activity_date: "", activity_time: "", location: "" });
     setDoc(null);
     setShowForm(false);
   };
@@ -135,6 +136,16 @@ export default function ActivityManagement() {
               />
             </div>
             <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Jam</label>
+              <input
+                type="time"
+                name="activity_time"
+                value={form.activity_time}
+                onChange={handleChange}
+                className={inputClass}
+              />
+            </div>
+            <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Lokasi</label>
               <input
                 name="location"
@@ -220,7 +231,7 @@ export default function ActivityManagement() {
                     </button>
                   )}
                 </div>
-                <p className="text-xs text-gray-500 mb-3 flex items-center gap-1.5">
+                <p className="text-xs text-gray-500 mb-3 flex items-center gap-1.5 flex-wrap">
                   <Calendar className="w-3.5 h-3.5" />
                   {new Date(a.activity_date).toLocaleDateString("id-ID", {
                     weekday: "short",
@@ -228,6 +239,12 @@ export default function ActivityManagement() {
                     month: "short",
                     year: "numeric",
                   })}
+                  {a.activity_time && (
+                    <>
+                      <span className="text-gray-300">·</span>
+                      <span>{a.activity_time.slice(0, 5)}</span>
+                    </>
+                  )}
                   {a.location && (
                     <>
                       <span className="text-gray-300">·</span>

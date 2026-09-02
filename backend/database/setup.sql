@@ -11,7 +11,7 @@ USE sistem_kebencanaan;
 
 -- Hapus tabel lama jika ada (urutan penting karena foreign key)
 SET FOREIGN_KEY_CHECKS = 0;
-DROP TABLE IF EXISTS report_photos;
+DROP TABLE IF EXISTS report_photos; 
 DROP TABLE IF EXISTS report_logs;
 DROP TABLE IF EXISTS reports;
 DROP TABLE IF EXISTS activities;

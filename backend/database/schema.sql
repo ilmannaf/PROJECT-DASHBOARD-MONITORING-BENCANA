@@ -95,10 +95,33 @@ CREATE TABLE activities (
   title VARCHAR(150) NOT NULL,
   description TEXT,
   activity_date DATE NOT NULL,
+  activity_time TIME DEFAULT NULL,
   location VARCHAR(150),
   documentation_url VARCHAR(255),
   created_by INT,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
+ALTER TABLE activities
+ADD COLUMN activity_time TIME DEFAULT NULL
+AFTER activity_date;
+
+-- Tabel INFO_BOARD (Papan Informasi)
+-- Berbeda dari activities, info_board bisa banyak entries per hari dengan jam spesifik
+CREATE TABLE info_board (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  title VARCHAR(200) NOT NULL,
+  info_date DATE NOT NULL,
+  start_time TIME NOT NULL,
+  end_time TIME DEFAULT NULL,
+  location VARCHAR(200),
+  description TEXT,
+  priority ENUM('tinggi', 'sedang', 'rendah') DEFAULT 'sedang',
+  is_active TINYINT(1) DEFAULT 1,
+  created_by INT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
 );
 

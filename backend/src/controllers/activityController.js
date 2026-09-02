@@ -3,7 +3,7 @@ const pool = require('../config/db');
 // CREATE - Tambah kegiatan
 exports.createActivity = async (req, res) => {
   try {
-    const { title, description, activity_date, location } = req.body;
+    const { title, description, activity_date, activity_time, location } = req.body;
 
     if (!title || !activity_date) {
       return res.status(400).json({ message: 'Judul dan tanggal kegiatan wajib diisi' });
@@ -12,9 +12,9 @@ exports.createActivity = async (req, res) => {
     const documentation_url = req.file ? `/uploads/${req.file.filename}` : null;
 
     const [result] = await pool.query(
-      `INSERT INTO activities (title, description, activity_date, location, documentation_url, created_by)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [title, description || null, activity_date, location || null, documentation_url, req.user.id]
+      `INSERT INTO activities (title, description, activity_date, activity_time, location, documentation_url, created_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [title, description || null, activity_date, activity_time || null, location || null, documentation_url, req.user.id]
     );
 
     res.status(201).json({ message: 'Kegiatan berhasil ditambahkan', id: result.insertId });
@@ -31,7 +31,7 @@ exports.getActivities = async (req, res) => {
       SELECT a.*, u.name AS created_by_name
       FROM activities a
       LEFT JOIN users u ON a.created_by = u.id
-      ORDER BY a.activity_date DESC
+      ORDER BY a.activity_date DESC, a.activity_time DESC
     `);
     res.json(rows);
   } catch (err) {
@@ -44,7 +44,7 @@ exports.getActivities = async (req, res) => {
 exports.updateActivity = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description, activity_date, location } = req.body;
+    const { title, description, activity_date, activity_time, location } = req.body;
 
     const [existing] = await pool.query('SELECT * FROM activities WHERE id = ?', [id]);
     if (existing.length === 0) {
@@ -58,10 +58,11 @@ exports.updateActivity = async (req, res) => {
         title = COALESCE(?, title),
         description = COALESCE(?, description),
         activity_date = COALESCE(?, activity_date),
+        activity_time = COALESCE(?, activity_time),
         location = COALESCE(?, location),
         documentation_url = ?
        WHERE id = ?`,
-      [title, description, activity_date, location, documentation_url, id]
+      [title, description, activity_date, activity_time, location, documentation_url, id]
     );
 
     res.json({ message: 'Kegiatan berhasil diperbarui' });
