@@ -11,6 +11,8 @@ import {
   Building2,
   Calendar,
   Clock,
+  Info,
+  Monitor,
   LogOut,
   Menu,
   X,
@@ -25,6 +27,8 @@ const MENU_ITEMS = [
   { path: "/admin/vehicles", label: "Kendaraan", icon: Car },
   { path: "/admin/posko", label: "Posko", icon: Building2 },
   { path: "/admin/activities", label: "Kegiatan", icon: Calendar },
+  { path: "/admin/info-board", label: "Papan Informasi", icon: Info },
+  { path: "/admin/papan-informasi", label: "Layar Papan Informasi", icon: Monitor },
   { path: "/admin/login-history", label: "History Login", icon: Clock },
 ];
 

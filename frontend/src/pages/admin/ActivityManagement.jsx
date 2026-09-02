@@ -2,10 +2,11 @@ import { useState, useEffect } from "react";
 import {
   getActivities,
   createActivity,
+  updateActivity,
   deleteActivity,
 } from "../../services/activityService";
 import { isAdmin } from "../../services/authService";
-import { Calendar, Plus, X, Trash2 } from "lucide-react";
+import { Calendar, Plus, X, Trash2, Pencil } from "lucide-react";
 import AnimatedNumber from '../../components/AnimatedNumber';
 import { SkeletonCards, SkeletonPulse } from '../../components/Skeleton';
 
@@ -18,10 +19,12 @@ export default function ActivityManagement() {
   const [loading, setLoading] = useState(true);
   const [showContent, setShowContent] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [editId, setEditId] = useState(null);
   const [form, setForm] = useState({
     title: "",
     description: "",
     activity_date: "",
+    activity_time: "",
     location: "",
   });
   const [doc, setDoc] = useState(null);
@@ -41,23 +44,44 @@ export default function ActivityManagement() {
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const resetForm = () => {
-    setForm({ title: "", description: "", activity_date: "", location: "" });
+    setForm({ title: "", description: "", activity_date: "", activity_time: "", location: "" });
     setDoc(null);
+    setEditId(null);
     setShowForm(false);
+  };
+
+  const handleEdit = (activity) => {
+    setEditId(activity.id);
+    setForm({
+      title: activity.title || "",
+      description: activity.description || "",
+      activity_date: activity.activity_date ? activity.activity_date.split("T")[0] : "",
+      activity_time: activity.activity_time || "",
+      location: activity.location || "",
+    });
+    setDoc(null);
+    setShowForm(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const formData = new FormData();
-      Object.entries(form).forEach(([key, value]) => formData.append(key, value));
+      Object.entries(form).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) formData.append(key, value);
+      });
       if (doc) formData.append("documentation", doc);
 
-      await createActivity(formData);
+      if (editId) {
+        await updateActivity(editId, formData);
+      } else {
+        await createActivity(formData);
+      }
       resetForm();
       loadActivities();
     } catch (err) {
-      alert(err.response?.data?.message || "Gagal menambah kegiatan");
+      alert(err.response?.data?.message || (editId ? "Gagal memperbarui kegiatan" : "Gagal menambah kegiatan"));
     }
   };
 
@@ -69,6 +93,14 @@ export default function ActivityManagement() {
     } catch {
       alert("Gagal menghapus kegiatan");
     }
+  };
+
+  const formatTime = (time) => {
+    if (!time) return null;
+    const [h, m] = time.split(":");
+    const hour = parseInt(h, 10);
+    const period = hour >= 12 ? "WIB" : "WIB";
+    return `${hour.toString().padStart(2, "0")}:${m} ${period}`;
   };
 
   return (
@@ -103,9 +135,9 @@ export default function ActivityManagement() {
         <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/60 border border-gray-100 p-8 mb-8 animate-slide-in">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white flex items-center justify-center">
-              <Plus className="w-5 h-5" />
+              {editId ? <Pencil className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
             </div>
-            <h2 className="text-xl font-bold text-gray-900">Formulir Kegiatan</h2>
+            <h2 className="text-xl font-bold text-gray-900">{editId ? "Edit Kegiatan" : "Formulir Kegiatan"}</h2>
           </div>
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="md:col-span-2">
@@ -131,6 +163,16 @@ export default function ActivityManagement() {
                 value={form.activity_date}
                 onChange={handleChange}
                 required
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Jam</label>
+              <input
+                type="time"
+                name="activity_time"
+                value={form.activity_time}
+                onChange={handleChange}
                 className={inputClass}
               />
             </div>
@@ -163,10 +205,13 @@ export default function ActivityManagement() {
                 onChange={(e) => setDoc(e.target.files[0])}
                 className="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100"
               />
+              {editId && (
+                <p className="text-xs text-gray-400 mt-1">Kosongkan jika tidak ingin mengganti foto</p>
+              )}
             </div>
             <div className="md:col-span-2 flex gap-3">
               <button type="submit" className="flex-1 btn btn-primary py-3.5">
-                Simpan Kegiatan
+                {editId ? "Simpan Perubahan" : "Simpan Kegiatan"}
               </button>
               <button type="button" onClick={resetForm} className="btn btn-secondary py-3.5 px-8">
                 Batal
@@ -211,16 +256,25 @@ export default function ActivityManagement() {
                 <div className="flex justify-between items-start mb-3">
                   <h3 className="font-bold text-gray-900 text-sm leading-tight">{a.title}</h3>
                   {adminUser && (
-                    <button
-                      onClick={() => handleDelete(a.id)}
-                      className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition opacity-0 group-hover:opacity-100"
-                      title="Hapus"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition">
+                      <button
+                        onClick={() => handleEdit(a)}
+                        className="p-1.5 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                        title="Edit"
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(a.id)}
+                        className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
+                        title="Hapus"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   )}
                 </div>
-                <p className="text-xs text-gray-500 mb-3 flex items-center gap-1.5">
+                <p className="text-xs text-gray-500 mb-3 flex items-center gap-1.5 flex-wrap">
                   <Calendar className="w-3.5 h-3.5" />
                   {new Date(a.activity_date).toLocaleDateString("id-ID", {
                     weekday: "short",
@@ -228,6 +282,12 @@ export default function ActivityManagement() {
                     month: "short",
                     year: "numeric",
                   })}
+                  {a.activity_time && (
+                    <>
+                      <span className="text-gray-300">·</span>
+                      <span>{formatTime(a.activity_time)}</span>
+                    </>
+                  )}
                   {a.location && (
                     <>
                       <span className="text-gray-300">·</span>

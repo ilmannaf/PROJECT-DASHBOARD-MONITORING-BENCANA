@@ -52,6 +52,9 @@ CREATE DATABASE sistem_kebencanaan;
 USE sistem_kebencanaan;
 SOURCE backend/database/schema.sql;
 SOURCE backend/database/seed.sql;
+SOURCE backend/database/migration_activity_time.sql;
+SOURCE backend/database/migration_info_board.sql;
+SOURCE backend/database/seed_info_board.sql;
 ```
 
 Jika database sudah ada sebelumnya, jalankan migration di `backend/database/` sesuai urutan.
@@ -162,7 +165,8 @@ cd frontend && npm run build && npm run preview
 - Inventaris — CRUD lengkap (tambah, edit, hapus, ubah kondisi)
 - Kendaraan — fleet management dengan status service
 - Posko — kelola titik posko pengungsian
-- Kegiatan — laporan kegiatan lapangan dengan dokumentasi
+- Kegiatan — laporan kegiatan lapangan dengan waktu (jam) + fitur edit
+- Papan Informasi — jadwal internal staff (CRUD + tampilan fullscreen untuk display)
 - Manajemen akun — role selection & password confirmation
 - Histori login — info perangkat yang readable
 
@@ -172,6 +176,9 @@ cd frontend && npm run build && npm run preview
 - Animasi konsisten — page transitions (Framer Motion), stagger entrance, skeleton loading, micro-interactions
 - `prefers-reduced-motion` respected untuk accessibility
 - Role-based authorization (admin/petugas)
+- Dark mode toggle pada Papan Informasi (localStorage persistence)
+- Fullscreen API untuk display papan informasi (sidebar tersembunyi)
+- Keyboard shortcuts — `F` fullscreen, `D` toggle dark mode
 
 ---
 
@@ -188,6 +195,7 @@ cd frontend && npm run build && npm run preview
 | `inventory_items` | Logistik & peralatan |
 | `vehicles` | Kendaraan BPBD |
 | `activities` | Laporan kegiatan lapangan |
+| `info_board` | Papan informasi jadwal internal (waktu, lokasi, deskripsi) |
 | `disaster_records` | Pendataan bencana (kronologi, korban, terdampak, kerugian) |
 
 ---
@@ -239,6 +247,12 @@ cd frontend && npm run build && npm run preview
 - `PATCH /api/activities/:id` - Update
 - `DELETE /api/activities/:id` - Hapus
 
+### Info Board (Papan Informasi)
+- `GET /api/info-board` - List jadwal (admin)
+- `POST /api/info-board` - Tambah jadwal (admin)
+- `PATCH /api/info-board/:id` - Update jadwal (admin)
+- `DELETE /api/info-board/:id` - Hapus jadwal (admin)
+
 ---
 
 ## Brand Colors
@@ -276,6 +290,8 @@ cd frontend && npm run build && npm run preview
 - [x] Animasi konsisten (page transitions, skeleton, micro-interactions)
 - [x] WhatsApp float button
 - [x] Manajemen akun admin/petugas + histori login
+- [x] Papan informasi jadwal internal (CRUD + fullscreen display)
+- [x] Kegiatan dengan field waktu + fitur edit
 - [ ] Google OAuth login
 - [ ] Socket.IO live updates
 - [ ] Mobile app (React Native)

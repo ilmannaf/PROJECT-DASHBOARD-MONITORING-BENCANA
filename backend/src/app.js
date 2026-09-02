@@ -49,6 +49,9 @@ app.use('/api/vehicles', vehicleRoutes);
 const activityRoutes = require('./routes/activityRoutes');
 app.use('/api/activities', activityRoutes);
 
+const infoBoardRoutes = require('./routes/infoBoardRoutes');
+app.use('/api/info-board', infoBoardRoutes);
+
 const poskoRoutes = require('./routes/poskoRoutes');
 app.use('/api/posko', poskoRoutes);
 
