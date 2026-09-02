@@ -54,10 +54,12 @@ const markerIcon = new L.Icon({
   iconAnchor: [12, 41],
 });
 
-function LocationPicker({ location, setLocation }) {
+function LocationPicker({ location, setLocation, onLocationChange }) {
   useMapEvents({
     click(e) {
-      setLocation({ latitude: e.latlng.lat, longitude: e.latlng.lng });
+      const newLocation = { latitude: e.latlng.lat, longitude: e.latlng.lng };
+      setLocation(newLocation);
+      if (onLocationChange) onLocationChange(newLocation);
     },
   });
   return location ? (
@@ -68,7 +70,9 @@ function LocationPicker({ location, setLocation }) {
       eventHandlers={{
         dragend: (e) => {
           const latlng = e.target.getLatLng();
-          setLocation({ latitude: latlng.lat, longitude: latlng.lng });
+          const newLocation = { latitude: latlng.lat, longitude: latlng.lng };
+          setLocation(newLocation);
+          if (onLocationChange) onLocationChange(newLocation);
         },
       }}
     />
@@ -143,6 +147,33 @@ export default function ReportForm() {
     });
   };
 
+  const reverseGeocode = async (lat, lng) => {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+      );
+      const data = await response.json();
+      if (data.address) {
+        const parts = [];
+        if (data.address.road) parts.push(data.address.road);
+        if (data.address.suburb) parts.push(data.address.suburb);
+        if (data.address.village) parts.push(data.address.village);
+        if (data.address.county) parts.push(data.address.county);
+        return parts.join(", ") || data.display_name;
+      }
+      return data.display_name || "";
+    } catch (err) {
+      return "";
+    }
+  };
+
+  const handleLocationChange = async (newLocation) => {
+    const address = await reverseGeocode(newLocation.latitude, newLocation.longitude);
+    if (address) {
+      setForm({ ...form, address });
+    }
+  };
+
   const handleGetLocation = () => {
     if (!navigator.geolocation) {
       setError("Browser tidak mendukung geolocation");
@@ -153,6 +184,7 @@ export default function ReportForm() {
       (pos) => {
         const loc = { latitude: pos.coords.latitude, longitude: pos.coords.longitude };
         setLocation(loc);
+        handleLocationChange(loc);
         setLocating(false);
         setGpsSuccess(true);
         setTimeout(() => setGpsSuccess(false), 400);
@@ -370,7 +402,7 @@ export default function ReportForm() {
                       <FitSemarang />
                       <Polygon positions={[WORLD_RECT, SEMARANG_LATLNG]} pathOptions={{ stroke: false, fillColor: "#0f172a", fillOpacity: 0.55, fillRule: "evenodd" }} />
                       <GeoJSON key="kota-semarang-boundary" data={KOTA_SEMARANG_GEOJSON} style={{ color: "#f97316", weight: 3, opacity: 0.9, fill: false }} />
-                      <LocationPicker location={location} setLocation={setLocation} />
+                       <LocationPicker location={location} setLocation={setLocation} onLocationChange={handleLocationChange} />
                     </MapContainer>
                   </div>
                   <div className="flex flex-wrap gap-2 mt-3">
