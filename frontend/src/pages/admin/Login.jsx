@@ -27,23 +27,20 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden bg-white font-sans">
-      {/* ===== Diagonal gradient background ===== */}
+      {/* ===== Gradient background — oranye di tengah, putih di sisi ===== */}
       <div
         className="absolute inset-0 z-0"
         style={{
           background:
-            "linear-gradient(135deg, #ff8c1a 0%, #f47a1e 25%, #e85d18 50%, #d44515 75%, #c0392b 100%)",
-          clipPath: "polygon(38% 0, 100% 0, 100% 100%, 18% 100%)",
+            "radial-gradient(ellipse at center, rgba(255,140,50,0.95) 0%, rgba(255,170,80,0.75) 25%, rgba(255,200,130,0.5) 45%, rgba(255,235,210,0.25) 65%, rgba(255,255,255,0) 80%)",
         }}
       ></div>
 
       {/* ===== Decorative dots ===== */}
-      <span className="absolute w-2.5 h-2.5 rounded-full bg-orange-300/70 top-[16%] left-[8%] z-10"></span>
-      <span className="absolute w-1.5 h-1.5 rounded-full bg-orange-300/60 top-[27%] left-[13%] z-10"></span>
-      <span className="absolute w-1.5 h-1.5 rounded-full bg-white/70 top-[14%] right-[10%] z-10"></span>
-      <span className="absolute w-1 h-1 rounded-full bg-white/70 top-[32%] right-[6%] z-10"></span>
-      <span className="absolute w-1.5 h-1.5 rounded-full bg-white/60 top-[38%] right-[13%] z-10"></span>
-      <span className="absolute w-1.5 h-1.5 rounded-full bg-white/60 bottom-[24%] right-[15%] z-10"></span>
+      <span className="absolute w-2.5 h-2.5 rounded-full bg-orange-300/50 top-[12%] left-[10%] z-10"></span>
+      <span className="absolute w-1.5 h-1.5 rounded-full bg-orange-200/60 top-[20%] right-[15%] z-10"></span>
+      <span className="absolute w-2 h-2 rounded-full bg-orange-300/40 bottom-[25%] left-[12%] z-10"></span>
+      <span className="absolute w-1.5 h-1.5 rounded-full bg-orange-200/50 bottom-[18%] right-[10%] z-10"></span>
 
       {/* ===== Konten utama ===== */}
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-10 relative z-10">
@@ -53,17 +50,17 @@ export default function Login() {
           alt="Logo BPBD"
           className="w-24 h-24 rounded-full object-cover shadow-md mb-4 border-4 border-white"
         />
-        <h1 className="text-2xl font-extrabold text-blue-950 tracking-tight">
+        <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">
           BPBD KOTA SEMARANG
         </h1>
-        <p className="text-[15px] text-orange-100 font-medium mb-8">
+        <p className="text-[15px] text-orange-400 font-medium mb-8">
           Sistem Informasi Penanggulangan Bencana
         </p>
 
         {/* Card Form */}
-        <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl border border-gray-100 p-8">
+        <div className="w-full max-w-md bg-white rounded-[2rem] shadow-2xl border border-gray-100 p-8">
           {error && (
-            <div className="mb-5 bg-red-50 border border-red-100 text-red-600 text-[13px] rounded-lg px-4 py-3">
+            <div className="mb-5 bg-orange-50 border border-orange-100 text-orange-600 text-[13px] rounded-xl px-4 py-3">
               {error}
             </div>
           )}
@@ -71,7 +68,7 @@ export default function Login() {
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Username / Email */}
             <div>
-              <label className="block text-[13px] font-bold text-blue-950 mb-1.5 tracking-wide">
+              <label className="block text-[13px] font-bold text-gray-800 mb-1.5 tracking-wide">
                 USERNAME / EMAIL
               </label>
               <input
@@ -80,13 +77,13 @@ export default function Login() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Masukkan username atau email"
                 required
-                className="w-full border border-gray-200 rounded-lg px-4 py-3 text-[14px] text-gray-800 placeholder-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-400/30 focus:border-orange-400 transition-all"
+                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-[14px] text-gray-800 placeholder-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-300/40 focus:border-orange-400 transition-all"
               />
             </div>
 
             {/* Password */}
             <div>
-              <label className="block text-[13px] font-bold text-blue-950 mb-1.5 tracking-wide">
+              <label className="block text-[13px] font-bold text-gray-800 mb-1.5 tracking-wide">
                 PASSWORD
               </label>
               <div className="relative">
@@ -96,7 +93,7 @@ export default function Login() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Masukkan password"
                   required
-                  className="w-full border border-gray-200 rounded-lg px-4 py-3 pr-11 text-[14px] text-gray-800 placeholder-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-400/30 focus:border-orange-400 transition-all"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 pr-11 text-[14px] text-gray-800 placeholder-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-400/30 focus:border-orange-400 transition-all"
                 />
                 <button
                   type="button"
@@ -125,14 +122,14 @@ export default function Login() {
                   type="checkbox"
                   checked={remember}
                   onChange={(e) => setRemember(e.target.checked)}
-                  className="w-4 h-4 rounded border-gray-300 accent-red-600"
+                  className="w-4 h-4 rounded border-gray-300 accent-orange-500"
                 />
                 Ingat Saya
               </label>
               <button
                 type="submit"
                 disabled={loading}
-                className="bg-red-700 hover:bg-red-800 text-white font-semibold text-[14px] rounded-lg px-6 py-2.5 shadow-sm hover:shadow-md active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-orange-500 hover:bg-orange-600 text-white font-semibold text-[14px] rounded-xl px-6 py-2.5 shadow-sm hover:shadow-md active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? "Memproses..." : "Masuk"}
               </button>
@@ -142,7 +139,7 @@ export default function Login() {
             <div className="text-center pt-1">
               <a
                 href="/lupa-password"
-                className="text-[13px] text-blue-800 underline hover:text-blue-900 font-medium"
+                className="text-[13px] text-orange-500 underline hover:text-orange-600 font-medium"
               >
                 Lupa Password?
               </a>
@@ -151,16 +148,13 @@ export default function Login() {
         </div>
       </div>
 
-      {/* ===== Footer merah tua ===== */}
-      <footer
-        className="relative z-10 py-3 px-6"
-        style={{
-          background: "linear-gradient(90deg, #7f1418 0%, #9a1c1c 50%, #7f1418 100%)",
-        }}
-      >
-        <p className="text-center text-[12px] text-white/90">
-          &copy; 2024 BPBD Kota Semarang &mdash; Badan Penanggulangan Bencana Daerah
-        </p>
+      {/* ===== Footer oranye ===== */}
+      <footer className="relative z-10 pb-6 px-6 flex justify-center">
+        <div className="bg-orange-500/90 backdrop-blur-sm rounded-2xl py-3 px-8 max-w-md w-full shadow-lg">
+          <p className="text-center text-[12px] text-white/90">
+            &copy; 2024 BPBD Kota Semarang &mdash; Badan Penanggulangan Bencana Daerah
+          </p>
+        </div>
       </footer>
     </div>
   );
