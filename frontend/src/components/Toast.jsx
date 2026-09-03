@@ -12,9 +12,9 @@ export function showToast(message, type = "info") {
 }
 
 const TYPE_STYLE = {
-  success: { bg: "bg-emerald-50 border-emerald-200", text: "text-emerald-800", icon: CheckCircle },
-  info: { bg: "bg-sky-50 border-sky-200", text: "text-sky-800", icon: Info },
-  warning: { bg: "bg-amber-50 border-amber-200", text: "text-amber-800", icon: AlertTriangle },
+  success: { bg: "bg-emerald-50 border-emerald-100", text: "text-emerald-700", icon: CheckCircle },
+  info: { bg: "bg-blue-50 border-blue-100", text: "text-blue-700", icon: Info },
+  warning: { bg: "bg-amber-50 border-amber-100", text: "text-amber-700", icon: AlertTriangle },
 };
 
 function ToastItem({ toast, onRemove }) {
@@ -25,25 +25,25 @@ function ToastItem({ toast, onRemove }) {
   useEffect(() => {
     timerRef.current = setTimeout(() => {
       setExiting(true);
-      setTimeout(() => onRemove(toast.id), 280);
+      setTimeout(() => onRemove(toast.id), 300);
     }, 5000);
     return () => clearTimeout(timerRef.current);
   }, [toast.id, onRemove]);
 
   return (
     <div
-      className={`flex items-start gap-3 px-4 py-3 rounded-xl border shadow-lg backdrop-blur-sm ${
-        exiting ? 'toast-exit' : 'animate-[slideInRight_0.3s_cubic-bezier(0.22,1,0.36,1)]'
+      className={`flex items-start gap-3 px-4 py-3.5 rounded-2xl border shadow-xl shadow-black/5 backdrop-blur-md ${
+        exiting ? 'toast-exit' : 'animate-[slideInRight_0.35s_cubic-bezier(0.22,1,0.36,1)]'
       } ${style.bg}`}
     >
-      {React.createElement(style.icon, { className: `shrink-0 ${style.text}` })}
-      <p className={`text-sm font-medium flex-1 ${style.text}`}>{toast.message}</p>
+      {React.createElement(style.icon, { className: `shrink-0 w-5 h-5 ${style.text}` })}
+      <p className={`text-sm font-medium flex-1 leading-relaxed ${style.text}`}>{toast.message}</p>
       <button
         onClick={() => {
           setExiting(true);
-          setTimeout(() => onRemove(toast.id), 280);
+          setTimeout(() => onRemove(toast.id), 300);
         }}
-        className={`text-xs opacity-50 hover:opacity-100 shrink-0 ${style.text} transition-opacity hover:scale-110`}
+        className={`text-xs opacity-40 hover:opacity-100 shrink-0 ${style.text} transition-all duration-200 hover:scale-110 p-0.5`}
       >
         <X className="w-4 h-4" />
       </button>
@@ -69,7 +69,7 @@ export default function ToastContainer() {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed top-20 right-4 z-[9999] flex flex-col gap-2 w-80 max-w-[calc(100vw-2rem)]">
+    <div className="fixed top-24 right-4 z-[9999] flex flex-col gap-2.5 w-80 max-w-[calc(100vw-2rem)]">
       {toasts.map((t) => (
         <ToastItem key={t.id} toast={t} onRemove={removeToast} />
       ))}

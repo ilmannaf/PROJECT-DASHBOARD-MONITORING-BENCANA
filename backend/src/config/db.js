@@ -107,8 +107,6 @@ const ensureBaseSchema = async () => {
         FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
 
-      `ALTER TABLE activities ADD COLUMN IF NOT EXISTS activity_time TIME DEFAULT NULL AFTER activity_date`,
-
       `CREATE TABLE IF NOT EXISTS disaster_records (
         id INT AUTO_INCREMENT PRIMARY KEY,
         disaster_date DATE NOT NULL,

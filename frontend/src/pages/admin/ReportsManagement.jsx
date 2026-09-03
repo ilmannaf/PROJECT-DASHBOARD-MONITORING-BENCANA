@@ -161,37 +161,45 @@ export default function ReportsManagement() {
       </div>
 
       {/* Status cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
         <button
           onClick={() => setFilter('')}
-          className={`stat-card ${showContent ? 'show' : ''} rounded-2xl p-5 border transition-all ${filter === '' ? 'bg-gradient-to-br from-gray-900 to-gray-800 text-white border-gray-900 shadow-lg shadow-gray-900/25' : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'}`}
+          className={`stat-card ${showContent ? 'show' : ''} rounded-2xl p-5 border transition-all duration-300 ${
+            filter === ''
+              ? 'bg-gradient-to-br from-gray-900 to-gray-800 text-white border-gray-900 shadow-xl shadow-gray-900/20'
+              : 'bg-white text-gray-700 border-gray-100 hover:border-gray-200 hover:shadow-md'
+          }`}
           style={{ transitionDelay: '0s' }}
         >
-          <p className="text-sm font-semibold mb-1">Semua</p>
-          <p className="text-2xl font-extrabold"><AnimatedNumber value={total} /></p>
+          <p className="text-xs font-bold uppercase tracking-wider mb-2 opacity-70">Semua</p>
+          <p className="text-3xl font-extrabold tabular-nums"><AnimatedNumber value={total} /></p>
         </button>
         {STATUS_OPTIONS.map((s, index) => (
           <button
             key={s}
             onClick={() => setFilter(s)}
-            className={`stat-card ${showContent ? 'show' : ''} rounded-2xl p-5 border transition-all ${filter === s ? `bg-gradient-to-br ${STATUS_COLOR[s]} text-white border-transparent shadow-lg` : 'bg-white text-gray-700 border-gray-200 hover:border-gray-300'}`}
-            style={{ transitionDelay: `${(index + 1) * 0.08}s` }}
+            className={`stat-card ${showContent ? 'show' : ''} rounded-2xl p-5 border transition-all duration-300 ${
+              filter === s
+                ? `bg-gradient-to-br ${STATUS_COLOR[s]} text-white border-transparent shadow-xl`
+                : 'bg-white text-gray-700 border-gray-100 hover:border-gray-200 hover:shadow-md'
+            }`}
+            style={{ transitionDelay: `${(index + 1) * 0.06}s` }}
           >
-            <div className="flex items-center gap-2 mb-1">
-              {filter === s ? STATUS_ICON[s] : <span className="text-gray-400">{STATUS_ICON[s]}</span>}
-              <p className="text-sm font-semibold capitalize">{s}</p>
+            <div className="flex items-center gap-2 mb-2">
+              <span className={filter === s ? 'text-white' : 'text-gray-400'}>{STATUS_ICON[s]}</span>
+              <p className="text-xs font-bold uppercase tracking-wider capitalize">{s}</p>
             </div>
-            <p className="text-2xl font-extrabold"><AnimatedNumber value={statusCounts[s] || 0} /></p>
+            <p className="text-3xl font-extrabold tabular-nums"><AnimatedNumber value={statusCounts[s] || 0} /></p>
           </button>
         ))}
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/60 border border-gray-100 overflow-hidden">
-        <div className="p-6 border-b border-gray-100 space-y-3">
+      <div className="card-premium border border-gray-100 rounded-2xl overflow-hidden">
+        <div className="p-6 border-b border-gray-100 space-y-4">
           <div className="flex gap-3">
             <div className="relative flex-1">
-              <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
               <input
@@ -199,20 +207,20 @@ export default function ReportsManagement() {
                 placeholder="Cari kode, nama, jenis, atau lokasi..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"
+                className="w-full pl-12 pr-4 py-3.5 rounded-xl border border-gray-200 bg-gray-50/50 text-sm input-premium focus:outline-none"
               />
             </div>
             <select
               value={disasterType}
               onChange={(e) => setDisasterType(e.target.value)}
-              className="px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition bg-white text-gray-700 text-sm"
+              className="px-4 py-3.5 rounded-xl border border-gray-200 bg-gray-50/50 text-sm input-premium focus:outline-none bg-white text-gray-700"
             >
               <option value="">Semua Jenis</option>
               {DISASTER_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
             </select>
             <button
               onClick={() => exportReportsExcel(exportParams)}
-              className="shrink-0 inline-flex items-center gap-2 px-4 py-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-xl text-sm font-semibold transition"
+              className="shrink-0 inline-flex items-center gap-2 px-5 py-3.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-xl text-sm font-semibold transition-all duration-200 hover:shadow-sm"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -222,29 +230,29 @@ export default function ReportsManagement() {
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <div className="flex items-center gap-2">
-              <label className="text-xs font-semibold text-gray-500">Dari:</label>
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Dari:</label>
               <input
                 type="date"
                 value={dateFrom}
                 onChange={(e) => setDateFrom(e.target.value)}
-                className="px-3 py-2 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none"
+                className="px-3 py-2 rounded-lg border border-gray-200 text-sm input-premium focus:outline-none"
               />
             </div>
             <div className="flex items-center gap-2">
-              <label className="text-xs font-semibold text-gray-500">Sampai:</label>
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Sampai:</label>
               <input
                 type="date"
                 value={dateTo}
                 onChange={(e) => setDateTo(e.target.value)}
-                className="px-3 py-2 rounded-lg border border-gray-200 text-sm focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none"
+                className="px-3 py-2 rounded-lg border border-gray-200 text-sm input-premium focus:outline-none"
               />
             </div>
             {hasActiveFilters && (
-              <button onClick={resetFilters} className="text-xs font-semibold text-brand-600 hover:text-brand-700 transition">
+              <button onClick={resetFilters} className="text-xs font-bold text-brand-600 hover:text-brand-700 transition-colors ml-2">
                 Reset Semua
               </button>
             )}
-            <span className="text-xs text-gray-400 ml-auto">{total} laporan ditemukan</span>
+            <span className="text-xs text-gray-400 ml-auto font-medium">{total} laporan ditemukan</span>
           </div>
         </div>
 
@@ -267,8 +275,8 @@ export default function ReportsManagement() {
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {reports.length > 0 ? (
-                    reports.map((r) => (
-                      <tr key={r.id} className="hover:bg-orange-50/40 transition-colors group">
+                    reports.map((r, idx) => (
+                      <tr key={r.id} className={`hover:bg-orange-50/30 transition-all duration-200 group ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/30'}`}>
                         <td className="py-4 px-6">
                           <span className="font-mono text-xs bg-gray-50 text-gray-700 px-3 py-1.5 rounded-lg border border-gray-200 inline-block">
                             {r.tracking_code}
@@ -368,13 +376,13 @@ export default function ReportsManagement() {
 
             {/* Pagination */}
             {totalPages > 1 && (
-              <div className="p-4 border-t border-gray-100 flex items-center justify-between">
-                <p className="text-xs text-gray-500">Halaman {page} dari {totalPages}</p>
-                <div className="flex items-center gap-2">
+              <div className="p-5 border-t border-gray-100 flex items-center justify-between">
+                <p className="text-xs text-gray-500 font-medium">Halaman <span className="font-bold text-gray-700">{page}</span> dari <span className="font-bold text-gray-700">{totalPages}</span></p>
+                <div className="flex items-center gap-1.5">
                   <button
                     onClick={() => setPage(Math.max(1, page - 1))}
                     disabled={page <= 1}
-                    className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                    className="px-3.5 py-2 text-xs font-semibold rounded-xl border border-gray-200 hover:bg-gray-50 hover:border-gray-300 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
                   >
                     ← Sebelumnya
                   </button>
@@ -386,7 +394,11 @@ export default function ReportsManagement() {
                       <button
                         key={p}
                         onClick={() => setPage(p)}
-                        className={`w-8 h-8 text-xs font-semibold rounded-lg transition ${p === page ? 'bg-brand-600 text-white' : 'border border-gray-200 hover:bg-gray-50 text-gray-700'}`}
+                        className={`w-9 h-9 text-xs font-semibold rounded-xl transition-all duration-200 ${
+                          p === page
+                            ? 'bg-gradient-to-r from-brand-500 to-brand-600 text-white shadow-md shadow-brand-500/20'
+                            : 'border border-gray-200 hover:bg-gray-50 hover:border-gray-300 text-gray-700'
+                        }`}
                       >
                         {p}
                       </button>
@@ -395,7 +407,7 @@ export default function ReportsManagement() {
                   <button
                     onClick={() => setPage(Math.min(totalPages, page + 1))}
                     disabled={page >= totalPages}
-                    className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                    className="px-3.5 py-2 text-xs font-semibold rounded-xl border border-gray-200 hover:bg-gray-50 hover:border-gray-300 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200"
                   >
                     Berikutnya →
                   </button>

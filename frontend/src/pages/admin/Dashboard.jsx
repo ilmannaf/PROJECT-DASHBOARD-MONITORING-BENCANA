@@ -81,10 +81,10 @@ export default function Dashboard() {
   const countByStatus = (s) => byStatus[s] || 0;
 
   const statCards = [
-    { label: 'Total Laporan', value: total, icon: 'doc', color: 'text-gray-900', bg: 'bg-blue-50', iconColor: 'text-blue-600' },
-    { label: 'Baru', value: countByStatus('baru'), icon: 'bell', color: 'text-red-600', bg: 'bg-red-50', iconColor: 'text-red-500' },
-    { label: 'Ditindaklanjuti', value: countByStatus('ditindaklanjuti'), icon: 'wrench', color: 'text-blue-600', bg: 'bg-blue-50', iconColor: 'text-blue-500' },
-    { label: 'Selesai', value: countByStatus('selesai'), icon: 'check', color: 'text-green-600', bg: 'bg-green-50', iconColor: 'text-green-600' },
+    { label: 'Total Laporan', value: total, icon: 'doc', color: 'text-gray-900', bg: 'bg-gradient-to-br from-blue-50 to-indigo-50', iconColor: 'text-blue-600', border: 'border-blue-100/60' },
+    { label: 'Baru', value: countByStatus('baru'), icon: 'bell', color: 'text-red-600', bg: 'bg-gradient-to-br from-red-50 to-rose-50', iconColor: 'text-red-500', border: 'border-red-100/60' },
+    { label: 'Ditindaklanjuti', value: countByStatus('ditindaklanjuti'), icon: 'wrench', color: 'text-blue-600', bg: 'bg-gradient-to-br from-blue-50 to-sky-50', iconColor: 'text-blue-500', border: 'border-blue-100/60' },
+    { label: 'Selesai', value: countByStatus('selesai'), icon: 'check', color: 'text-green-600', bg: 'bg-gradient-to-br from-emerald-50 to-green-50', iconColor: 'text-green-600', border: 'border-emerald-100/60' },
   ];
 
   const pieData = Object.keys(STATUS_LABELS)
@@ -166,16 +166,16 @@ export default function Dashboard() {
         {statCards.map((c, i) => (
           <div
             key={c.label}
-            className={`stat-card bg-white rounded-xl p-4 border border-gray-200 hover:shadow-md transition-all ${showContent ? 'show' : ''}`}
+            className={`stat-card card-premium rounded-2xl p-5 border ${c.border} ${showContent ? 'show' : ''}`}
             style={{ transitionDelay: `${i * 0.06}s` }}
           >
-            <div className="flex items-center justify-between mb-3">
-              <div className={`w-9 h-9 rounded-lg ${c.bg} ${c.iconColor} flex items-center justify-center`}>
+            <div className="flex items-center justify-between mb-4">
+              <div className={`w-10 h-10 rounded-xl ${c.bg} ${c.iconColor} flex items-center justify-center shadow-sm`}>
                 {icons[c.icon]}
               </div>
-              <span className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">{c.label}</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">{c.label}</span>
             </div>
-            <p className={`text-2xl font-extrabold ${c.color}`}>
+            <p className={`text-3xl font-extrabold ${c.color} tabular-nums`}>
               <AnimatedNumber value={c.value} />
             </p>
           </div>
@@ -183,71 +183,73 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className={`stat-card bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0.3s' }}>
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center text-amber-600">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+        <div className={`stat-card card-premium border border-amber-100/60 rounded-2xl p-5 ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0.3s' }}>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 flex items-center justify-center text-amber-600 shadow-sm">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
-            <span className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">Pendataan</span>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Pendataan</span>
           </div>
-          <p className="text-2xl font-extrabold text-gray-900"><AnimatedNumber value={disasterRecords.length} /></p>
-          <p className="text-[11px] text-gray-500 mt-0.5">Total data bencana</p>
+          <p className="text-3xl font-extrabold text-gray-900 tabular-nums"><AnimatedNumber value={disasterRecords.length} /></p>
+          <p className="text-[11px] text-gray-500 mt-1">Total data bencana</p>
         </div>
-        <div className={`stat-card bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0.36s' }}>
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center text-purple-600">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+        <div className={`stat-card card-premium border border-purple-100/60 rounded-2xl p-5 ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0.36s' }}>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-50 to-violet-50 flex items-center justify-center text-purple-600 shadow-sm">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </div>
-            <span className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">Kecamatan</span>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Kecamatan</span>
           </div>
-          <p className="text-2xl font-extrabold text-gray-900"><AnimatedNumber value={kecamatanCount} /></p>
-          <p className="text-[11px] text-gray-500 mt-0.5">Wilayah terdampak</p>
+          <p className="text-3xl font-extrabold text-gray-900 tabular-nums"><AnimatedNumber value={kecamatanCount} /></p>
+          <p className="text-[11px] text-gray-500 mt-1">Wilayah terdampak</p>
         </div>
-        <div className={`stat-card bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0.42s' }}>
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-9 h-9 rounded-lg bg-red-50 flex items-center justify-center text-red-500">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+        <div className={`stat-card card-premium border border-red-100/60 rounded-2xl p-5 ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0.42s' }}>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-50 to-rose-50 flex items-center justify-center text-red-500 shadow-sm">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
             </div>
-            <span className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">Korban</span>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-gray-400">Korban</span>
           </div>
-          <p className="text-2xl font-extrabold text-gray-900"><AnimatedNumber value={totalKorban} /></p>
-          <p className="text-[11px] text-gray-500 mt-0.5">Total korban tercatat</p>
+          <p className="text-3xl font-extrabold text-gray-900 tabular-nums"><AnimatedNumber value={totalKorban} /></p>
+          <p className="text-[11px] text-gray-500 mt-1">Total korban tercatat</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
-        <div className={`chart-enter bg-white rounded-xl shadow-sm border border-gray-200 p-5 ${showContent ? 'show' : ''}`}>
-          <h2 className="font-semibold text-gray-900 mb-3 text-sm">
-            Distribusi Status
-          </h2>
+        <div className={`chart-enter card-premium border border-gray-100 rounded-2xl p-6 ${showContent ? 'show' : ''}`}>
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-2 h-2 rounded-full bg-brand-500"></div>
+            <h2 className="font-semibold text-gray-900 text-sm">Distribusi Status</h2>
+          </div>
           {pieData.length === 0 ? (
             <p className="text-xs text-gray-400 text-center py-10">Belum ada data</p>
           ) : (
             <ResponsiveContainer width="100%" height={220}>
               <PieChart>
-                <Pie data={pieData} dataKey="value" nameKey="name" innerRadius={50} outerRadius={80} paddingAngle={2} strokeWidth={0}>
+                <Pie data={pieData} dataKey="value" nameKey="name" innerRadius={50} outerRadius={80} paddingAngle={3} strokeWidth={0}>
                   {pieData.map((entry, i) => (
                     <Cell key={i} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip contentStyle={{ borderRadius: 8, border: '1px solid #e5e7eb', fontSize: 12 }} />
+                <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid #f3f4f6', fontSize: 12, boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }} />
                 <Legend verticalAlign="bottom" height={28} iconType="circle" iconSize={7} wrapperStyle={{ fontSize: '11px' }} />
               </PieChart>
             </ResponsiveContainer>
           )}
         </div>
 
-        <div className={`chart-enter lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 p-5 ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0.08s' }}>
-          <h2 className="font-semibold text-gray-900 mb-3 text-sm">
-            Laporan per Jenis Bencana
-          </h2>
+        <div className={`chart-enter lg:col-span-2 card-premium border border-gray-100 rounded-2xl p-6 ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0.08s' }}>
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-2 h-2 rounded-full bg-brand-500"></div>
+            <h2 className="font-semibold text-gray-900 text-sm">Laporan per Jenis Bencana</h2>
+          </div>
           {byType.length === 0 ? (
             <p className="text-xs text-gray-400 text-center py-10">Belum ada data</p>
           ) : (
@@ -256,41 +258,50 @@ export default function Dashboard() {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
                 <XAxis dataKey="name" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
                 <YAxis allowDecimals={false} tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
-                <Tooltip contentStyle={{ borderRadius: 8, border: '1px solid #e5e7eb', fontSize: 12 }} />
-                <Bar dataKey="jumlah" fill="#e65100" radius={[6, 6, 0, 0]} maxBarSize={36} />
+                <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid #f3f4f6', fontSize: 12, boxShadow: '0 4px 16px rgba(0,0,0,0.06)' }} />
+                <Bar dataKey="jumlah" fill="#e65100" radius={[8, 8, 0, 0]} maxBarSize={36} />
               </BarChart>
             </ResponsiveContainer>
           )}
         </div>
       </div>
 
-      <div className={`chart-enter bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0.16s' }}>
-        <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h2 className="font-semibold text-gray-900 text-sm">
-            Laporan Terbaru
-          </h2>
-          <span className="text-[11px] text-gray-400">{total} laporan</span>
+      <div className={`chart-enter card-premium border border-gray-100 rounded-2xl overflow-hidden ${showContent ? 'show' : ''}`} style={{ transitionDelay: '0.16s' }}>
+        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-brand-500"></div>
+            <h2 className="font-semibold text-gray-900 text-sm">Laporan Terbaru</h2>
+          </div>
+          <span className="text-[11px] text-gray-400 font-medium">{total} laporan</span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left">
             <thead>
-              <tr className="bg-gray-50">
-                <th className="py-2.5 px-5 text-[11px] font-semibold uppercase tracking-wide text-gray-500">Kode</th>
-                <th className="py-2.5 px-5 text-[11px] font-semibold uppercase tracking-wide text-gray-500">Pelapor</th>
-                <th className="py-2.5 px-5 text-[11px] font-semibold uppercase tracking-wide text-gray-500">Jenis</th>
-                <th className="py-2.5 px-5 text-[11px] font-semibold uppercase tracking-wide text-gray-500">Lokasi</th>
-                <th className="py-2.5 px-5 text-[11px] font-semibold uppercase tracking-wide text-gray-500 text-center">Status</th>
+              <tr className="bg-gray-50/80">
+                <th className="py-3 px-6 text-[11px] font-bold uppercase tracking-wider text-gray-500">Kode</th>
+                <th className="py-3 px-6 text-[11px] font-bold uppercase tracking-wider text-gray-500">Pelapor</th>
+                <th className="py-3 px-6 text-[11px] font-bold uppercase tracking-wider text-gray-500">Jenis</th>
+                <th className="py-3 px-6 text-[11px] font-bold uppercase tracking-wider text-gray-500">Lokasi</th>
+                <th className="py-3 px-6 text-[11px] font-bold uppercase tracking-wider text-gray-500 text-center">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
-              {recent.map((r) => (
-                <tr key={r.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="py-2.5 px-5 font-mono text-xs text-gray-500">{r.tracking_code}</td>
-                  <td className="py-2.5 px-5 font-medium text-gray-900">{r.reporter_name}</td>
-                  <td className="py-2.5 px-5 text-gray-600">{r.disaster_type}</td>
-                  <td className="py-2.5 px-5 text-gray-500 truncate max-w-[200px]">{r.address}</td>
-                  <td className="py-2.5 px-5 text-center">
-                    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-gradient-to-r ${STATUS_BG[r.status]} text-white`}>
+            <tbody className="divide-y divide-gray-50">
+              {recent.map((r, idx) => (
+                <tr key={r.id} className={`hover:bg-orange-50/30 transition-colors duration-200 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50/30'}`}>
+                  <td className="py-3 px-6">
+                    <span className="font-mono text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-lg">{r.tracking_code}</span>
+                  </td>
+                  <td className="py-3 px-6 font-medium text-gray-900">{r.reporter_name}</td>
+                  <td className="py-3 px-6">
+                    <span className="inline-flex items-center gap-1.5 text-gray-600">
+                      <span className="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
+                      {r.disaster_type}
+                    </span>
+                  </td>
+                  <td className="py-3 px-6 text-gray-500 truncate max-w-[200px]">{r.address}</td>
+                  <td className="py-3 px-6 text-center">
+                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-gradient-to-r ${STATUS_BG[r.status]} text-white shadow-sm`}>
+                      <span className="w-1.5 h-1.5 rounded-full bg-white/60"></span>
                       {STATUS_LABELS[r.status]}
                     </span>
                   </td>
@@ -298,7 +309,7 @@ export default function Dashboard() {
               ))}
             </tbody>
           </table>
-          {recent.length === 0 && <p className="text-sm text-gray-500 py-8 text-center">Belum ada laporan.</p>}
+          {recent.length === 0 && <p className="text-sm text-gray-500 py-10 text-center">Belum ada laporan.</p>}
         </div>
       </div>
     </div>
