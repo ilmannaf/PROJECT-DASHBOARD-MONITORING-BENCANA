@@ -27,40 +27,51 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden bg-white font-sans">
-      {/* ===== Gradient background — setengah putih, setengah oranye ===== */}
+      {/* ===== Animated gradient background ===== */}
       <div
         className="absolute inset-0 z-0"
         style={{
           background:
-            "linear-gradient(to right, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 30%, rgba(255,248,240,0.9) 40%, rgba(255,230,190,0.7) 45%, rgba(255,180,100,0.85) 50%, rgba(255,155,65,0.95) 55%, rgba(255,140,50,1) 65%, rgba(255,140,50,1) 100%)",
+            "linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,252,245,1) 25%, rgba(255,240,215,0.6) 45%, rgba(255,183,77,0.7) 60%, rgba(255,111,0,0.85) 75%, rgba(230,81,0,0.95) 100%)",
         }}
-      ></div>
+      />
 
-      {/* ===== Decorative dots ===== */}
-      <span className="absolute w-2.5 h-2.5 rounded-full bg-orange-300/50 top-[12%] left-[10%] z-10"></span>
-      <span className="absolute w-1.5 h-1.5 rounded-full bg-orange-200/60 top-[20%] right-[15%] z-10"></span>
-      <span className="absolute w-2 h-2 rounded-full bg-orange-300/40 bottom-[25%] left-[12%] z-10"></span>
-      <span className="absolute w-1.5 h-1.5 rounded-full bg-orange-200/50 bottom-[18%] right-[10%] z-10"></span>
+      {/* ===== Animated decorative orbs ===== */}
+      <div className="absolute top-[15%] left-[8%] w-72 h-72 bg-orange-300/20 rounded-full blur-[80px] animate-[blobFloat_16s_ease-in-out_infinite_alternate]" />
+      <div className="absolute bottom-[20%] right-[10%] w-64 h-64 bg-amber-200/25 rounded-full blur-[70px] animate-[blobFloat_20s_ease-in-out_infinite_alternate]" style={{ animationDelay: '-4s' }} />
+      <div className="absolute top-[60%] left-[50%] w-48 h-48 bg-orange-400/15 rounded-full blur-[60px] animate-[blobFloat_14s_ease-in-out_infinite_alternate]" style={{ animationDelay: '-8s' }} />
+
+      {/* ===== Floating dots ===== */}
+      <span className="absolute w-2 h-2 rounded-full bg-orange-300/40 top-[12%] left-[10%] z-10 animate-[heroFloatUp_3s_ease-in-out_infinite_alternate]"></span>
+      <span className="absolute w-1.5 h-1.5 rounded-full bg-orange-200/50 top-[20%] right-[15%] z-10 animate-[heroFloatUp_4s_ease-in-out_infinite_alternate]" style={{ animationDelay: '-1s' }}></span>
+      <span className="absolute w-2.5 h-2.5 rounded-full bg-orange-300/30 bottom-[25%] left-[12%] z-10 animate-[heroFloatUp_3.5s_ease-in-out_infinite_alternate]" style={{ animationDelay: '-2s' }}></span>
+      <span className="absolute w-1.5 h-1.5 rounded-full bg-orange-200/40 bottom-[18%] right-[10%] z-10 animate-[heroFloatUp_4.5s_ease-in-out_infinite_alternate]" style={{ animationDelay: '-1.5s' }}></span>
 
       {/* ===== Konten utama ===== */}
       <div className="flex-1 flex flex-col items-center justify-center px-4 py-10 relative z-10">
         {/* Logo + Judul */}
-        <img
-          src="/assets/logo-bpbd.jpg"
-          alt="Logo BPBD"
-          className="w-24 h-24 rounded-full object-cover shadow-md mb-4 border-4 border-white"
-        />
-        <h1 className="text-2xl font-extrabold text-[#17417d] tracking-tight">
+        <div className="relative mb-6">
+          <div className="absolute -inset-3 bg-gradient-to-br from-orange-400/20 to-amber-300/20 rounded-full blur-xl" />
+          <img
+            src="/assets/logo-bpbd.jpg"
+            alt="Logo BPBD"
+            className="relative w-24 h-24 rounded-full object-cover shadow-xl shadow-orange-500/15 border-4 border-white"
+          />
+        </div>
+        <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">
           BPBD KOTA SEMARANG
         </h1>
-        <p className="text-[15px] text-[#154991] font-medium mb-8">
+        <p className="text-[14px] text-gray-500 font-medium mb-8">
           Sistem Informasi Penanggulangan Bencana
         </p>
 
         {/* Card Form */}
-        <div className="w-full max-w-md bg-white rounded-[2rem] shadow-2xl border border-gray-100 p-8">
+        <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl shadow-gray-200/60 border border-gray-100 p-8 hover-lift">
           {error && (
-            <div className="mb-5 bg-orange-50 border border-orange-100 text-orange-600 text-[13px] rounded-xl px-4 py-3">
+            <div className="mb-5 bg-red-50 border border-red-100 text-red-600 text-[13px] rounded-xl px-4 py-3 flex items-center gap-2">
+              <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
               {error}
             </div>
           )}
@@ -68,37 +79,49 @@ export default function Login() {
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Username / Email */}
             <div>
-              <label className="block text-[13px] font-bold text-gray-800 mb-1.5 tracking-wide">
-                USERNAME / EMAIL
+              <label className="block text-[12px] font-bold text-gray-600 mb-2 tracking-wider uppercase">
+                Username / Email
               </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Masukkan username atau email"
-                required
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 text-[14px] text-gray-800 placeholder-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-300/40 focus:border-orange-400 transition-all"
-              />
+              <div className="relative">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Masukkan username atau email"
+                  required
+                  className="w-full border border-gray-200 rounded-xl pl-11 pr-4 py-3.5 text-[14px] text-gray-800 placeholder-gray-400 bg-gray-50/80 input-premium focus:outline-none"
+                />
+              </div>
             </div>
 
             {/* Password */}
             <div>
-              <label className="block text-[13px] font-bold text-gray-800 mb-1.5 tracking-wide">
-                PASSWORD
+              <label className="block text-[12px] font-bold text-gray-600 mb-2 tracking-wider uppercase">
+                Password
               </label>
               <div className="relative">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Masukkan password"
                   required
-                  className="w-full border border-gray-200 rounded-xl px-4 py-3 pr-11 text-[14px] text-gray-800 placeholder-gray-400 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-400/30 focus:border-orange-400 transition-all"
+                  className="w-full border border-gray-200 rounded-xl pl-11 pr-12 py-3.5 text-[14px] text-gray-800 placeholder-gray-400 bg-gray-50/80 input-premium focus:outline-none"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-all duration-200"
                   aria-label={showPassword ? "Sembunyikan password" : "Tampilkan password"}
                 >
                   {showPassword ? (
@@ -116,22 +139,39 @@ export default function Login() {
             </div>
 
             {/* Ingat Saya + Tombol Masuk */}
-            <div className="flex items-center justify-between pt-1">
-              <label className="flex items-center gap-2 text-[13px] text-gray-600 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={remember}
-                  onChange={(e) => setRemember(e.target.checked)}
-                  className="w-4 h-4 rounded border-gray-300 accent-orange-500"
-                />
-                Ingat Saya
+            <div className="flex items-center justify-between pt-2">
+              <label className="flex items-center gap-2.5 text-[13px] text-gray-500 cursor-pointer select-none group">
+                <div className="relative">
+                  <input
+                    type="checkbox"
+                    checked={remember}
+                    onChange={(e) => setRemember(e.target.checked)}
+                    className="peer sr-only"
+                  />
+                  <div className="w-4 h-4 rounded border-2 border-gray-300 peer-checked:border-brand-500 peer-checked:bg-brand-500 transition-all duration-200 flex items-center justify-center">
+                    {remember && (
+                      <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </div>
+                </div>
+                <span className="group-hover:text-gray-700 transition-colors">Ingat Saya</span>
               </label>
               <button
                 type="submit"
                 disabled={loading}
-                className="bg-orange-500 hover:bg-orange-600 text-white font-semibold text-[14px] rounded-xl px-6 py-2.5 shadow-sm hover:shadow-md active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white font-semibold text-[14px] rounded-xl px-8 py-3 shadow-lg shadow-brand-500/25 hover:shadow-xl hover:shadow-brand-500/30 active:scale-[0.97] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? "Memproses..." : "Masuk"}
+                {loading ? (
+                  <span className="flex items-center gap-2">
+                    <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    Memproses...
+                  </span>
+                ) : "Masuk"}
               </button>
             </div>
 
@@ -141,20 +181,20 @@ export default function Login() {
         {/* Kembali ke Beranda */}
         <a
           href="/"
-          className="mt-6 inline-flex items-center gap-2 text-[13px] text-[#17417d] hover:text-orange-500 font-medium transition-colors"
+          className="mt-8 inline-flex items-center gap-2 text-[13px] text-gray-500 hover:text-brand-600 font-medium transition-colors duration-200 group"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+          <svg className="w-4 h-4 transition-transform duration-200 group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
           </svg>
           Kembali ke Beranda
         </a>
       </div>
 
-      {/* ===== Footer oranye ===== */}
+      {/* ===== Footer ===== */}
       <footer className="relative z-10 pb-6 px-6 flex justify-center">
-        <div className="bg-orange-500/90 backdrop-blur-sm rounded-2xl py-3 px-8 max-w-md w-full shadow-lg">
+        <div className="bg-gradient-to-r from-brand-500/90 to-brand-600/90 backdrop-blur-sm rounded-2xl py-3 px-8 max-w-md w-full shadow-lg shadow-brand-500/20">
           <p className="text-center text-[12px] text-white/90">
-            &copy; 2024 BPBD Kota Semarang &mdash; Badan Penanggulangan Bencana Daerah
+            &copy; 2026 BPBD Kota Semarang &mdash; Badan Penanggulangan Bencana Daerah
           </p>
         </div>
       </footer>

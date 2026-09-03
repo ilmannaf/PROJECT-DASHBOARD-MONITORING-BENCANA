@@ -7,3 +7,9 @@ dist/
 .vscode/
 uploads/
 **/uploads/
+
+# Reference repos
+LeetCodeAnimation/
+shadcnspace/
+uiGradients/
+ui-ux-pro-max-skill/
