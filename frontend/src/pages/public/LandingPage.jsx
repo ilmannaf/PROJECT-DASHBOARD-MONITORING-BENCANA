@@ -442,7 +442,14 @@ function LatestReportCard() {
 export default function LandingPage() {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const sectionsRef = useRef(null);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 40);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     const prefersReduced = window.matchMedia(
@@ -508,16 +515,24 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent" />
 
-        {/* ===== NAVBAR (transparent over photo) ===== */}
-        <nav className="absolute top-0 left-0 z-50 w-full bg-black/20 backdrop-blur-md">
+        {/* ===== NAVBAR (transparent over photo, scroll-aware) ===== */}
+        <nav className={`absolute top-0 left-0 z-50 w-full transition-all duration-500 ${
+          scrolled
+            ? "bg-white/90 backdrop-blur-xl border-b border-white/20 shadow-lg shadow-black/5"
+            : "bg-black/20 backdrop-blur-md"
+        }`}>
           <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4">
-            <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-3">
               <img
                 src="/assets/logo-bpbd.jpg"
                 alt="Logo BPBD Kota Semarang"
-                className="h-9 w-9 rounded-lg object-cover"
+                className={`h-9 w-9 rounded-xl object-cover transition-all duration-300 ${
+                  scrolled ? "shadow-md ring-2 ring-brand-100" : ""
+                }`}
               />
-              <span className="text-sm font-bold text-white">
+              <span className={`text-sm font-bold transition-colors duration-300 ${
+                scrolled ? "text-gray-900" : "text-white"
+              }`}>
                 BPBD Kota Semarang
               </span>
             </div>
@@ -525,21 +540,31 @@ export default function LandingPage() {
             <div className="hidden items-center gap-1 md:flex">
               <button
                 onClick={() => navigate("/tentang")}
-                className="rounded-full px-3.5 py-1.5 text-[13px] font-medium text-white/80 transition hover:bg-white/10 hover:text-white"
+                className={`rounded-full px-4 py-1.5 text-[13px] font-medium transition-all duration-200 ${
+                  scrolled
+                    ? "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                    : "text-white/80 hover:bg-white/10 hover:text-white"
+                }`}
               >
                 Tentang Kami
               </button>
-              <span className="text-white/30 text-[10px]">•</span>
               <button
                 onClick={() => navigate("/statistik")}
-                className="rounded-full px-3.5 py-1.5 text-[13px] font-medium text-white/80 transition hover:bg-white/10 hover:text-white"
+                className={`rounded-full px-4 py-1.5 text-[13px] font-medium transition-all duration-200 ${
+                  scrolled
+                    ? "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                    : "text-white/80 hover:bg-white/10 hover:text-white"
+                }`}
               >
                 Statistik
               </button>
-              <span className="text-white/30 text-[10px]">•</span>
               <button
                 onClick={() => scrollToSection("kontak")}
-                className="rounded-full px-3.5 py-1.5 text-[13px] font-medium text-white/80 transition hover:bg-white/10 hover:text-white"
+                className={`rounded-full px-4 py-1.5 text-[13px] font-medium transition-all duration-200 ${
+                  scrolled
+                    ? "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                    : "text-white/80 hover:bg-white/10 hover:text-white"
+                }`}
               >
                 Kontak
               </button>
@@ -548,7 +573,11 @@ export default function LandingPage() {
             <div className="hidden items-center gap-3 md:flex">
               <button
                 onClick={() => navigate("/admin/login")}
-                className="rounded-lg bg-brand-600 px-5 py-1.5 text-[13px] font-semibold text-white shadow-sm transition-all duration-200 hover:bg-brand-700 hover:shadow-md"
+                className={`rounded-xl px-5 py-2 text-[13px] font-semibold transition-all duration-300 ${
+                  scrolled
+                    ? "bg-gradient-to-r from-brand-500 to-brand-600 text-white shadow-md shadow-brand-500/20 hover:shadow-lg hover:shadow-brand-500/30"
+                    : "bg-white/15 text-white backdrop-blur-sm border border-white/20 hover:bg-white/25"
+                }`}
               >
                 Login Admin
               </button>
@@ -556,76 +585,48 @@ export default function LandingPage() {
 
             <button
               onClick={() => setMobileMenuOpen((open) => !open)}
-              className="rounded-lg p-2 text-white transition hover:bg-white/10 md:hidden"
+              className={`rounded-xl p-2 transition-all duration-200 md:hidden ${
+                scrolled
+                  ? "text-gray-600 hover:bg-gray-100"
+                  : "text-white hover:bg-white/10"
+              }`}
               aria-label="Menu"
             >
               {mobileMenuOpen ? (
-                <svg
-                  className="h-5 w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 18L18 6M6 6l12 12"
-                  />
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               ) : (
-                <svg
-                  className="h-5 w-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
               )}
             </button>
           </div>
 
           {mobileMenuOpen && (
-            <div className="border-t border-white/10 bg-black/50 backdrop-blur-sm px-4 pb-4 pt-2 md:hidden">
+            <div className="border-t border-white/10 bg-white/95 backdrop-blur-xl px-4 pb-4 pt-2 md:hidden shadow-lg">
               <button
-                onClick={() => {
-                  navigate("/tentang");
-                  setMobileMenuOpen(false);
-                }}
-                className="block w-full rounded-lg px-4 py-2.5 text-left text-sm font-medium text-white/90 transition hover:bg-white/10"
+                onClick={() => { navigate("/tentang"); setMobileMenuOpen(false); }}
+                className="block w-full rounded-xl px-4 py-3 text-left text-sm font-medium text-gray-700 transition hover:bg-gray-50"
               >
                 Tentang Kami
               </button>
               <button
-                onClick={() => {
-                  navigate("/statistik");
-                  setMobileMenuOpen(false);
-                }}
-                className="block w-full rounded-lg px-4 py-2.5 text-left text-sm font-medium text-white/90 transition hover:bg-white/10"
+                onClick={() => { navigate("/statistik"); setMobileMenuOpen(false); }}
+                className="block w-full rounded-xl px-4 py-3 text-left text-sm font-medium text-gray-700 transition hover:bg-gray-50"
               >
                 Statistik
               </button>
               <button
-                onClick={() => {
-                  scrollToSection("kontak");
-                  setMobileMenuOpen(false);
-                }}
-                className="block w-full rounded-lg px-4 py-2.5 text-left text-sm font-medium text-white/90 transition hover:bg-white/10"
+                onClick={() => { scrollToSection("kontak"); setMobileMenuOpen(false); }}
+                className="block w-full rounded-xl px-4 py-3 text-left text-sm font-medium text-gray-700 transition hover:bg-gray-50"
               >
                 Kontak
               </button>
               <button
-                onClick={() => {
-                  navigate("/admin/login");
-                  setMobileMenuOpen(false);
-                }}
-                className="mt-2 block w-full rounded-lg bg-brand-600 py-2.5 text-sm font-semibold text-white"
+                onClick={() => { navigate("/admin/login"); setMobileMenuOpen(false); }}
+                className="mt-2 block w-full rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-500/20"
               >
                 Login Admin
               </button>
@@ -660,19 +661,19 @@ export default function LandingPage() {
               <div className="hero-btn flex flex-wrap items-center gap-3 pt-2">
                 <button
                   onClick={() => navigate("/lapor")}
-                  className="rounded-lg bg-brand-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-600/30 transition-all duration-200 hover:bg-brand-700 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
+                  className="rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 px-7 py-3.5 text-sm font-semibold text-white shadow-xl shadow-brand-600/30 transition-all duration-300 hover:from-brand-600 hover:to-brand-700 hover:shadow-2xl hover:shadow-brand-600/40 hover:scale-[1.03] active:scale-[0.97]"
                 >
                   Laporkan Bencana
                 </button>
                 <button
                   onClick={() => navigate("/peta")}
-                  className="rounded-lg border border-white/20 bg-black/30 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-all duration-200 hover:bg-white/10 hover:border-white/40"
+                  className="rounded-xl border border-white/25 bg-white/10 px-7 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/20 hover:border-white/40 hover:shadow-lg"
                 >
                   Peta Bencana
                 </button>
                 <button
                   onClick={() => navigate("/lacak")}
-                  className="rounded-lg border border-white/40 px-6 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-white/10"
+                  className="rounded-xl border border-white/40 px-7 py-3.5 text-sm font-semibold text-white transition-all duration-300 hover:bg-white/15 hover:border-white/60"
                 >
                   Lacak Status
                 </button>
@@ -1039,156 +1040,87 @@ export default function LandingPage() {
       <FotoHighlight />
 
       <footer className="relative bg-gray-900 text-gray-400">
-        <div className="absolute top-0 left-0 h-px w-full bg-gradient-to-r from-transparent via-brand-500/30 to-transparent" />
-        <div className="mx-auto max-w-6xl px-6 py-10">
-          <div className="grid gap-8 md:grid-cols-3">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2.5">
+        <div className="absolute top-0 left-0 h-px w-full bg-gradient-to-r from-transparent via-brand-500/40 to-transparent" />
+        <div className="mx-auto max-w-6xl px-6 py-12">
+          <div className="grid gap-10 md:grid-cols-3">
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
                 <img
                   src="/assets/logo-bpbd.jpg"
                   alt="Logo BPBD Kota Semarang"
-                  className="h-8 w-8 rounded-lg object-cover"
+                  className="h-10 w-10 rounded-xl object-cover shadow-lg shadow-black/20"
                 />
-                <p className="font-bold text-white text-sm">
-                  BPBD Kota Semarang
-                </p>
+                <div>
+                  <p className="font-bold text-white text-sm">BPBD Kota Semarang</p>
+                  <p className="text-[10px] text-gray-500">Badan Penanggulangan Bencana Daerah</p>
+                </div>
               </div>
-              <p className="text-xs leading-relaxed">
-                Platform pelaporan dan pemantauan bencana terpadu.
+              <p className="text-xs leading-relaxed text-gray-500">
+                Platform pelaporan dan pemantauan bencana terpadu untuk warga Kota Semarang.
               </p>
             </div>
 
             <div>
-              <h4 className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-300">
+              <h4 className="mb-4 text-xs font-bold uppercase tracking-wider text-gray-300">
                 Navigasi
               </h4>
-              <ul className="space-y-1.5 text-xs">
-                <li>
-                  <button
-                    onClick={() => navigate("/tentang")}
-                    className="transition hover:text-white"
-                  >
-                    Tentang Kami
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => navigate("/statistik")}
-                    className="transition hover:text-white"
-                  >
-                    Statistik
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => scrollToSection("kontak")}
-                    className="transition hover:text-white"
-                  >
-                    Kontak
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => navigate("/peta")}
-                    className="transition hover:text-white"
-                  >
-                    Peta Bencana
-                  </button>
-                </li>
-                <li>
-                  <button
-                    onClick={() => navigate("/lacak")}
-                    className="transition hover:text-white"
-                  >
-                    Lacak Laporan
-                  </button>
-                </li>
+              <ul className="space-y-2 text-xs">
+                {[
+                  { label: "Tentang Kami", action: () => navigate("/tentang") },
+                  { label: "Statistik", action: () => navigate("/statistik") },
+                  { label: "Kontak", action: () => scrollToSection("kontak") },
+                  { label: "Peta Bencana", action: () => navigate("/peta") },
+                  { label: "Lacak Laporan", action: () => navigate("/lacak") },
+                ].map((item) => (
+                  <li key={item.label}>
+                    <button
+                      onClick={item.action}
+                      className="text-gray-500 transition-all duration-200 hover:text-white hover:pl-1"
+                    >
+                      {item.label}
+                    </button>
+                  </li>
+                ))}
               </ul>
             </div>
 
             <div>
-              <h4 className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-300">
+              <h4 className="mb-4 text-xs font-bold uppercase tracking-wider text-gray-300">
                 Kontak
               </h4>
-              <ul className="space-y-1.5 text-xs">
-                <li className="flex items-center gap-2">
-                  <svg
-                    className="w-3 h-3 shrink-0 text-brand-500"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                  </svg>
-                  Jl. Brigjen Sudiarto No.KM. 11, Penggaron Kidul, Semarang
+              <ul className="space-y-3 text-xs">
+                <li className="flex items-start gap-3">
+                  <div className="mt-0.5 w-5 h-5 rounded-md bg-brand-500/15 flex items-center justify-center shrink-0">
+                    <svg className="w-3 h-3 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                  <span className="text-gray-500">Jl. Brigjen Sudiarto No.KM. 11, Penggaron Kidul, Semarang</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <svg
-                    className="w-3 h-3 shrink-0 text-brand-500"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                    />
-                  </svg>
-                  <span className="text-white font-semibold">112</span> /
-                  0812-3456-7890
+                <li className="flex items-start gap-3">
+                  <div className="mt-0.5 w-5 h-5 rounded-md bg-brand-500/15 flex items-center justify-center shrink-0">
+                    <svg className="w-3 h-3 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                    </svg>
+                  </div>
+                  <span className="text-gray-500"><span className="text-white font-semibold">112</span> / 0812-3456-7890</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <svg
-                    className="w-3 h-3 shrink-0 text-brand-500"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    strokeWidth={1.5}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                    />
-                  </svg>
-                  bpbd@semarangkota.go.id
-                </li>
-                <li className="flex items-center gap-2">
-                  <svg
-                    className="w-3 h-3 shrink-0 text-brand-500"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
-                  </svg>
-                  <a
-                    href="https://instagram.com/bpbdkotasemarang"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:underline"
-                  >
-                    @bpbdkotasemarang
-                  </a>
+                <li className="flex items-start gap-3">
+                  <div className="mt-0.5 w-5 h-5 rounded-md bg-brand-500/15 flex items-center justify-center shrink-0">
+                    <svg className="w-3 h-3 text-brand-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <span className="text-gray-500">bpbd@semarangkota.go.id</span>
                 </li>
               </ul>
             </div>
           </div>
         </div>
-        <div className="border-t border-white/10">
-          <div className="mx-auto max-w-6xl px-6 py-4 text-center text-[11px]">
-            © 2026 BPBD Kota Semarang
+        <div className="border-t border-white/[0.06]">
+          <div className="mx-auto max-w-6xl px-6 py-5 text-center text-[11px] text-gray-600">
+            © 2026 BPBD Kota Semarang — Badan Penanggulangan Bencana Daerah
           </div>
         </div>
       </footer>
@@ -1198,15 +1130,15 @@ export default function LandingPage() {
 
 function ContactItem({ icon, label, value }) {
   return (
-    <div className="group flex items-start gap-4 rounded-xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm transition-all duration-200 hover:bg-white/10 hover:border-white/20">
-      <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-500/15 text-brand-400 transition-colors group-hover:bg-brand-500/25 group-hover:text-brand-300">
+    <div className="group flex items-start gap-4 rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm transition-all duration-300 hover:bg-white/10 hover:border-white/20 hover:shadow-lg hover:shadow-black/5">
+      <div className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-500/15 text-brand-400 transition-all duration-300 group-hover:bg-brand-500/25 group-hover:text-brand-300 group-hover:scale-110">
         {icon}
       </div>
       <div>
         <p className="text-[11px] font-bold uppercase tracking-wider text-gray-500">
           {label}
         </p>
-        <p className="mt-0.5 text-sm font-semibold text-white">{value}</p>
+        <p className="mt-1 text-sm font-semibold text-white leading-relaxed">{value}</p>
       </div>
     </div>
   );
@@ -1214,33 +1146,29 @@ function ContactItem({ icon, label, value }) {
 
 function FeatureCard({ icon, title, description }) {
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5">
-      <div className="absolute -top-10 -right-10 h-24 w-24 rounded-full bg-gradient-to-br from-brand-500 to-orange-500 opacity-[0.06] blur-2xl transition-all duration-500 group-hover:opacity-[0.12] group-hover:scale-125" />
+    <div className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-7 transition-all duration-400 hover:shadow-xl hover:shadow-gray-200/50 hover:-translate-y-1 hover:border-brand-100/50">
+      <div className="absolute -top-12 -right-12 h-32 w-32 rounded-full bg-gradient-to-br from-brand-500 to-orange-500 opacity-[0.04] blur-3xl transition-all duration-700 group-hover:opacity-[0.1] group-hover:scale-150" />
       <div className="relative">
-        <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-orange-500 text-white shadow-sm shadow-brand-500/20">
+        <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-orange-500 text-white shadow-lg shadow-brand-500/20 transition-all duration-300 group-hover:shadow-xl group-hover:shadow-brand-500/30 group-hover:scale-105">
           {icon}
         </div>
-        <h3 className="font-bold text-gray-900 mb-1">{title}</h3>
-        <p className="text-sm text-gray-500 leading-relaxed">{description}</p>
+        <h3 className="font-bold text-gray-900 mb-2 text-[15px]">{title}</h3>
+        <p className="text-[13px] text-gray-500 leading-relaxed">{description}</p>
       </div>
-      <div className="absolute bottom-0 left-0 h-1 w-full bg-gradient-to-r from-brand-500 to-orange-500 opacity-0 transition-opacity duration-300 group-hover:opacity-50" />
+      <div className="absolute bottom-0 left-0 h-[2px] w-full bg-gradient-to-r from-brand-500 to-orange-500 opacity-0 transition-all duration-400 group-hover:opacity-60" />
     </div>
   );
 }
 
 function CheckItem({ text }) {
   return (
-    <li className="flex items-start gap-2.5 rounded-xl p-2.5 transition-colors hover:bg-brand-50/50">
-      <svg
-        className="mt-0.5 h-4 w-4 shrink-0 text-brand-500"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-        strokeWidth={2}
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-      </svg>
-      <span className="text-sm text-gray-600">{text}</span>
+    <li className="flex items-start gap-3 rounded-xl p-3 transition-all duration-200 hover:bg-brand-50/60 group">
+      <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-500/10 text-brand-500 transition-all duration-200 group-hover:bg-brand-500 group-hover:text-white group-hover:scale-110">
+        <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={3}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+        </svg>
+      </div>
+      <span className="text-sm text-gray-600 group-hover:text-gray-800 transition-colors">{text}</span>
     </li>
   );
 }
