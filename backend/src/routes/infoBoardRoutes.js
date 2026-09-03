@@ -7,7 +7,7 @@ const { verifyToken, requireRole } = require('../middlewares/authMiddleware');
 router.use(verifyToken);
 
 router.post('/', requireRole('admin'), createInfoBoard);
-router.get('/', requireRole('admin'), getInfoBoard);
+router.get('/', getInfoBoard);
 router.patch('/:id', requireRole('admin'), updateInfoBoard);
 router.delete('/:id', requireRole('admin'), deleteInfoBoard);
 
