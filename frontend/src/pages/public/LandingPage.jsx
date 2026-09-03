@@ -944,7 +944,11 @@ export default function LandingPage() {
       {/* ===== SECTION: KONTAK ===== */}
       <section
         id="kontak"
-        className="relative overflow-hidden bg-gradient-to-b from-gray-900 via-gray-900 to-gray-950 py-20 text-white"
+        className="relative overflow-hidden py-20 text-white"
+        style={{
+          background:
+            "linear-gradient(to bottom, #111827 0%, rgba(40,20,10,1) 40%, rgba(30,15,10,1) 70%, #111827 100%)",
+        }}
       >
         <div className="absolute inset-0 pointer-events-none">
           <div className="absolute top-0 right-1/4 h-[300px] w-[300px] rounded-full bg-brand-500/[0.03] blur-3xl" />
