@@ -151,6 +151,18 @@ const ensureBaseSchema = async () => {
     for (const sql of statements) {
       await conn.query(sql);
     }
+
+    // Tambah kolom profil ke tabel users jika belum ada
+    const addColumnIfNotExists = async (table, column, definition) => {
+      const [cols] = await conn.query(`SHOW COLUMNS FROM ${table} LIKE ?`, [column]);
+      if (cols.length === 0) {
+        await conn.query(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+      }
+    };
+
+    await addColumnIfNotExists('users', 'bio', 'TEXT');
+    await addColumnIfNotExists('users', 'status', "ENUM('on_duty','off_duty','resting') DEFAULT 'on_duty'");
+    await addColumnIfNotExists('users', 'photo_url', 'VARCHAR(255)');
   } finally {
     conn.release();
   }

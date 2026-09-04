@@ -17,6 +17,8 @@ import {
   Menu,
   X,
   ChevronRight,
+  UserCircle,
+  UserCheck,
 } from "lucide-react";
 
 const MENU_ITEMS = [
@@ -31,6 +33,8 @@ const MENU_ITEMS = [
   { path: "/admin/info-board", label: "Papan Informasi", icon: Info },
   { path: "/admin/papan-informasi", label: "Layar Papan Informasi", icon: Monitor },
   { path: "/admin/login-history", label: "History Login", icon: Clock },
+  { path: "/admin/profile", label: "Profil", icon: UserCircle },
+  { path: "/admin/petugas-profiles", label: "Profil Petugas", icon: UserCheck },
 ];
 
 export default function AdminLayout() {
@@ -45,7 +49,7 @@ export default function AdminLayout() {
 
   const MENU = isAdmin()
     ? MENU_ITEMS
-    : MENU_ITEMS.filter((item) => item.path !== "/admin/users");
+    : MENU_ITEMS.filter((item) => item.path !== "/admin/users" && item.path !== "/admin/petugas-profiles");
 
   const initials = user?.name
     ?.split(" ")
@@ -122,17 +126,22 @@ export default function AdminLayout() {
 
       {/* User section */}
       <div className="p-3 border-t border-white/[0.06]">
-        <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white/[0.03]">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white text-xs font-bold shadow-lg shadow-brand-500/20 ring-2 ring-white/10">
-            {initials}
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold text-white truncate">{user?.name}</p>
-            <p className="text-[10px] text-gray-500 capitalize">{user?.role}</p>
-          </div>
+        <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white/[0.03]">
+          <button
+            onClick={() => { navigate("/admin/profile"); closeMobile(); }}
+            className="flex items-center gap-3 flex-1 min-w-0 hover:bg-white/[0.05] rounded-lg px-2 py-1.5 transition-all duration-200 cursor-pointer"
+          >
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white text-xs font-bold shadow-lg shadow-brand-500/20 ring-2 ring-white/10 shrink-0">
+              {initials}
+            </div>
+            <div className="flex-1 min-w-0 text-left">
+              <p className="text-xs font-semibold text-white truncate">{user?.name}</p>
+              <p className="text-[10px] text-gray-500 capitalize">{user?.role}</p>
+            </div>
+          </button>
           <button
             onClick={handleLogout}
-            className="p-1.5 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200"
+            className="p-1.5 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 shrink-0"
             title="Keluar"
           >
             <LogOut className="w-4 h-4" />
@@ -180,15 +189,18 @@ export default function AdminLayout() {
         <div className="flex-1 min-w-0 bg-gray-50/80 lg:ml-11 lg:mt-2 lg:rounded-tl-3xl">
           {/* Desktop header */}
           <header className="hidden lg:flex items-center justify-between px-8 py-4 bg-white/80 backdrop-blur-md border-b border-gray-100">
-            <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate("/admin/profile")}
+              className="flex items-center gap-3 hover:bg-gray-50 rounded-xl px-3 py-1.5 -ml-3 transition-all duration-200 cursor-pointer"
+            >
               <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-brand-500 to-brand-600 text-white font-bold text-[10px] flex items-center justify-center shrink-0 shadow-md shadow-brand-500/20">
                 {initials}
               </div>
-              <div>
+              <div className="text-left">
                 <p className="text-sm font-semibold text-gray-900">{user?.name}</p>
                 <p className="text-[11px] text-gray-500 capitalize">{user?.role}</p>
               </div>
-            </div>
+            </button>
             <button
               onClick={handleLogout}
               className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-500 hover:bg-red-50 hover:text-red-600 transition-all duration-200"

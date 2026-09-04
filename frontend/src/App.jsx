@@ -20,6 +20,8 @@ import DisasterMap from './pages/public/DisasterMap';
 import TentangKami from './pages/public/TentangKami';
 import StatisticPage from './pages/public/StatisticPage';
 import PapanInformasi from './pages/admin/PapanInformasi';
+import ProfilePage from './pages/admin/ProfilePage';
+import PetugasProfiles from './pages/admin/PetugasProfiles';
 import AdminLayout from './layouts/AdminLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 import WhatsAppFloat from './components/WhatsAppFloat';
@@ -94,6 +96,8 @@ function AnimatedRoutes() {
           <Route path="/admin/disaster-records" element={<PageWrapper><DisasterRecordsManagement /></PageWrapper>} />
           <Route path="/admin/users" element={<PageWrapper><UsersManagement /></PageWrapper>} />
           <Route path="/admin/login-history" element={<PageWrapper><LoginHistory /></PageWrapper>} />
+          <Route path="/admin/profile" element={<PageWrapper><ProfilePage /></PageWrapper>} />
+          <Route path="/admin/petugas-profiles" element={<PageWrapper><PetugasProfiles /></PageWrapper>} />
         </Route>
       </Routes>
     </AnimatePresence>

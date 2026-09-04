@@ -579,7 +579,7 @@ export default function LandingPage() {
                     : "bg-white/15 text-white backdrop-blur-sm border border-white/20 hover:bg-white/25"
                 }`}
               >
-                Login Admin
+                Login petugas
               </button>
             </div>
 
@@ -628,7 +628,7 @@ export default function LandingPage() {
                 onClick={() => { navigate("/admin/login"); setMobileMenuOpen(false); }}
                 className="mt-2 block w-full rounded-xl bg-gradient-to-r from-brand-500 to-brand-600 py-3 text-sm font-semibold text-white shadow-lg shadow-brand-500/20"
               >
-                Login Admin
+                Login petugas
               </button>
             </div>
           )}

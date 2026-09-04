@@ -61,6 +61,9 @@ app.use('/api/disaster-records', disasterRoutes);
 const userRoutes = require('./routes/userRoutes');
 app.use('/api/users', userRoutes);
 
+const profileRoutes = require('./routes/profileRoutes');
+app.use('/api/profile', profileRoutes);
+
 const publicRoutes = require('./routes/publicRoutes');
 app.use('/api/public', publicRoutes);
 
