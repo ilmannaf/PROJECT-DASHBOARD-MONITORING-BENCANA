@@ -695,6 +695,165 @@ button:disabled {
   50% { opacity: 0; transform: translate(-50%, -50%) scale(2.5); }
 }
 
+/* ===== ADMINLTE v3 BOOTSTRAP COLOR CLASSES ===== */
+.bg-primary { background-color: #0d6efd !important; color: #fff !important; }
+.bg-secondary { background-color: #6c757d !important; color: #fff !important; }
+.bg-success { background-color: #198754 !important; color: #fff !important; }
+.bg-danger { background-color: #dc3545 !important; color: #fff !important; }
+.bg-warning { background-color: #ffc107 !important; color: #212529 !important; }
+.bg-info { background-color: #0dcaf0 !important; color: #000 !important; }
+
+.text-bg-primary { background-color: #0d6efd !important; color: #fff !important; }
+.text-bg-secondary { background-color: #6c757d !important; color: #fff !important; }
+.text-bg-success { background-color: #198754 !important; color: #fff !important; }
+.text-bg-danger { background-color: #dc3545 !important; color: #fff !important; }
+.text-bg-warning { background-color: #ffc107 !important; color: #212529 !important; }
+.text-bg-info { background-color: #0dcaf0 !important; color: #000 !important; }
+
+.text-primary { color: #0d6efd !important; }
+.text-secondary { color: #6c757d !important; }
+.text-success { color: #198754 !important; }
+.text-danger { color: #dc3545 !important; }
+.text-warning { color: #ffc107 !important; }
+.text-info { color: #0dcaf0 !important; }
+
+.bg-gradient {
+  background-image: none !important;
+}
+
+/* ===== ADMINLTE v3 STYLE ===== */
+
+/* Small Box Widget - AdminLTE style stat cards */
+.adminlte-small-box {
+  border-radius: 0.25rem;
+  box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
+  display: block;
+  position: relative;
+}
+.adminlte-small-box .inner {
+  padding: 10px;
+}
+.adminlte-small-box .inner h3 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin: 0 0 10px;
+  white-space: nowrap;
+  padding: 0;
+}
+.adminlte-small-box .inner p {
+  font-size: 1rem;
+}
+.adminlte-small-box .small-box-footer {
+  background-color: rgba(0,0,0,.1);
+  color: rgba(255,255,255,.8);
+  display: block;
+  padding: 3px 0;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  z-index: 10;
+}
+.adminlte-small-box .small-box-footer:hover {
+  background-color: rgba(0,0,0,.15);
+  color: #fff;
+}
+.adminlte-small-box .icon {
+  color: rgba(255,255,255,.3);
+  font-size: 5rem;
+  position: absolute;
+  right: 15px;
+  top: 5px;
+  transition: transform .3s linear;
+}
+.adminlte-small-box:hover .icon {
+  transform: scale(1.1);
+}
+
+/* AdminLTE Card */
+.adminlte-card {
+  background: #fff;
+  border-radius: 0.25rem;
+  box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
+  margin-bottom: 1rem;
+}
+.adminlte-card-header {
+  border-bottom: 1px solid rgba(0,0,0,.125);
+  color: #444;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .75rem 1.25rem;
+  position: relative;
+}
+.adminlte-card-header .card-title {
+  font-size: 1.1rem;
+  font-weight: 400;
+  margin: 0;
+}
+.adminlte-card-body {
+  padding: 1.25rem;
+}
+
+/* AdminLTE Navbar */
+.adminlte-navbar {
+  box-shadow: 0 2px 4px -1px rgba(0,0,0,.065);
+  min-height: 57px;
+}
+.adminlte-sidebar {
+  min-height: 100vh;
+  transition: margin-left .3s ease-in-out, width .3s ease-in-out;
+}
+
+/* AdminLTE Footer */
+.adminlte-footer {
+  background: #fff;
+  border-top: 1px solid #dee2e6;
+  color: #869099;
+  padding: 1rem;
+}
+
+/* AdminLTE Breadcrumb */
+.adminlte-breadcrumb {
+  background: none;
+  margin-bottom: 0;
+  padding: 0;
+  font-size: 0.875rem;
+}
+
+/* AdminLTE table */
+.adminlte-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.adminlte-table th {
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6c757d;
+  border-bottom: 1px solid #dee2e6;
+  padding: .75rem;
+}
+.adminlte-table td {
+  padding: .75rem;
+  border-top: 1px solid #dee2e6;
+  font-size: 0.875rem;
+}
+
+/* AdminLTE badge */
+.adminlte-badge {
+  display: inline-block;
+  padding: .35em .65em;
+  font-size: .75em;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: .25rem;
+}
+
 /* Smooth number counter */
 .tabular-nums {
   font-variant-numeric: tabular-nums;

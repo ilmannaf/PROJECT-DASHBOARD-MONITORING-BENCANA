@@ -1,4 +1,4 @@
-import { Outlet, NavLink, useNavigate } from "react-router-dom";
+import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { logout, getCurrentUser, isAdmin } from "../services/authService";
 import {
@@ -16,9 +16,14 @@ import {
   LogOut,
   Menu,
   X,
+  ChevronDown,
   ChevronRight,
+  Search,
+  Bell,
+  MessageSquare,
   UserCircle,
   UserCheck,
+  Home,
 } from "lucide-react";
 
 const MENU_ITEMS = [
@@ -37,10 +42,30 @@ const MENU_ITEMS = [
   { path: "/admin/petugas-profiles", label: "Profil Petugas", icon: UserCheck },
 ];
 
+// Breadcrumb mapping
+const BREADCRUMB_MAP = {
+  "/admin/dashboard": "Dashboard",
+  "/admin/reports": "Laporan Bencana",
+  "/admin/disaster-records": "Pendataan Bencana",
+  "/admin/users": "Manajemen Akun",
+  "/admin/inventory": "Inventaris",
+  "/admin/vehicles": "Kendaraan",
+  "/admin/posko": "Posko",
+  "/admin/activities": "Kegiatan",
+  "/admin/info-board": "Papan Informasi",
+  "/admin/papan-informasi": "Layar Papan Informasi",
+  "/admin/login-history": "History Login",
+  "/admin/profile": "Profil",
+  "/admin/petugas-profiles": "Profil Petugas",
+};
+
 export default function AdminLayout() {
   const navigate = useNavigate();
+  const location = useLocation();
   const user = getCurrentUser();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -60,32 +85,44 @@ export default function AdminLayout() {
 
   const closeMobile = () => setMobileOpen(false);
 
+  const currentBreadcrumb = BREADCRUMB_MAP[location.pathname] || "Dashboard";
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClick = () => setUserDropdownOpen(false);
+    if (userDropdownOpen) {
+      document.addEventListener("click", handleClick);
+      return () => document.removeEventListener("click", handleClick);
+    }
+  }, [userDropdownOpen]);
+
   const sidebarContent = (
     <>
-      {/* Logo */}
-      <div className="p-4 border-b border-white/[0.06]">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl overflow-hidden shrink-0 ring-2 ring-white/10 shadow-lg shadow-black/20">
-            <img
-              src="/assets/logo-bpbd.jpg"
-              alt="Logo BPBD"
-              className="w-full h-full object-cover"
-            />
-          </div>
-          <div className="leading-tight min-w-0">
-            <p className="font-bold text-white text-sm tracking-tight">
-              BPBD Kota Semarang
-            </p>
-            <p className="text-[10px] text-gray-500 font-medium mt-0.5">
-              Dashboard Monitoring
-            </p>
-          </div>
+      {/* Sidebar Brand */}
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-white/10">
+        <div className="w-10 h-10 rounded-lg overflow-hidden shrink-0 ring-2 ring-white/10 shadow-lg shadow-black/20">
+          <img
+            src="/assets/logo-bpbd.jpg"
+            alt="Logo BPBD"
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <div className={`leading-tight min-w-0 ${sidebarCollapsed ? "hidden" : ""}`}>
+          <p className="font-bold text-white text-sm tracking-tight">
+            BPBD Kota Semarang
+          </p>
+          <p className="text-[10px] text-gray-400 font-medium mt-0.5">
+            Monitoring Bencana
+          </p>
         </div>
       </div>
 
       {/* Menu */}
-      <nav className="flex-1 p-3 py-4 space-y-1 overflow-y-auto">
-        {MENU.map((item, idx) => {
+      <nav className="flex-1 py-3 space-y-0.5 overflow-y-auto px-2">
+        <p className={`text-[10px] font-bold uppercase tracking-wider text-gray-500 px-3 mb-2 ${sidebarCollapsed ? "hidden" : ""}`}>
+          MENU
+        </p>
+        {MENU.map((item) => {
           const Icon = item.icon;
           return (
             <NavLink
@@ -93,150 +130,206 @@ export default function AdminLayout() {
               to={item.path}
               onClick={closeMobile}
               className={({ isActive }) =>
-                `group relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] font-medium transition-all duration-200 ${
+                `flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-150 ${
                   isActive
-                    ? "bg-gradient-to-r from-brand-600/20 to-brand-500/10 text-white shadow-sm shadow-brand-500/10"
-                    : "text-gray-400 hover:bg-white/[0.05] hover:text-gray-200"
+                    ? "bg-white/10 text-white"
+                    : "text-gray-400 hover:bg-white/5 hover:text-gray-200"
                 }`
               }
-              style={{ animationDelay: `${idx * 0.04}s` }}
             >
-              {({ isActive }) => (
-                <>
-                  {isActive && (
-                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-gradient-to-b from-brand-400 to-brand-600 shadow-sm shadow-brand-500/30" />
-                  )}
-                  <div className={`flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-200 ${
-                    isActive
-                      ? "bg-brand-500/20 text-brand-400"
-                      : "text-gray-500 group-hover:text-gray-400 group-hover:bg-white/[0.05]"
-                  }`}>
-                    <Icon className="w-[18px] h-[18px]" />
-                  </div>
-                  <span className="flex-1">{item.label}</span>
-                  {isActive && (
-                    <ChevronRight className="w-3.5 h-3.5 text-brand-400/50" />
-                  )}
-                </>
-              )}
+              <Icon className="w-[18px] h-[18px] shrink-0" />
+              <span className={`flex-1 ${sidebarCollapsed ? "hidden" : ""}`}>{item.label}</span>
             </NavLink>
           );
         })}
       </nav>
 
       {/* User section */}
-      <div className="p-3 border-t border-white/[0.06]">
-        <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white/[0.03]">
-          <button
-            onClick={() => { navigate("/admin/profile"); closeMobile(); }}
-            className="flex items-center gap-3 flex-1 min-w-0 hover:bg-white/[0.05] rounded-lg px-2 py-1.5 transition-all duration-200 cursor-pointer"
-          >
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white text-xs font-bold shadow-lg shadow-brand-500/20 ring-2 ring-white/10 shrink-0">
+      {!sidebarCollapsed && (
+        <div className="p-3 border-t border-white/10">
+          <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5">
+            <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
               {initials}
             </div>
-            <div className="flex-1 min-w-0 text-left">
+            <div className="flex-1 min-w-0">
               <p className="text-xs font-semibold text-white truncate">{user?.name}</p>
-              <p className="text-[10px] text-gray-500 capitalize">{user?.role}</p>
+              <p className="text-[10px] text-gray-400 capitalize">{user?.role}</p>
             </div>
-          </button>
-          <button
-            onClick={handleLogout}
-            className="p-1.5 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 shrink-0"
-            title="Keluar"
-          >
-            <LogOut className="w-4 h-4" />
-          </button>
+            <button
+              onClick={handleLogout}
+              className="p-1.5 rounded text-gray-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-150"
+              title="Keluar"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 
   return (
-    <div className="min-h-screen bg-gray-50/80 flex">
-        {/* Desktop sidebar */}
-        <aside className="hidden lg:flex flex-col h-screen w-64 bg-gradient-to-b from-gray-900 via-gray-900 to-gray-950 text-white sticky top-0 shrink-0 border-r border-white/[0.04] lg:ml-11 lg:mt-2 lg:rounded-3xl overflow-hidden justify-between shadow-xl shadow-black/10">
-          {sidebarContent}
-        </aside>
+    <div className="min-h-screen bg-[#f4f6f9] flex">
+      {/* Desktop Sidebar */}
+      <aside
+        className={`hidden lg:flex flex-col h-screen fixed top-0 left-0 z-30 bg-[#343a40] text-white transition-all duration-300 ${
+          sidebarCollapsed ? "w-[60px]" : "w-64"
+        }`}
+      >
+        {sidebarContent}
+      </aside>
 
-        {/* Mobile overlay */}
+      {/* Mobile Overlay */}
+      <div
+        className={`fixed inset-0 z-40 lg:hidden transition-all duration-300 ${
+          mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        }`}
+      >
         <div
-          className={`fixed inset-0 z-40 lg:hidden transition-all duration-300 ${
-            mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-          }`}
-        >
-          <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={closeMobile}
-          />
+          className="absolute inset-0 bg-black/50"
+          onClick={closeMobile}
+        />
         <aside
-          className={`absolute left-0 top-0 bottom-0 w-72 bg-gradient-to-b from-gray-900 via-gray-900 to-gray-950 text-white flex flex-col z-50 shadow-2xl shadow-black/30 ${
+          className={`absolute left-0 top-0 bottom-0 w-72 bg-[#343a40] text-white flex flex-col z-50 shadow-2xl ${
             mobileOpen ? "sidebar-drawer-enter" : "sidebar-drawer-exit"
           }`}
         >
-          <div className="flex items-center justify-end p-3 lg:hidden">
+          <div className="flex items-center justify-end p-2 lg:hidden">
             <button
               onClick={closeMobile}
-              className="p-2 text-gray-400 hover:text-white rounded-xl hover:bg-white/10 transition-all duration-200"
+              className="p-2 text-gray-400 hover:text-white rounded hover:bg-white/10 transition-all"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
           {sidebarContent}
         </aside>
-        </div>
+      </div>
 
-        {/* Main content */}
-        <div className="flex-1 min-w-0 bg-gray-50/80 lg:ml-11 lg:mt-2 lg:rounded-tl-3xl">
-          {/* Desktop header */}
-          <header className="hidden lg:flex items-center justify-between px-8 py-4 bg-white/80 backdrop-blur-md border-b border-gray-100">
-            <button
-              onClick={() => navigate("/admin/profile")}
-              className="flex items-center gap-3 hover:bg-gray-50 rounded-xl px-3 py-1.5 -ml-3 transition-all duration-200 cursor-pointer"
-            >
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-brand-500 to-brand-600 text-white font-bold text-[10px] flex items-center justify-center shrink-0 shadow-md shadow-brand-500/20">
-                {initials}
-              </div>
-              <div className="text-left">
-                <p className="text-sm font-semibold text-gray-900">{user?.name}</p>
-                <p className="text-[11px] text-gray-500 capitalize">{user?.role}</p>
-              </div>
-            </button>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium text-gray-500 hover:bg-red-50 hover:text-red-600 transition-all duration-200"
-              title="Keluar"
-            >
-              <LogOut className="w-4 h-4" />
-              <span className="hidden xl:inline">Keluar</span>
-            </button>
-          </header>
-
-          {/* Mobile header */}
-          <header className="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-gray-100 lg:hidden">
-            <div className="px-4 flex items-center gap-3 h-14">
+      {/* Main Content */}
+      <div className={`flex-1 min-w-0 transition-all duration-300 ${sidebarCollapsed ? "lg:ml-[60px]" : "lg:ml-64"}`}>
+        {/* Top Navbar */}
+        <nav className="sticky top-0 z-20 bg-white border-b border-gray-200 adminlte-navbar">
+          <div className="flex items-center justify-between px-4 py-0 h-[57px]">
+            {/* Left: Toggle + Search */}
+            <div className="flex items-center gap-2">
               <button
-                onClick={() => setMobileOpen(true)}
-                className="p-2 -ml-1 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-xl transition-all duration-200"
+                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                className="hidden lg:flex p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-all"
+                title="Toggle sidebar"
               >
                 <Menu className="w-5 h-5" />
               </button>
-              <div className="flex items-center gap-2.5">
-                <img
-                  src="/assets/logo-bpbd.jpg"
-                  alt="Logo BPBD"
-                  className="h-8 w-8 rounded-lg object-cover shadow-sm"
-                />
-                <p className="font-bold text-gray-900 text-sm">
-                  BPBD Kota Semarang
-                </p>
+              <button
+                onClick={() => setMobileOpen(true)}
+                className="lg:hidden p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-all"
+              >
+                <Menu className="w-5 h-5" />
+              </button>
+
+              {/* Search */}
+              <div className="hidden md:flex items-center ml-2">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    className="w-64 pl-10 pr-4 py-2 bg-gray-100 border border-transparent rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:bg-white transition-all"
+                  />
+                </div>
               </div>
             </div>
-          </header>
 
-          <main className="max-w-[1400px] mx-auto p-4 sm:p-6 lg:p-8">
-            <Outlet />
-          </main>
+            {/* Right: Notifications + User */}
+            <div className="flex items-center gap-1">
+              {/* Messages */}
+              <button className="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-all hidden sm:flex">
+                <MessageSquare className="w-5 h-5" />
+                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  3
+                </span>
+              </button>
+
+              {/* Notifications */}
+              <button className="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-all hidden sm:flex">
+                <Bell className="w-5 h-5" />
+                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-yellow-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  15
+                </span>
+              </button>
+
+              {/* User Dropdown */}
+              <div className="relative ml-2">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setUserDropdownOpen(!userDropdownOpen);
+                  }}
+                  className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-gray-100 transition-all"
+                >
+                  <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold">
+                    {initials}
+                  </div>
+                  <span className="hidden sm:inline text-sm font-medium text-gray-700">{user?.name}</span>
+                  <ChevronDown className="w-4 h-4 text-gray-400 hidden sm:block" />
+                </button>
+
+                {/* Dropdown Menu */}
+                {userDropdownOpen && (
+                  <div className="absolute right-0 top-full mt-1 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                    <div className="px-4 py-3 border-b border-gray-100">
+                      <p className="text-sm font-semibold text-gray-900">{user?.name}</p>
+                      <p className="text-xs text-gray-500 capitalize">{user?.role}</p>
+                    </div>
+                    <button
+                      onClick={() => { navigate("/admin/profile"); setUserDropdownOpen(false); }}
+                      className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 transition-all"
+                    >
+                      <UserCircle className="w-4 h-4" />
+                      Profil Saya
+                    </button>
+                    <div className="border-t border-gray-100 my-1"></div>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 transition-all"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Keluar
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </nav>
+
+        {/* Content Header (Breadcrumb) */}
+        <div className="bg-white border-b border-gray-200 px-4 py-3">
+          <div className="flex items-center justify-between">
+            <h1 className="text-xl font-semibold text-gray-800">{currentBreadcrumb}</h1>
+            <nav className="flex items-center text-sm text-gray-500">
+              <Home className="w-3.5 h-3.5 mr-1" />
+              <span className="mx-1">/</span>
+              <NavLink to="/admin/dashboard" className="text-blue-600 hover:underline">Home</NavLink>
+              <span className="mx-1">/</span>
+              <span className="text-gray-600">{currentBreadcrumb}</span>
+            </nav>
+          </div>
         </div>
+
+        {/* Main Content Area */}
+        <main className="p-4">
+          <Outlet />
+        </main>
+
+        {/* Footer */}
+        <footer className="adminlte-footer text-center text-sm">
+          <strong>Copyright &copy; 2024&nbsp;
+            <a href="#" className="text-blue-600 hover:underline">BPBD Kota Semarang</a>.
+          </strong>
+          All rights reserved.
+        </footer>
+      </div>
     </div>
   );
 }
