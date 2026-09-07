@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { ThemeProvider } from './context/ThemeContext';
 import ToastContainer from './components/Toast';
 import Login from './pages/admin/Login';
 import Dashboard from './pages/admin/Dashboard';
@@ -106,12 +107,14 @@ function AnimatedRoutes() {
 
 function App() {
   return (
-    <BrowserRouter>
-      <ScrollToTop />
-      <ToastContainer />
-      <WhatsAppFloat />
-      <AnimatedRoutes />
-    </BrowserRouter>
+    <ThemeProvider>
+      <BrowserRouter>
+        <ScrollToTop />
+        <ToastContainer />
+        <WhatsAppFloat />
+        <AnimatedRoutes />
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

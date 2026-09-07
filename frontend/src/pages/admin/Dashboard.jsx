@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import { getReportStats } from '../../services/reportService';
 import { getSocket } from '../../services/socket';
@@ -49,6 +50,7 @@ const STATUS_TEXT_BG = {
 };
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const [total, setTotal] = useState(0);
   const [byStatus, setByStatus] = useState({});
   const [byType, setByType] = useState([]);
@@ -104,32 +106,32 @@ export default function Dashboard() {
       value: total,
       icon: FileText,
       bgClass: 'bg-primary',
-      footerLink: '#',
-      footerText: 'More info',
+      onClick: () => navigate('/admin/reports'),
+      footerText: 'Lihat semua',
     },
     {
       label: 'Laporan Baru',
       value: countByStatus('baru'),
       icon: AlertTriangle,
       bgClass: 'bg-danger',
-      footerLink: '#',
-      footerText: 'More info',
+      onClick: () => navigate('/admin/reports'),
+      footerText: 'Verifikasi sekarang',
     },
     {
       label: 'Ditindaklanjuti',
       value: countByStatus('ditindaklanjuti'),
       icon: Clock,
       bgClass: 'bg-warning',
-      footerLink: '#',
-      footerText: 'More info',
+      onClick: () => navigate('/admin/reports'),
+      footerText: 'Lihat detail',
     },
     {
       label: 'Selesai',
       value: countByStatus('selesai'),
       icon: CheckCircle,
       bgClass: 'bg-success',
-      footerLink: '#',
-      footerText: 'More info',
+      onClick: () => navigate('/admin/reports'),
+      footerText: 'Lihat riwayat',
     },
   ];
 
@@ -193,12 +195,12 @@ export default function Dashboard() {
               <div className="icon text-white/30">
                 <Icon className="w-20 h-20" strokeWidth={1} />
               </div>
-              <a
-                href={card.footerLink}
-                className="small-box-footer text-white/80 hover:text-white hover:bg-black/10 transition-all"
+              <button
+                onClick={card.onClick}
+                className="small-box-footer text-white/80 hover:text-white hover:bg-black/10 transition-all w-full text-left"
               >
                 {card.footerText} <i className="ml-1">→</i>
-              </a>
+              </button>
             </div>
           );
         })}

@@ -1,6 +1,11 @@
 import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { logout, getCurrentUser, isAdmin } from "../services/authService";
+import { getSocket } from "../services/socket";
+import { useTheme } from "../context/ThemeContext";
+import useKeyboardShortcuts from "../hooks/useKeyboardShortcuts";
+import CommandPalette from "../components/CommandPalette";
+import KeyboardShortcutsHelp from "../components/KeyboardShortcutsHelp";
 import {
   LayoutDashboard,
   FileText,
@@ -20,10 +25,12 @@ import {
   ChevronRight,
   Search,
   Bell,
-  MessageSquare,
   UserCircle,
   UserCheck,
   Home,
+  Keyboard,
+  Sun,
+  Moon,
 } from "lucide-react";
 
 const MENU_ITEMS = [
@@ -63,9 +70,16 @@ export default function AdminLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const user = getCurrentUser();
+  const { isDark, toggleTheme } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  const [shortcutsHelpOpen, setShortcutsHelpOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const searchInputRef = useRef(null);
+  const notifDropdownRef = useRef(null);
 
   const handleLogout = () => {
     logout();
@@ -95,6 +109,104 @@ export default function AdminLayout() {
       return () => document.removeEventListener("click", handleClick);
     }
   }, [userDropdownOpen]);
+
+  // Keyboard shortcuts
+  const toggleSidebar = useCallback(() => setSidebarCollapsed((p) => !p), []);
+  const expandSidebar = useCallback(() => setSidebarCollapsed(false), []);
+  const collapseSidebar = useCallback(() => setSidebarCollapsed(true), []);
+  const focusSearch = useCallback(() => searchInputRef.current?.focus(), []);
+
+  // Navigation shortcuts (1-0) — map ke MENU_ITEMS paths
+  const navigationShortcuts = MENU_ITEMS.slice(0, 10).map((item, index) => ({
+    key: String(index === 9 ? 0 : index + 1),
+    action: () => navigate(item.path),
+  }));
+
+  useKeyboardShortcuts([
+    // Command Palette
+    { key: 'k', ctrl: true, action: () => setCommandPaletteOpen((p) => !p), allowWhenTyping: true },
+    // Shortcuts Help
+    { key: '?', action: () => setShortcutsHelpOpen((p) => !p), allowWhenTyping: true },
+    // Navigation 1-0
+    ...navigationShortcuts,
+    // Sidebar toggle
+    { key: '[', action: collapseSidebar },
+    { key: ']', action: expandSidebar },
+    // Search focus
+    { key: '/', action: focusSearch },
+    // Dark mode toggle
+    { key: 'd', action: toggleTheme },
+    // Escape — tutup semua modal
+    { key: 'Escape', action: () => {
+      setCommandPaletteOpen(false);
+      setShortcutsHelpOpen(false);
+      setNotifOpen(false);
+    }, allowWhenTyping: true },
+  ]);
+
+  // Socket — real-time notifications
+  useEffect(() => {
+    const socket = getSocket();
+
+    const onNewReport = (data) => {
+      setNotifications((prev) => [
+        {
+          id: Date.now(),
+          type: 'new_report',
+          title: 'Laporan Baru',
+          message: `${data.disaster_type} di ${data.address || '-'}`,
+          time: new Date(),
+          read: false,
+        },
+        ...prev.slice(0, 19), // max 20 notif
+      ]);
+    };
+
+    const onStatusUpdate = (data) => {
+      setNotifications((prev) => [
+        {
+          id: Date.now(),
+          type: 'status_update',
+          title: 'Status Diperbarui',
+          message: `${data.tracking_code} → ${data.status}`,
+          time: new Date(),
+          read: false,
+        },
+        ...prev.slice(0, 19),
+      ]);
+    };
+
+    socket.on('new_report', onNewReport);
+    socket.on('report_status_updated', onStatusUpdate);
+    return () => {
+      socket.off('new_report', onNewReport);
+      socket.off('report_status_updated', onStatusUpdate);
+    };
+  }, []);
+
+  // Close notification dropdown on outside click
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (notifDropdownRef.current && !notifDropdownRef.current.contains(e.target)) {
+        setNotifOpen(false);
+      }
+    };
+    if (notifOpen) {
+      document.addEventListener('mousedown', handleClick);
+      return () => document.removeEventListener('mousedown', handleClick);
+    }
+  }, [notifOpen]);
+
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
+  const markAllRead = () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
+  };
+
+  const clearNotifications = () => {
+    setNotifications([]);
+    setNotifOpen(false);
+  };
 
   const sidebarContent = (
     <>
@@ -215,8 +327,8 @@ export default function AdminLayout() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                className="hidden lg:flex p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-all"
-                title="Toggle sidebar"
+                className="hidden lg:flex p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:hover:text-gray-200 dark:hover:bg-white/10 rounded transition-all"
+                title="Toggle sidebar ( [ / ] )"
               >
                 <Menu className="w-5 h-5" />
               </button>
@@ -227,36 +339,132 @@ export default function AdminLayout() {
                 <Menu className="w-5 h-5" />
               </button>
 
-              {/* Search */}
+              {/* Search — klik untuk buka Command Palette */}
               <div className="hidden md:flex items-center ml-2">
-                <div className="relative">
+                <button
+                  ref={searchInputRef}
+                  onClick={() => setCommandPaletteOpen(true)}
+                  className="relative flex items-center w-64 pl-10 pr-4 py-2 bg-gray-100 dark:bg-white/10 border border-transparent rounded-lg text-sm text-gray-400 hover:bg-gray-200 dark:hover:bg-white/15 hover:border-gray-300 dark:hover:border-white/20 focus:outline-none focus:border-blue-500 focus:bg-white dark:focus:bg-white/10 transition-all cursor-text"
+                >
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search..."
-                    className="w-64 pl-10 pr-4 py-2 bg-gray-100 border border-transparent rounded-lg text-sm focus:outline-none focus:border-blue-500 focus:bg-white transition-all"
-                  />
-                </div>
+                  <span>Cari halaman... ( Ctrl+K )</span>
+                </button>
               </div>
             </div>
 
             {/* Right: Notifications + User */}
             <div className="flex items-center gap-1">
-              {/* Messages */}
-              <button className="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-all hidden sm:flex">
-                <MessageSquare className="w-5 h-5" />
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                  3
-                </span>
+              {/* Keyboard Shortcuts */}
+              <button
+                onClick={() => setShortcutsHelpOpen(true)}
+                className="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:hover:text-gray-200 dark:hover:bg-white/10 rounded transition-all hidden sm:flex"
+                title="Keyboard Shortcuts ( ? )"
+              >
+                <Keyboard className="w-5 h-5" />
               </button>
 
-              {/* Notifications */}
-              <button className="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-all hidden sm:flex">
-                <Bell className="w-5 h-5" />
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-yellow-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                  15
-                </span>
+              {/* Command Palette */}
+              <button
+                onClick={() => setCommandPaletteOpen(true)}
+                className="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:hover:text-gray-200 dark:hover:bg-white/10 rounded transition-all hidden sm:flex"
+                title="Command Palette ( Ctrl+K )"
+              >
+                <Search className="w-5 h-5" />
               </button>
+
+              {/* Dark Mode Toggle */}
+              <button
+                onClick={toggleTheme}
+                className="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:hover:text-yellow-400 dark:hover:bg-white/10 rounded transition-all hidden sm:flex"
+                title={isDark ? "Mode Terang" : "Mode Gelap"}
+              >
+                {isDark ? <Sun className="w-5 h-5 text-yellow-500" /> : <Moon className="w-5 h-5" />}
+              </button>
+
+              {/* Notifications — functional dropdown */}
+              <div className="relative" ref={notifDropdownRef}>
+                <button
+                  onClick={() => setNotifOpen((p) => !p)}
+                  className="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded transition-all hidden sm:flex"
+                  title="Notifikasi"
+                >
+                  <Bell className="w-5 h-5" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse">
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
+                </button>
+
+                {/* Notification Dropdown */}
+                {notifOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-200 z-50 overflow-hidden">
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
+                      <h3 className="text-sm font-bold text-gray-900">Notifikasi</h3>
+                      <div className="flex items-center gap-2">
+                        {notifications.length > 0 && (
+                          <button
+                            onClick={markAllRead}
+                            className="text-[11px] text-blue-600 hover:text-blue-700 font-medium"
+                          >
+                            Semua dibaca
+                          </button>
+                        )}
+                        {notifications.length > 0 && (
+                          <button
+                            onClick={clearNotifications}
+                            className="text-[11px] text-gray-400 hover:text-red-500 font-medium"
+                          >
+                            Hapus
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    <div className="max-h-72 overflow-y-auto">
+                      {notifications.length === 0 ? (
+                        <div className="py-8 text-center">
+                          <Bell className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                          <p className="text-sm text-gray-400">Belum ada notifikasi</p>
+                          <p className="text-[11px] text-gray-300 mt-1">Notifikasi laporan baru akan muncul di sini</p>
+                        </div>
+                      ) : (
+                        notifications.map((notif) => (
+                          <div
+                            key={notif.id}
+                            className={`px-4 py-3 border-b border-gray-50 hover:bg-gray-50 transition-colors ${
+                              !notif.read ? 'bg-blue-50/50' : ''
+                            }`}
+                          >
+                            <div className="flex items-start gap-3">
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
+                                notif.type === 'new_report'
+                                  ? 'bg-red-100 text-red-600'
+                                  : 'bg-blue-100 text-blue-600'
+                              }`}>
+                                {notif.type === 'new_report' ? (
+                                  <FileText className="w-4 h-4" />
+                                ) : (
+                                  <Clock className="w-4 h-4" />
+                                )}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs font-bold text-gray-900">{notif.title}</p>
+                                <p className="text-xs text-gray-500 truncate">{notif.message}</p>
+                                <p className="text-[10px] text-gray-400 mt-1">
+                                  {notif.time.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                                </p>
+                              </div>
+                              {!notif.read && (
+                                <div className="w-2 h-2 rounded-full bg-blue-500 shrink-0 mt-1" />
+                              )}
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
 
               {/* User Dropdown */}
               <div className="relative ml-2">
@@ -330,6 +538,18 @@ export default function AdminLayout() {
           All rights reserved.
         </footer>
       </div>
+
+      {/* Keyboard Shortcuts Components */}
+      <CommandPalette
+        open={commandPaletteOpen}
+        onClose={() => setCommandPaletteOpen(false)}
+        onShowShortcuts={() => setShortcutsHelpOpen(true)}
+        onToggleDarkMode={toggleTheme}
+      />
+      <KeyboardShortcutsHelp
+        open={shortcutsHelpOpen}
+        onClose={() => setShortcutsHelpOpen(false)}
+      />
     </div>
   );
 }

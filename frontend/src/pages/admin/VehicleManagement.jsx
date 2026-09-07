@@ -24,6 +24,7 @@ export default function VehicleManagement() {
   const [showContent, setShowContent] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState({
     plate_number: "",
     type: "",
@@ -48,15 +49,36 @@ export default function VehicleManagement() {
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
+  const handleEdit = (vehicle) => {
+    setEditingId(vehicle.id);
+    setForm({
+      plate_number: vehicle.plate_number || "",
+      type: vehicle.type || "",
+      status: vehicle.status || "siap",
+      posko_id: vehicle.posko_id || "",
+    });
+    setShowForm(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const resetForm = () => {
+    setForm({ plate_number: "", type: "", status: "siap", posko_id: "" });
+    setEditingId(null);
+    setShowForm(false);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await createVehicle(form);
-      setForm({ plate_number: "", type: "", status: "siap", posko_id: "" });
-      setShowForm(false);
+      if (editingId) {
+        await updateVehicle(editingId, form);
+      } else {
+        await createVehicle(form);
+      }
+      resetForm();
       loadVehicles();
     } catch (err) {
-      alert(err.response?.data?.message || "Gagal menambah kendaraan");
+      alert(err.response?.data?.message || (editingId ? "Gagal update kendaraan" : "Gagal menambah kendaraan"));
     }
   };
 
@@ -109,12 +131,8 @@ export default function VehicleManagement() {
         {adminUser && (
           <button
             onClick={() => {
-              if (showForm) {
-                setShowForm(false);
-                setForm({ plate_number: "", type: "", status: "siap", posko_id: "" });
-              } else {
-                setShowForm(true);
-              }
+              if (showForm) resetForm();
+              else setShowForm(true);
             }}
             className="btn btn-primary flex items-center gap-2 px-5 py-3 shadow-lg shadow-purple-500/25"
           >
@@ -140,7 +158,7 @@ export default function VehicleManagement() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
             </div>
-            <h2 className="text-xl font-bold text-gray-900">Formulir Kendaraan</h2>
+            <h2 className="text-xl font-bold text-gray-900">{editingId ? 'Edit Kendaraan' : 'Formulir Kendaraan'}</h2>
           </div>
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -196,14 +214,11 @@ export default function VehicleManagement() {
                 type="submit"
                 className="flex-1 btn btn-primary py-3.5"
               >
-                Simpan
+                {editingId ? 'Simpan Perubahan' : 'Simpan'}
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  setShowForm(false);
-                  setForm({ plate_number: "", type: "", status: "siap", posko_id: "" });
-                }}
+                onClick={resetForm}
                 className="px-8 btn btn-secondary py-3.5"
               >
                 Batal
@@ -299,6 +314,15 @@ export default function VehicleManagement() {
                                 <option key={s} value={s}>{s}</option>
                               ))}
                             </select>
+                            <button
+                              onClick={() => handleEdit(v)}
+                              className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                              title="Edit"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                              </svg>
+                            </button>
                             <button
                               onClick={() => handleDelete(v.id)}
                               className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"

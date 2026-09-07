@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { getPosko, createPosko } from "../../services/poskoService";
+import { getPosko, createPosko, updatePosko, deletePosko } from "../../services/poskoService";
 import { isAdmin } from "../../services/authService";
-import { Building2, Plus, X } from "lucide-react";
+import { Building2, Plus, X, Pencil, Trash2 } from "lucide-react";
 import AnimatedNumber from '../../components/AnimatedNumber';
 import { SkeletonTable } from '../../components/Skeleton';
 
@@ -13,6 +13,7 @@ export default function PoskoManagement() {
   const [poskoList, setPoskoList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [form, setForm] = useState({ name: "", address: "" });
   const [showContent, setShowContent] = useState(false);
 
@@ -30,19 +31,41 @@ export default function PoskoManagement() {
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
+  const handleEdit = (posko) => {
+    setEditingId(posko.id);
+    setForm({ name: posko.name || "", address: posko.address || "" });
+    setShowForm(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm("Yakin hapus posko ini?")) return;
+    try {
+      await deletePosko(id);
+      loadPosko();
+    } catch (err) {
+      alert(err.response?.data?.message || "Gagal menghapus posko");
+    }
+  };
+
   const resetForm = () => {
     setForm({ name: "", address: "" });
+    setEditingId(null);
     setShowForm(false);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await createPosko(form);
+      if (editingId) {
+        await updatePosko(editingId, form);
+      } else {
+        await createPosko(form);
+      }
       resetForm();
       loadPosko();
     } catch (err) {
-      alert(err.response?.data?.message || "Gagal menambah posko");
+      alert(err.response?.data?.message || (editingId ? "Gagal update posko" : "Gagal menambah posko"));
     }
   };
 
@@ -80,7 +103,7 @@ export default function PoskoManagement() {
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white flex items-center justify-center">
               <Plus className="w-5 h-5" />
             </div>
-            <h2 className="text-xl font-bold text-gray-900">Formulir Posko</h2>
+            <h2 className="text-xl font-bold text-gray-900">{editingId ? 'Edit Posko' : 'Formulir Posko'}</h2>
           </div>
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
@@ -108,7 +131,7 @@ export default function PoskoManagement() {
             </div>
             <div className="md:col-span-2 flex gap-3">
               <button type="submit" className="flex-1 btn btn-primary py-3.5">
-                Simpan Posko
+                {editingId ? 'Simpan Perubahan' : 'Simpan Posko'}
               </button>
               <button type="button" onClick={resetForm} className="btn btn-secondary py-3.5 px-8">
                 Batal
@@ -143,6 +166,9 @@ export default function PoskoManagement() {
                 <tr className="bg-gray-50/80">
                   <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-500">Nama Posko</th>
                   <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-500">Alamat</th>
+                  {adminUser && (
+                    <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-500 text-center">Aksi</th>
+                  )}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -160,11 +186,31 @@ export default function PoskoManagement() {
                       <td className="py-4 px-6">
                         <span className="text-sm text-gray-600">{p.address || "-"}</span>
                       </td>
+                      {adminUser && (
+                        <td className="py-4 px-6 text-center">
+                          <div className="flex justify-center gap-1">
+                            <button
+                              onClick={() => handleEdit(p)}
+                              className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition"
+                              title="Edit"
+                            >
+                              <Pencil className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(p.id)}
+                              className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition"
+                              title="Hapus"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      )}
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="2" className="py-20 text-center">
+                    <td colSpan={adminUser ? 3 : 2} className="py-20 text-center">
                       <div className="flex flex-col items-center gap-4">
                         <div className="w-20 h-20 rounded-full bg-gray-50 flex items-center justify-center">
                           <Building2 className="w-10 h-10 text-gray-300" />
