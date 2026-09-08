@@ -84,6 +84,9 @@ app.use('/api/profile', profileRoutes);
 const publicRoutes = require('./routes/publicRoutes');
 app.use('/api/public', publicRoutes);
 
+const bidang3Routes = require('./routes/bidang3Routes');
+app.use('/api/bidang3', bidang3Routes);
+
 // 404 handler untuk route yang tidak ada
 app.use((req, res) => {
   res.status(404).json({ message: 'Endpoint tidak ditemukan' });

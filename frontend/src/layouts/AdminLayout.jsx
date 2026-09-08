@@ -31,12 +31,16 @@ import {
   Keyboard,
   Sun,
   Moon,
+  Droplets,
+  HandHelping,
+  Building,
 } from "lucide-react";
 
 const MENU_ITEMS = [
   { path: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { path: "/admin/reports", label: "Laporan Bencana", icon: FileText },
   { path: "/admin/disaster-records", label: "Pendataan Bencana", icon: ClipboardList },
+  { path: "/admin/bidang3", label: "Bidang 3", icon: Building },
   { path: "/admin/users", label: "Manajemen Akun", icon: Users },
   { path: "/admin/inventory", label: "Inventaris", icon: Package },
   { path: "/admin/vehicles", label: "Kendaraan", icon: Car },
@@ -54,6 +58,10 @@ const BREADCRUMB_MAP = {
   "/admin/dashboard": "Dashboard",
   "/admin/reports": "Laporan Bencana",
   "/admin/disaster-records": "Pendataan Bencana",
+  "/admin/bidang3": "Bidang 3 - Distribusi Bantuan",
+  "/admin/bidang3/air-bersih": "Usulan Air Bersih",
+  "/admin/bidang3/bansos": "Usulan Bansos",
+  "/admin/bidang3/infrastruktur": "Usulan Infrastruktur",
   "/admin/users": "Manajemen Akun",
   "/admin/inventory": "Inventaris",
   "/admin/vehicles": "Kendaraan",
