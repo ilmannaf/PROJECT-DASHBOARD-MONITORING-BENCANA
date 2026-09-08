@@ -23,6 +23,10 @@ import StatisticPage from './pages/public/StatisticPage';
 import PapanInformasi from './pages/admin/PapanInformasi';
 import ProfilePage from './pages/admin/ProfilePage';
 import PetugasProfiles from './pages/admin/PetugasProfiles';
+import Bidang3Dashboard from './pages/admin/Bidang3Dashboard';
+import AirBersihManagement from './pages/admin/AirBersihManagement';
+import BansosManagement from './pages/admin/BansosManagement';
+import InfrastrukturManagement from './pages/admin/InfrastrukturManagement';
 import AdminLayout from './layouts/AdminLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 import WhatsAppFloat from './components/WhatsAppFloat';
@@ -99,6 +103,10 @@ function AnimatedRoutes() {
           <Route path="/admin/login-history" element={<PageWrapper><LoginHistory /></PageWrapper>} />
           <Route path="/admin/profile" element={<PageWrapper><ProfilePage /></PageWrapper>} />
           <Route path="/admin/petugas-profiles" element={<PageWrapper><PetugasProfiles /></PageWrapper>} />
+          <Route path="/admin/bidang3" element={<PageWrapper><Bidang3Dashboard /></PageWrapper>} />
+          <Route path="/admin/bidang3/air-bersih" element={<PageWrapper><AirBersihManagement /></PageWrapper>} />
+          <Route path="/admin/bidang3/bansos" element={<PageWrapper><BansosManagement /></PageWrapper>} />
+          <Route path="/admin/bidang3/infrastruktur" element={<PageWrapper><InfrastrukturManagement /></PageWrapper>} />
         </Route>
       </Routes>
     </AnimatePresence>

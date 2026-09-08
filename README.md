@@ -137,6 +137,10 @@ cd frontend && npm run build && npm run preview
 | `/admin/dashboard` | Dashboard admin |
 | `/admin/reports` | Kelola laporan |
 | `/admin/disaster-records` | Pendataan bencana + download PDF |
+| `/admin/bidang3` | Dashboard Bidang 3 - Distribusi Bantuan |
+| `/admin/bidang3/air-bersih` | Kelola usulan air bersih |
+| `/admin/bidang3/bansos` | Kelola usulan bansos |
+| `/admin/bidang3/infrastruktur` | Kelola usulan infrastruktur |
 | `/admin/inventory` | Manajemen inventaris |
 | `/admin/vehicles` | Manajemen kendaraan |
 | `/admin/posko` | Manajemen posko |
@@ -162,6 +166,13 @@ cd frontend && npm run build && npm run preview
 - Kelola laporan — update status, filter, assign petugas, hapus, preview foto & koordinat
 - Pendataan bencana — formulir detail (kronologi, korban, terdampak, kerugian)
 - Download PDF — ekspor formulir pendataan sebagai dokumen resmi BPBD
+- **Bidang 3 — Distribusi Bantuan:**
+  - Dashboard ringkasan usulan air bersih, bansos, infrastruktur
+  - Usulan Air Bersih — CRUD + status tracking (pending → diproses → selesai)
+  - Usulan Bansos — CRUD + validasi data bencana + upload surat pengajuan + status berjenjang
+  - Usulan Infrastruktur — CRUD + cek aset OPD lain + status berjenjang
+  - Survey lapangan — buat jadwal survey, upload surat tugas & form survey, input hasil survey
+  - Status berjenjang — lolos/tidak lolos survey → proses → selesai + bukti dukung
 - Inventaris — CRUD lengkap (tambah, edit, hapus, ubah kondisi)
 - Kendaraan — fleet management dengan status service
 - Posko — kelola titik posko pengungsian
@@ -182,6 +193,198 @@ cd frontend && npm run build && npm run preview
 
 ---
 
+## Alur Sistem
+
+### 1. Alur Pelaporan Awal (Intake)
+
+```
+MASYARAKAT
+    │
+    ▼
+SISTEM PELAPORAN (WA Bot)
+    │
+    ▼
+LAPORAN BENCANA MASUK
+    │
+    ▼
+ADMIN PUSDALOPS
+    │
+    ├── Verifikasi & Dispo Unit Lapangan
+    │   ├── Input Data Bencana
+    │   ├── Foto
+    │   ├── Titik Lokasi
+    │   └── Verifikasi Logistik (Ya/Tidak)
+    │
+    ▼
+UPDATE DATA BENCANA
+    ├── Dashboard
+    └── Peta
+```
+
+### 2. Assessment & Manajemen Logistik (Bidang 2)
+
+```
+ASSESSMENT BIDANG 2
+    │
+    ▼
+Logistik = YA? ──TIDAK──► Selesai
+    │
+   YA
+    │
+    ▼
+ADMIN LOGISTIK LOGIN
+    │
+    ▼
+CEK STOK LOGISTIK (Sumber/Jumlah)
+    │
+    ├── CUKUP ──► Input Logistik pada Data Bencana
+    │               │
+    │               ▼
+    │             Laporan Jumlah Kondisi Saat Ini & History Keluar
+    │
+    └── HABIS ──► Potong Jumlah Logistik
+                    │
+                    ▼
+                  Input Logistik Masuk (Sumber/Jumlah)
+                    │
+                    ▼
+                  Input pada Data Bencana
+                    │
+                    ▼
+                  Laporan Bulanan/Triwulan
+```
+
+### 3. Distribusi Bantuan (Bidang 3)
+
+Data diambil dari Assessment Bencana Bidang 2. Dipecah menjadi 3 kategori:
+
+#### 3a. Air Bersih
+
+```
+KELURAHAN
+    │
+    ▼
+INPUT USULAN BANTUAN AIR BERSIH
+    │
+    ▼
+USULAN MASUK SISTEM
+    │
+    ▼
+WA BOT KIRIM PESAN KE GRUP BIDANG 3
+    │
+    ▼
+ADMIN BIDANG 3
+    │
+    ▼
+UPLOAD BUKTI DUKUNG DROPPING AIR BERSIH
+```
+
+#### 3b. Bansos
+
+```
+KELURAHAN / WEBSITE SIRERE
+    │
+    ▼
+INPUT DATA USULAN BANSOS + UPLOAD SURAT PENGAJUAN
+    │
+    ▼
+CEK DATA BENCANA
+    │
+    ├── TIDAK DITEMUKAN ──► HARUS LAPOR BENCANA DULU (Loop ke Pelaporan)
+    │
+    └── DITEMUKAN (YA)
+            │
+            ▼
+        USULAN MASUK SISTEM
+            │
+            ▼
+        WA BOT KIRIM PESAN KE GRUP BIDANG 3 & NOMOR PRIBADI PENERIMA
+            │
+            ▼
+        ADMIN BIDANG 3 BUAT SURAT TUGAS
+            │
+            ▼
+        WA BOT KIRIM SURAT TUGAS + LINK FORM SURVEY KE PERSONIL
+            │
+            ▼
+        PERSONIL SURVEY LAPANGAN & ISI FORM SURVEY
+            │
+            ├── TIDAK LOLOS ──► PROSES TIDAK DILANJUTKAN
+            │
+            └── LOLOS (YA)
+                    │
+                    ▼
+                SISTEM UPDATE STATUS + NOTIFIKASI KE NOMOR PRIBADI PENERIMA
+                    │
+                    ▼
+                ADMIN BIDANG 3 UPDATE STATUS BERJENJANG
+                    │
+                    ▼
+                STATUS "PENCAIRAN"
+                    │
+                    ▼
+                ADMIN UPLOAD BUKTI DUKUNG
+                    │
+                    ▼
+                STATUS "SELESAI"
+```
+
+#### 3c. Infrastruktur
+
+```
+KELURAHAN
+    │
+    ▼
+INPUT USULAN BANSOS INFRASTRUKTUR
+    │
+    ▼
+USULAN MASUK SISTEM → WA BOT KIRIM PESAN KE GRUP BIDANG 3
+    │
+    ▼
+ADMIN BIDANG 3 BUAT SURAT TUGAS
+    │
+    ▼
+WA BOT KIRIM SURAT TUGAS + LINK FORM SURVEY KE PERSONIL
+    │
+    ▼
+PERSONIL SURVEY LAPANGAN & ISI FORM SURVEY
+    │
+    ├── TIDAK ──► CEK ASET MILIK OPD LAIN?
+    │               │
+    │               ├── YA ──► BOT KIRIM WA PEMBERITAHUAN KE KELURAHAN
+    │               │
+    │               └── TIDAK ──► TIDAK DILANJUTKAN
+    │
+    └── YA
+            │
+            ▼
+        SISTEM UPDATE STATUS + KIRIM PEMBERITAHUAN KE KELURAHAN
+            │
+            ▼
+        ADMIN BIDANG 3 UPDATE STATUS BERJENJANG
+            │
+            ▼
+        STATUS "DALAM PENGERJAAN"
+            │
+            ▼
+        SETELAH PENGERJAAN SELESAI
+            │
+            ▼
+        ADMIN UPLOAD BUKTI DUKUNG
+            │
+            ▼
+        STATUS "SELESAI"
+```
+
+### Poin Kunci Sistem
+
+- **WA Bot** jadi penggerak notifikasi/komunikasi di banyak titik: distribusi surat tugas, link form survey, notifikasi status ke masyarakat/kelurahan
+- **Pemisahan Tanggung Jawab**: Bidang 2 (assessment awal + logistik) vs Bidang 3 (eksekusi bantuan: air bersih, bansos, infrastruktur)
+- **Status Berjenjang**: Bukan cuma "selesai/belum" — lebih granular per jenis bantuan (verifikasi survey → proses → pencairan/pengerjaan → selesai + bukti dukung)
+- **Validasi Silang**: Pengajuan bansos/infrastruktur wajib terhubung ke data laporan bencana yang sudah ada (tidak bisa berdiri sendiri)
+
+---
+
 ## Database Schema
 
 | Table | Deskripsi |
@@ -197,6 +400,11 @@ cd frontend && npm run build && npm run preview
 | `activities` | Laporan kegiatan lapangan |
 | `info_board` | Papan informasi jadwal internal (waktu, lokasi, deskripsi) |
 | `disaster_records` | Pendataan bencana (kronologi, korban, terdampak, kerugian) |
+| `air_bersih_proposals` | Usulan bantuan air bersih dari kelurahan |
+| `bansos_proposals` | Usulan bantuan sosial dari kelurahan |
+| `infrastruktur_proposals` | Usulan bantuan infrastruktur dari kelurahan |
+| `surveys` | Data survey lapangan untuk bansos & infrastruktur |
+| `status_history` | Riwayat perubahan status proposal |
 
 ---
 
@@ -253,6 +461,37 @@ cd frontend && npm run build && npm run preview
 - `PATCH /api/info-board/:id` - Update jadwal (admin)
 - `DELETE /api/info-board/:id` - Hapus jadwal (admin)
 
+### Bidang 3 - Distribusi Bantuan
+
+#### Air Bersih
+- `GET /api/bidang3/air-bersih` - List usulan air bersih
+- `GET /api/bidang3/air-bersih/:id` - Detail usulan air bersih
+- `POST /api/bidang3/air-bersih` - Buat usulan air bersih (admin)
+- `PATCH /api/bidang3/air-bersih/:id/status` - Update status (admin)
+- `DELETE /api/bidang3/air-bersih/:id` - Hapus usulan (admin)
+
+#### Bansos
+- `GET /api/bidang3/bansos` - List usulan bansos
+- `GET /api/bidang3/bansos/:id` - Detail usulan bansos
+- `POST /api/bidang3/bansos` - Buat usulan bansos (admin, multipart: surat_pengajuan)
+- `PATCH /api/bidang3/bansos/:id/status` - Update status (admin)
+- `DELETE /api/bidang3/bansos/:id` - Hapus usulan (admin)
+
+#### Infrastruktur
+- `GET /api/bidang3/infrastruktur` - List usulan infrastruktur
+- `GET /api/bidang3/infrastruktur/:id` - Detail usulan infrastruktur
+- `POST /api/bidang3/infrastruktur` - Buat usulan infrastruktur (admin)
+- `PATCH /api/bidang3/infrastruktur/:id/status` - Update status (admin)
+- `DELETE /api/bidang3/infrastruktur/:id` - Hapus usulan (admin)
+
+#### Survey
+- `GET /api/bidang3/surveys` - List survey (filter: proposal_type, proposal_id)
+- `POST /api/bidang3/surveys` - Buat survey (admin, multipart: surat_tugas, form_survey)
+- `PATCH /api/bidang3/surveys/:id` - Update hasil survey (admin, multipart: foto_dokumentasi)
+
+#### Statistik
+- `GET /api/bidang3/stats` - Statistik ringkasan Bidang 3
+
 ---
 
 ## Brand Colors
@@ -292,6 +531,13 @@ cd frontend && npm run build && npm run preview
 - [x] Manajemen akun admin/petugas + histori login
 - [x] Papan informasi jadwal internal (CRUD + fullscreen display)
 - [x] Kegiatan dengan field waktu + fitur edit
+- [x] **Bidang 3 — Distribusi Bantuan:**
+  - [x] Dashboard ringkasan usulan air bersih, bansos, infrastruktur
+  - [x] Usulan Air Bersih — CRUD + status tracking
+  - [x] Usulan Bansos — CRUD + validasi data bencana + upload surat pengajuan
+  - [x] Usulan Infrastruktur — CRUD + cek aset OPD lain
+  - [x] Survey lapangan — buat jadwal, upload surat tugas & form survey
+  - [x] Status berjenjang + riwayat perubahan status
 - [ ] Google OAuth login
 - [ ] Socket.IO live updates
 - [ ] Mobile app (React Native)
