@@ -18,6 +18,8 @@ import {
   Search,
   ArrowRight,
   LogOut,
+  Droplets,
+  Weight,
 } from 'lucide-react';
 import { logout } from '../services/authService';
 
@@ -31,6 +33,8 @@ const COMMANDS = [
   { id: 'vehicles', label: 'Kendaraan', path: '/admin/vehicles', icon: Car, category: 'Navigasi', shortcut: '6' },
   { id: 'posko', label: 'Posko', path: '/admin/posko', icon: Building2, category: 'Navigasi', shortcut: '7' },
   { id: 'activities', label: 'Kegiatan', path: '/admin/activities', icon: Calendar, category: 'Navigasi', shortcut: '8' },
+  { id: 'water-distribution', label: 'Pendistribusian Air Bersih', path: '/admin/water-distribution', icon: Droplets, category: 'Navigasi' },
+  { id: 'unexpected-expenditure', label: 'Belanja Tidak Terduga (BTT)', path: '/admin/unexpected-expenditure', icon: Weight, category: 'Navigasi' },
   { id: 'info-board', label: 'Papan Informasi', path: '/admin/info-board', icon: Info, category: 'Navigasi', shortcut: '9' },
   { id: 'info-screen', label: 'Layar Papan Informasi', path: '/admin/papan-informasi', icon: Monitor, category: 'Navigasi' },
   { id: 'login-history', label: 'History Login', path: '/admin/login-history', icon: Clock, category: 'Navigasi', shortcut: '0' },

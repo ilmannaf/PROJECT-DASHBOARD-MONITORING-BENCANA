@@ -84,8 +84,13 @@ app.use('/api/profile', profileRoutes);
 const publicRoutes = require('./routes/publicRoutes');
 app.use('/api/public', publicRoutes);
 
+<<<<<<< Updated upstream
 const bidang3Routes = require('./routes/bidang3Routes');
 app.use('/api/bidang3', bidang3Routes);
+=======
+const waterDistributionRoutes = require('./routes/waterDistributionRoutes');
+app.use('/api/water-distributions', waterDistributionRoutes);
+>>>>>>> Stashed changes
 
 // 404 handler untuk route yang tidak ada
 app.use((req, res) => {

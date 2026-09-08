@@ -23,10 +23,15 @@ import StatisticPage from './pages/public/StatisticPage';
 import PapanInformasi from './pages/admin/PapanInformasi';
 import ProfilePage from './pages/admin/ProfilePage';
 import PetugasProfiles from './pages/admin/PetugasProfiles';
+<<<<<<< Updated upstream
 import Bidang3Dashboard from './pages/admin/Bidang3Dashboard';
 import AirBersihManagement from './pages/admin/AirBersihManagement';
 import BansosManagement from './pages/admin/BansosManagement';
 import InfrastrukturManagement from './pages/admin/InfrastrukturManagement';
+=======
+import WaterDistribution from './pages/admin/WaterDistribution';
+import UnexpectedExpenditure from './pages/admin/UnexpectedExpenditure';
+>>>>>>> Stashed changes
 import AdminLayout from './layouts/AdminLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 import WhatsAppFloat from './components/WhatsAppFloat';
@@ -97,6 +102,8 @@ function AnimatedRoutes() {
           <Route path="/admin/vehicles" element={<PageWrapper><VehicleManagement /></PageWrapper>} />
           <Route path="/admin/posko" element={<PageWrapper><PoskoManagement /></PageWrapper>} />
           <Route path="/admin/activities" element={<PageWrapper><ActivityManagement /></PageWrapper>} />
+          <Route path="/admin/water-distribution" element={<PageWrapper><WaterDistribution /></PageWrapper>} />
+          <Route path="/admin/unexpected-expenditure" element={<PageWrapper><UnexpectedExpenditure /></PageWrapper>} />
           <Route path="/admin/info-board" element={<PageWrapper><InfoBoardManagement /></PageWrapper>} />
           <Route path="/admin/disaster-records" element={<PageWrapper><DisasterRecordsManagement /></PageWrapper>} />
           <Route path="/admin/users" element={<PageWrapper><UsersManagement /></PageWrapper>} />

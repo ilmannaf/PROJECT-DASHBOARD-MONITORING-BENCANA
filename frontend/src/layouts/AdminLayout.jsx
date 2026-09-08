@@ -32,8 +32,12 @@ import {
   Sun,
   Moon,
   Droplets,
+<<<<<<< Updated upstream
   HandHelping,
   Building,
+=======
+  Weight,
+>>>>>>> Stashed changes
 } from "lucide-react";
 
 const MENU_ITEMS = [
@@ -46,6 +50,8 @@ const MENU_ITEMS = [
   { path: "/admin/vehicles", label: "Kendaraan", icon: Car },
   { path: "/admin/posko", label: "Posko", icon: Building2 },
   { path: "/admin/activities", label: "Kegiatan", icon: Calendar },
+  { path: "/admin/water-distribution", label: "Pendistribusian Air Bersih", icon: Droplets },
+  { path: "/admin/unexpected-expenditure", label: "Belanja Tidak Terduga (BTT)", icon: Weight },
   { path: "/admin/info-board", label: "Papan Informasi", icon: Info },
   { path: "/admin/papan-informasi", label: "Layar Papan Informasi", icon: Monitor },
   { path: "/admin/login-history", label: "History Login", icon: Clock },
@@ -67,6 +73,8 @@ const BREADCRUMB_MAP = {
   "/admin/vehicles": "Kendaraan",
   "/admin/posko": "Posko",
   "/admin/activities": "Kegiatan",
+  "/admin/water-distribution": "Pendistribusian Air Bersih",
+  "/admin/unexpected-expenditure": "Belanja Tidak Terduga (BTT)",
   "/admin/info-board": "Papan Informasi",
   "/admin/papan-informasi": "Layar Papan Informasi",
   "/admin/login-history": "History Login",
