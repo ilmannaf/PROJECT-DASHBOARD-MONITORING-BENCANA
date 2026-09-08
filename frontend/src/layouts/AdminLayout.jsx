@@ -32,12 +32,9 @@ import {
   Sun,
   Moon,
   Droplets,
-<<<<<<< Updated upstream
   HandHelping,
   Building,
-=======
   Weight,
->>>>>>> Stashed changes
 } from "lucide-react";
 
 const MENU_ITEMS = [
