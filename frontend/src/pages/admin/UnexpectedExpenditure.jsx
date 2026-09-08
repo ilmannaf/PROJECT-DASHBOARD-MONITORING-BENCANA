@@ -37,7 +37,7 @@ export default function UnexpectedExpenditure() {
   const loadItems = () => {
     setLoading(true);
     unexpectedExpenditureService
-      .getWaterDistributions()
+      .getUnexpectedExpenditures()
       .then(setItems)
       .catch(console.error)
       .finally(() => {
@@ -69,7 +69,7 @@ export default function UnexpectedExpenditure() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await unexpectedExpenditureService.createWaterDistribution(form);
+      await unexpectedExpenditureService.createUnexpectedExpenditure(form);
       resetForm();
       loadItems();
     } catch (err) {
@@ -79,7 +79,7 @@ export default function UnexpectedExpenditure() {
 
   const handleStatusChange = async (id, status) => {
     try {
-      await unexpectedExpenditureService.updateWaterDistributionStatus(id, { status, note: `Status diubah ke ${status}` });
+      await unexpectedExpenditureService.updateUnexpectedExpenditureStatus(id, { status, note: `Status diubah ke ${status}` });
       loadItems();
     } catch {
       alert("Gagal update status");
@@ -89,7 +89,7 @@ export default function UnexpectedExpenditure() {
   const handleDelete = async (id) => {
     if (!confirm("Yakin hapus data pengeluaran ini?")) return;
     try {
-      await unexpectedExpenditureService.deleteWaterDistribution(id);
+      await unexpectedExpenditureService.deleteUnexpectedExpenditure(id);
       loadItems();
     } catch {
       alert("Gagal menghapus data pengeluaran");
@@ -98,7 +98,7 @@ export default function UnexpectedExpenditure() {
 
   const handleViewDetail = async (id) => {
     try {
-      const detail = await unexpectedExpenditureService.getWaterDistributionById(id);
+      const detail = await unexpectedExpenditureService.getUnexpectedExpenditureById(id);
       setShowDetail(detail);
     } catch {
       alert("Gagal memuat detail");
@@ -109,13 +109,13 @@ export default function UnexpectedExpenditure() {
     const q = searchTerm.toLowerCase();
     return (
       item.kelurahan?.toLowerCase().includes(q) ||
-      item.nama_distribusi?.toLowerCase().includes(q) ||
+      item.nama_pengeluaran?.toLowerCase().includes(q) ||
       item.status?.toLowerCase().includes(q)
     );
   });
 
   const countByStatus = (s) => items.filter((i) => i.status === s).length;
-  const totalJumlah = items.reduce((sum, i) => sum + (Number(i.jumlah_kubikasi) || 0), 0);
+  const totalJumlah = items.reduce((sum, i) => sum + (Number(i.jumlah) || 0), 0);
 
   return (
     <div className="p-6 lg:p-8 animate-fade-in">
@@ -178,13 +178,13 @@ export default function UnexpectedExpenditure() {
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Nama Pengeluaran <span className="text-red-500">*</span>
               </label>
-              <input name="nama_pengeluaran" value={form.nama_pengeluaran || form.nama_distribusi} onChange={handleChange} required placeholder="Contoh: Beli selang tambahan" className={inputClass} />
+              <input name="nama_pengeluaran" value={form.nama_pengeluaran} onChange={handleChange} required placeholder="Contoh: Beli selang tambahan" className={inputClass} />
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Jumlah (Rp) <span className="text-red-500">*</span>
               </label>
-              <input name="jumlah" type="number" value={form.jumlah || form.jumlah_kubikasi} onChange={handleChange} required placeholder="0" className={inputClass} />
+              <input name="jumlah" type="number" value={form.jumlah} onChange={handleChange} required placeholder="0" className={inputClass} />
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Tanggal Pengeluaran</label>
@@ -276,7 +276,7 @@ export default function UnexpectedExpenditure() {
                     return (
                       <tr key={item.id} className="hover:bg-orange-50/40 transition-colors group">
                         <td className="py-4 px-6">
-                          <span className="font-semibold text-gray-900 text-sm">{item.nama_distribusi}</span>
+                          <span className="font-semibold text-gray-900 text-sm">{item.nama_pengeluaran}</span>
                           {item.keterangan && <p className="text-xs text-gray-500 mt-0.5 line-clamp-1">{item.keterangan}</p>}
                         </td>
                         <td className="py-4 px-6">
@@ -284,7 +284,7 @@ export default function UnexpectedExpenditure() {
                           {item.kecamatan && <p className="text-xs text-gray-400">{item.kecamatan}</p>}
                         </td>
                         <td className="py-4 px-6 text-center text-sm font-semibold text-gray-900">
-                          {item.jumlah_kubikasi ? `Rp ${Number(item.jumlah_kubikasi).toLocaleString("id-ID")}` : "-"}
+                          {item.jumlah ? `Rp ${Number(item.jumlah).toLocaleString("id-ID")}` : "-"}
                         </td>
                         <td className="py-4 px-6 text-center">
                           {adminUser ? (
@@ -362,10 +362,10 @@ export default function UnexpectedExpenditure() {
               </button>
             </div>
             <div className="space-y-3 text-sm">
-              <div><span className="font-semibold text-gray-700">Nama Pengeluaran:</span> {showDetail.nama_distribusi}</div>
+              <div><span className="font-semibold text-gray-700">Nama Pengeluaran:</span> {showDetail.nama_pengeluaran}</div>
               <div><span className="font-semibold text-gray-700">Kelurahan:</span> {showDetail.kelurahan}</div>
               <div><span className="font-semibold text-gray-700">Kecamatan:</span> {showDetail.kecamatan || "-"}</div>
-              <div><span className="font-semibold text-gray-700">Jumlah:</span> {showDetail.jumlah_kubikasi ? `Rp ${Number(showDetail.jumlah_kubikasi).toLocaleString("id-ID")}` : "-"}</div>
+              <div><span className="font-semibold text-gray-700">Jumlah:</span> {showDetail.jumlah ? `Rp ${Number(showDetail.jumlah).toLocaleString("id-ID")}` : "-"}</div>
               <div><span className="font-semibold text-gray-700">Keterangan:</span> {showDetail.keterangan || "-"}</div>
               <div><span className="font-semibold text-gray-700">Status:</span> {showDetail.status}</div>
               {showDetail.bukti_dukung_url && (

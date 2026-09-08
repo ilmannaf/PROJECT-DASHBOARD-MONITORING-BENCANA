@@ -90,6 +90,9 @@ app.use('/api/bidang3', bidang3Routes);
 const waterDistributionRoutes = require('./routes/waterDistributionRoutes');
 app.use('/api/water-distributions', waterDistributionRoutes);
 
+const waterSupplySettingsRoutes = require('./routes/waterSupplySettingsRoutes');
+app.use('/api/water-supply-settings', waterSupplySettingsRoutes);
+
 const unexpectedExpenditureRoutes = require('./routes/unexpectedExpenditureRoutes');
 app.use('/api/unexpected-expenditures', unexpectedExpenditureRoutes);
 

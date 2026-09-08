@@ -156,13 +156,22 @@ const ensureBaseSchema = async () => {
         latitude DECIMAL(10, 6),
         longitude DECIMAL(11, 6),
         amount_liters INT NOT NULL DEFAULT 0,
+        total_supply INT NOT NULL DEFAULT 0,
         notes TEXT,
         status ENUM('selesai', 'dalam_proses', 'dibatalkan') DEFAULT 'selesai',
         created_by INT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
+
+      `CREATE TABLE IF NOT EXISTS water_supply_settings (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        total_supply INT NOT NULL DEFAULT 0,
+        updated_by INT,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
     ];
 
     for (const sql of statements) {
@@ -180,6 +189,7 @@ const ensureBaseSchema = async () => {
     await addColumnIfNotExists('users', 'bio', 'TEXT');
     await addColumnIfNotExists('users', 'status', "ENUM('on_duty','off_duty','resting') DEFAULT 'on_duty'");
     await addColumnIfNotExists('users', 'photo_url', 'VARCHAR(255)');
+    await addColumnIfNotExists('water_distributions', 'total_supply', 'INT NOT NULL DEFAULT 0');
   } finally {
     conn.release();
   }

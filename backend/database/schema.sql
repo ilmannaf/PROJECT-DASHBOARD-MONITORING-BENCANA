@@ -166,3 +166,22 @@ CREATE TABLE login_history (
   success TINYINT(1) DEFAULT 1,
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+-- Tabel WATER_DISTRIBUTIONS (Pendistribusian Air Bersih)
+CREATE TABLE water_distributions (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  distribution_date DATE NOT NULL,
+  kelurahan VARCHAR(100) NOT NULL,
+  kecamatan VARCHAR(100) NOT NULL,
+  location_address VARCHAR(255) NOT NULL,
+  latitude DECIMAL(10, 6),
+  longitude DECIMAL(11, 6),
+  amount_liters INT NOT NULL DEFAULT 0,
+  total_supply INT NOT NULL DEFAULT 0,
+  notes TEXT,
+  status ENUM('selesai', 'dalam_proses', 'dibatalkan') DEFAULT 'selesai',
+  created_by INT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
+);

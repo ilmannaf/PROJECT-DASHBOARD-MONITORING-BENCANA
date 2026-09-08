@@ -83,11 +83,32 @@ CREATE TABLE IF NOT EXISTS surveys (
 );
 
 -- ========================================
--- 5. TABEL STATUS TRACKING (Status Berjenjang)
+-- 6. TABEL PENDISTRIBUSIAN AIR BERSIH
+-- ========================================
+CREATE TABLE IF NOT EXISTS water_distributions (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  distribution_date DATE NOT NULL,
+  kelurahan VARCHAR(100) NOT NULL,
+  kecamatan VARCHAR(100) NOT NULL,
+  location_address VARCHAR(255) NOT NULL,
+  latitude DECIMAL(10, 6),
+  longitude DECIMAL(11, 6),
+  amount_liters INT NOT NULL DEFAULT 0,
+  total_supply INT NOT NULL DEFAULT 0,
+  notes TEXT,
+  status ENUM('selesai', 'dalam_proses', 'dibatalkan') DEFAULT 'selesai',
+  created_by INT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- ========================================
+-- 6. TABEL STATUS TRACKING (Status Berjenjang)
 -- ========================================
 CREATE TABLE IF NOT EXISTS status_history (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  proposal_type ENUM('bansos', 'infrastruktur', 'air_bersih') NOT NULL,
+  proposal_type ENUM('bansos', 'infrastruktur', 'air_bersih', 'water_distribution') NOT NULL,
   proposal_id INT NOT NULL,
   status_from VARCHAR(50),
   status_to VARCHAR(50) NOT NULL,

@@ -2,34 +2,49 @@ import api from './api';
 
 const waterDistributionService = {
   getWaterDistributions: async () => {
-    const response = await api.get('/water-distributions');
-    return response.data;
+    const { data } = await api.get('/water-distributions');
+    return data;
   },
 
   getWaterDistributionById: async (id) => {
-    const response = await api.get(`/water-distributions/${id}`);
-    return response.data;
+    const { data } = await api.get(`/water-distributions/${id}`);
+    return data;
   },
 
-  createWaterDistribution: async (data) => {
-    const response = await api.post('/water-distributions', data);
-    return response.data;
+  getDistributionSummary: async () => {
+    const { data } = await api.get('/water-distributions/summary');
+    return data;
   },
 
-  updateWaterDistributionStatus: async (id, data) => {
-    const response = await api.patch(`/water-distributions/${id}/status`, data);
-    return response.data;
+  createWaterDistribution: async (payload) => {
+    const { data } = await api.post('/water-distributions', payload);
+    return data;
+  },
+
+  updateWaterDistribution: async (id, payload) => {
+    const { data } = await api.patch(`/water-distributions/${id}`, payload);
+    return data;
+  },
+
+  updateWaterDistributionStatus: async (id, payload) => {
+    const { data } = await api.patch(`/water-distributions/${id}`, payload);
+    return data;
   },
 
   deleteWaterDistribution: async (id) => {
-    const response = await api.delete(`/water-distributions/${id}`);
-    return response.data;
+    const { data } = await api.delete(`/water-distributions/${id}`);
+    return data;
   },
 
-  getWaterDistributionStats: async () => {
-    const response = await api.get('/water-distributions/stats');
-    return response.data;
-  }
+  getSupplySettings: async () => {
+    const { data } = await api.get('/water-supply-settings');
+    return data;
+  },
+
+  updateSupplySettings: async (payload) => {
+    const { data } = await api.put('/water-supply-settings', payload);
+    return data;
+  },
 };
 
 export default waterDistributionService;
