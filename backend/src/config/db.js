@@ -253,7 +253,17 @@ const ensureBaseSchema = async () => {
     await addColumnIfNotExists('btt_penerima', 'kategori_kerusakan', 'TEXT');
     await addColumnIfNotExists('btt_penerima', 'status_pendanaan', "ENUM('belum_cair','cair','tidak_cair') NOT NULL DEFAULT 'belum_cair'");
     await addColumnIfNotExists('btt_penerima', 'tanggal_pencairan', 'DATE');
+    await addColumnIfNotExists('btt_penerima', 'kelurahan', 'VARCHAR(100)');
+    await addColumnIfNotExists('btt_penerima', 'kecamatan', 'VARCHAR(100)');
     await conn.query("ALTER TABLE btt_penerima MODIFY COLUMN status_pendanaan ENUM('belum_cair','cair','tidak_cair') NOT NULL DEFAULT 'belum_cair'");
+
+    try {
+      await addColumnIfNotExists('bansos_proposals', 'bukti_dukung_url', 'VARCHAR(500)');
+    } catch (_) {}
+
+    try {
+      await addColumnIfNotExists('infrastruktur_proposals', 'bukti_dukung_url', 'VARCHAR(500)');
+    } catch (_) {}
   } finally {
     conn.release();
   }
