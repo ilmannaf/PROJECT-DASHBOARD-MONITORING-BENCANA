@@ -124,10 +124,31 @@ export default function DisasterMap() {
   const [legendOpen, setLegendOpen] = useState(true);
   const [mapMode, setMapMode] = useState("bencana");
   const [showStats, setShowStats] = useState(false);
+  const [smabLocations, setSmabLocations] = useState(smabData);
+  const [katanaLocations, setKatanaLocations] = useState(katanaData);
 
   useEffect(() => {
     const t = setTimeout(() => setShowStats(true), 300);
     return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchLocations = async () => {
+      try {
+        const [smabResponse, katanaResponse] = await Promise.all([
+          api.get("/locations/smab"),
+          api.get("/locations/katana"),
+        ]);
+        if (!mounted) return;
+        if (Array.isArray(smabResponse.data) && smabResponse.data.length > 0) setSmabLocations(smabResponse.data);
+        if (Array.isArray(katanaResponse.data) && katanaResponse.data.length > 0) setKatanaLocations(katanaResponse.data);
+      } catch (err) {
+        console.warn("Gagal memuat lokasi SMAB/KATANA dari API, memakai data cadangan", err);
+      }
+    };
+    fetchLocations();
+    return () => { mounted = false; };
   }, []);
 
   useEffect(() => {
@@ -251,8 +272,8 @@ export default function DisasterMap() {
             <span className="hidden md:inline-flex items-center gap-1.5 text-xs font-semibold text-gray-600 bg-gray-50 border border-gray-200 rounded-full px-3 py-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
               {mapMode === "bencana" && (loading ? "Memuat..." : `${filteredReports.length} titik`)}
-              {mapMode === "smab" && `${smabData.length} lokasi`}
-              {mapMode === "katana" && `${katanaData.length} lokasi`}
+              {mapMode === "smab" && `${smabLocations.length} lokasi`}
+              {mapMode === "katana" && `${katanaLocations.length} lokasi`}
             </span>
             <button
               onClick={() => navigate("/")}
@@ -412,7 +433,7 @@ export default function DisasterMap() {
                 <p className="text-xs font-bold text-blue-700 mb-2">SMAB - Satuan Pendidikan Aman Bencana</p>
                 <p className="text-xs text-gray-600 leading-relaxed mb-3">Peta menampilkan lokasi sekolah/madrasah yang telah terlatih dan tersertifikasi dalam penanggulangan bencana.</p>
                 <div className="text-xs space-y-1 text-gray-600">
-                  <p>Total SMAB: <span className="font-bold">{smabData.length}</span></p>
+                  <p>Total SMAB: <span className="font-bold">{smabLocations.length}</span></p>
                   <p>Klik marker untuk detail</p>
                 </div>
               </div>
@@ -424,14 +445,14 @@ export default function DisasterMap() {
                 <p className="text-xs font-bold text-emerald-700 mb-2">KATANA - FPRB Kelurahan</p>
                 <p className="text-xs text-gray-600 leading-relaxed mb-3">Peta menampilkan lokasi Forum Penanggulangan Risiko Bencana (FPRB) di tingkat kelurahan Kota Semarang.</p>
                 <div className="text-xs space-y-1 text-gray-600">
-                  <p>Total KATANA: <span className="font-bold">{katanaData.length}</span></p>
+                  <p>Total KATANA: <span className="font-bold">{katanaLocations.length}</span></p>
                   <p>Klik marker untuk detail</p>
                 </div>
                 <div className="mt-4 border-t border-emerald-100 pt-3">
                   <h6 className="text-sm font-bold text-gray-700 mb-2">Daftar Wilayah KATANA:</h6>
                   <div className="overflow-y-auto max-h-[180px] pr-1" style={{ scrollbarWidth: "thin" }}>
                     <ul className="space-y-1.5">
-                      {katanaData.map((item) => (
+                      {katanaLocations.map((item) => (
                         <li
                           key={item.id}
                           className="text-xs p-2 bg-gray-50 hover:bg-emerald-50 rounded border border-gray-100 cursor-pointer transition-colors"
@@ -550,7 +571,7 @@ export default function DisasterMap() {
                   })}
 
                   {/* Markers SMAB */}
-                  {mapMode === "smab" && smabData.map((smab) => {
+                  {mapMode === "smab" && smabLocations.map((smab) => {
                     const lat = parseFloat(smab.latitude);
                     const lng = parseFloat(smab.longitude);
                     if (isNaN(lat) || isNaN(lng)) return null;
@@ -609,7 +630,7 @@ export default function DisasterMap() {
                   })}
 
                   {/* Markers KATANA */}
-                  {mapMode === "katana" && katanaData.map((katana) => {
+                  {mapMode === "katana" && katanaLocations.map((katana) => {
                     const lat = parseFloat(katana.latitude);
                     const lng = parseFloat(katana.longitude);
                     if (isNaN(lat) || isNaN(lng)) return null;
@@ -836,11 +857,11 @@ export default function DisasterMap() {
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-700">Total SMAB</span>
-                        <span className="text-2xl font-bold text-blue-600">{smabData.length}</span>
+                        <span className="text-2xl font-bold text-blue-600">{smabLocations.length}</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-700">Kecamatan</span>
-                        <span className="text-lg font-bold text-gray-900">{new Set(smabData.map(s => s.kecamatan)).size}</span>
+                        <span className="text-lg font-bold text-gray-900">{new Set(smabLocations.map(s => s.kecamatan)).size}</span>
                       </div>
                     </div>
                   </div>
@@ -851,8 +872,8 @@ export default function DisasterMap() {
                       Tahun Pembentukan
                     </h3>
                     <div className="space-y-2">
-                      {[...new Set(smabData.map(s => s.tahun_pembentukan))].sort((a, b) => a - b).map((year) => {
-                        const count = smabData.filter(s => s.tahun_pembentukan === year).length;
+                      {[...new Set(smabLocations.map(s => s.tahun_pembentukan))].sort((a, b) => a - b).map((year) => {
+                        const count = smabLocations.filter(s => s.tahun_pembentukan === year).length;
                         return (
                           <div key={year} className="flex items-center justify-between">
                             <span className="text-sm text-gray-700">{year}</span>
@@ -881,11 +902,11 @@ export default function DisasterMap() {
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-700">Total KATANA</span>
-                        <span className="text-2xl font-bold text-emerald-600">{katanaData.length}</span>
+                        <span className="text-2xl font-bold text-emerald-600">{katanaLocations.length}</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-gray-700">Kecamatan</span>
-                        <span className="text-lg font-bold text-gray-900">{new Set(katanaData.map(k => k.kecamatan)).size}</span>
+                        <span className="text-lg font-bold text-gray-900">{new Set(katanaLocations.map(k => k.kecamatan)).size}</span>
                       </div>
                     </div>
                   </div>
@@ -896,8 +917,8 @@ export default function DisasterMap() {
                       Tahun Pembentukan
                     </h3>
                     <div className="space-y-2">
-                      {[...new Set(katanaData.map(k => k.pembentukan))].sort((a, b) => a - b).map((year) => {
-                        const count = katanaData.filter(k => k.pembentukan === year).length;
+                      {[...new Set(katanaLocations.map(k => k.pembentukan))].sort((a, b) => a - b).map((year) => {
+                        const count = katanaLocations.filter(k => k.pembentukan === year).length;
                         return (
                           <div key={year} className="flex items-center justify-between">
                             <span className="text-sm text-gray-700">{year}</span>

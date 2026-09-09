@@ -35,6 +35,7 @@ import {
   HandHelping,
   Building,
   Weight,
+  MapPinned,
 } from "lucide-react";
 
 const MENU_ITEMS = [
@@ -49,6 +50,7 @@ const MENU_ITEMS = [
   { path: "/admin/activities", label: "Kegiatan", icon: Calendar },
   { path: "/admin/water-distribution", label: "Pendistribusian Air Bersih", icon: Droplets },
   { path: "/admin/unexpected-expenditure", label: "Belanja Tidak Terduga (BTT)", icon: Weight },
+  { path: "/admin/locations", label: "Lokasi SMAB & KATANA", icon: MapPinned },
   { path: "/admin/info-board", label: "Papan Informasi", icon: Info },
   { path: "/admin/papan-informasi", label: "Layar Papan Informasi", icon: Monitor },
   { path: "/admin/login-history", label: "History Login", icon: Clock },
@@ -72,6 +74,7 @@ const BREADCRUMB_MAP = {
   "/admin/activities": "Kegiatan",
   "/admin/water-distribution": "Pendistribusian Air Bersih",
   "/admin/unexpected-expenditure": "Belanja Tidak Terduga (BTT)",
+  "/admin/locations": "Lokasi SMAB & KATANA",
   "/admin/info-board": "Papan Informasi",
   "/admin/papan-informasi": "Layar Papan Informasi",
   "/admin/login-history": "History Login",

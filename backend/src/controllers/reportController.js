@@ -354,6 +354,46 @@ exports.updateReportStatus = async (req, res) => {
   }
 };
 
+// UPDATE - Ubah data utama laporan (admin)
+exports.updateReportData = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { disaster_type, description, address, latitude, longitude } = req.body;
+    const validTypes = ['Banjir', 'Longsor', 'Kebakaran', 'Angin Puting Beliung', 'Gempa Bumi', 'Lainnya'];
+
+    if (!validTypes.includes(disaster_type)) {
+      return res.status(400).json({ message: 'Jenis bencana tidak valid' });
+    }
+
+    const latitudeValue = Number(latitude);
+    const longitudeValue = Number(longitude);
+    if (!Number.isFinite(latitudeValue) || latitudeValue < -90 || latitudeValue > 90) {
+      return res.status(400).json({ message: 'Latitude tidak valid' });
+    }
+    if (!Number.isFinite(longitudeValue) || longitudeValue < -180 || longitudeValue > 180) {
+      return res.status(400).json({ message: 'Longitude tidak valid' });
+    }
+
+    const [result] = await pool.query(
+      `UPDATE reports
+       SET disaster_type = ?, description = ?, address = ?, latitude = ?, longitude = ?
+       WHERE id = ?`,
+      [disaster_type, description || null, address || null, latitudeValue, longitudeValue, id],
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Laporan tidak ditemukan' });
+    }
+
+    const io = req.app.get('io');
+    io.emit('report_updated', { id: Number(id), disaster_type });
+    res.json({ message: 'Data laporan berhasil diperbarui' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Terjadi kesalahan server' });
+  }
+};
+
 // EXPORT EXCEL - Laporan Bencana
 exports.exportReportsExcel = async (req, res) => {
   try {
@@ -424,5 +464,36 @@ exports.exportReportsExcel = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Gagal export Excel' });
+  }
+};
+
+// CREATE - Tambah laporan langsung dari admin
+exports.createAdminReport = async (req, res) => {
+  try {
+    const { reporter_name, reporter_phone, disaster_type, description, latitude, longitude, address } = req.body;
+    const validTypes = ['Banjir', 'Longsor', 'Kebakaran', 'Angin Puting Beliung', 'Gempa Bumi', 'Lainnya'];
+    const lat = Number(latitude);
+    const lng = Number(longitude);
+
+    if (!reporter_name || !validTypes.includes(disaster_type) || !address) {
+      return res.status(400).json({ message: 'Nama pelapor, jenis bencana, dan alamat wajib diisi' });
+    }
+    if (!Number.isFinite(lat) || lat < -90 || lat > 90 || !Number.isFinite(lng) || lng < -180 || lng > 180) {
+      return res.status(400).json({ message: 'Koordinat latitude/longitude tidak valid' });
+    }
+
+    const trackingCode = generateTrackingCode();
+    const [result] = await pool.query(
+      `INSERT INTO reports (tracking_code, reporter_user_id, reporter_name, reporter_phone, disaster_type, description, latitude, longitude, address, status)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'baru')`,
+      [trackingCode, req.user.id, reporter_name, reporter_phone || null, disaster_type, description || null, lat, lng, address],
+    );
+
+    const io = req.app.get('io');
+    io.emit('new_report', { id: result.insertId, tracking_code: trackingCode, disaster_type, address, status: 'baru', latitude: lat, longitude: lng });
+    res.status(201).json({ message: 'Laporan bencana berhasil ditambahkan', report_id: result.insertId, tracking_code: trackingCode });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Terjadi kesalahan server' });
   }
 };

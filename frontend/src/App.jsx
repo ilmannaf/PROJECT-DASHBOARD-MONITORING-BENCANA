@@ -29,6 +29,7 @@ import BansosManagement from './pages/admin/BansosManagement';
 import InfrastrukturManagement from './pages/admin/InfrastrukturManagement';
 import WaterDistribution from './pages/admin/WaterDistribution';
 import UnexpectedExpenditure from './pages/admin/UnexpectedExpenditure';
+import LocationManagement from './pages/admin/LocationManagement';
 import AdminLayout from './layouts/AdminLayout';
 import ProtectedRoute from './components/ProtectedRoute';
 import WhatsAppFloat from './components/WhatsAppFloat';
@@ -111,6 +112,7 @@ function AnimatedRoutes() {
           <Route path="/admin/bidang3/infrastruktur" element={<PageWrapper><InfrastrukturManagement /></PageWrapper>} />
           <Route path="/admin/water-distribution" element={<PageWrapper><WaterDistribution /></PageWrapper>} />
           <Route path="/admin/unexpected-expenditure" element={<PageWrapper><UnexpectedExpenditure /></PageWrapper>} />
+          <Route path="/admin/locations" element={<PageWrapper><LocationManagement /></PageWrapper>} />
         </Route>
       </Routes>
     </AnimatePresence>

@@ -1,5 +1,8 @@
 const mysql = require('mysql2/promise');
 const bcrypt = require('bcrypt');
+const fs = require('fs');
+const path = require('path');
+const vm = require('vm');
 require('dotenv').config();
 
 const pool = mysql.createPool({
@@ -147,6 +150,37 @@ const ensureBaseSchema = async () => {
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
 
+      `CREATE TABLE IF NOT EXISTS smab_locations (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        nama_sekolah VARCHAR(200) NOT NULL,
+        kecamatan VARCHAR(100) NOT NULL,
+        ancaman_bencana VARCHAR(255),
+        tahun_pembentukan YEAR,
+        latitude DECIMAL(10, 8) NOT NULL,
+        longitude DECIMAL(11, 8) NOT NULL,
+        is_active TINYINT(1) NOT NULL DEFAULT 1,
+        created_by INT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
+
+      `CREATE TABLE IF NOT EXISTS katana_locations (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        kelurahan VARCHAR(150) NOT NULL,
+        kecamatan VARCHAR(100) NOT NULL,
+        pembentukan VARCHAR(30),
+        ancaman_bencana VARCHAR(255),
+        sumber_dana VARCHAR(150),
+        latitude DECIMAL(10, 8) NOT NULL,
+        longitude DECIMAL(11, 8) NOT NULL,
+        is_active TINYINT(1) NOT NULL DEFAULT 1,
+        created_by INT,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
+
       `CREATE TABLE IF NOT EXISTS water_distributions (
         id INT AUTO_INCREMENT PRIMARY KEY,
         distribution_date DATE NOT NULL,
@@ -190,6 +224,55 @@ const ensureBaseSchema = async () => {
     await addColumnIfNotExists('users', 'status', "ENUM('on_duty','off_duty','resting') DEFAULT 'on_duty'");
     await addColumnIfNotExists('users', 'photo_url', 'VARCHAR(255)');
     await addColumnIfNotExists('water_distributions', 'total_supply', 'INT NOT NULL DEFAULT 0');
+    await conn.query('ALTER TABLE katana_locations MODIFY COLUMN pembentukan VARCHAR(30)');
+  } finally {
+    conn.release();
+  }
+};
+
+const readLegacyData = (fileName, exportName) => {
+  const filePath = path.resolve(__dirname, '../../../frontend/src/data', fileName);
+  if (!fs.existsSync(filePath)) return [];
+
+  const source = fs.readFileSync(filePath, 'utf8')
+    .replace(`export const ${exportName} =`, 'globalThis.locationData =')
+    .replace(/pembentukan:\s*(\d{4}&\d{4})/g, 'pembentukan: "$1"');
+  const context = {};
+  vm.runInNewContext(source, context, { filename: filePath });
+  return Array.isArray(context.locationData) ? context.locationData : [];
+};
+
+const ensureDefaultLocations = async () => {
+  const conn = await pool.getConnection();
+  try {
+    const [[admin]] = await conn.query("SELECT id FROM users WHERE role = 'admin' ORDER BY id LIMIT 1");
+    if (!admin) return;
+
+    const [[smabCount]] = await conn.query('SELECT COUNT(*) AS total FROM smab_locations');
+    if (smabCount.total === 0) {
+      const smabData = readLegacyData('smabData.js', 'smabData');
+      for (const location of smabData) {
+        await conn.query(
+          `INSERT INTO smab_locations
+           (nama_sekolah, kecamatan, ancaman_bencana, tahun_pembentukan, latitude, longitude, created_by)
+           VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          [location.nama_sekolah, location.kecamatan, location.ancaman_bencana || null, location.tahun_pembentukan || null, location.latitude, location.longitude, admin.id],
+        );
+      }
+    }
+
+    const [[katanaCount]] = await conn.query('SELECT COUNT(*) AS total FROM katana_locations');
+    if (katanaCount.total === 0) {
+      const katanaData = readLegacyData('katanaData.js', 'katanaData');
+      for (const location of katanaData) {
+        await conn.query(
+          `INSERT INTO katana_locations
+           (kelurahan, kecamatan, pembentukan, ancaman_bencana, sumber_dana, latitude, longitude, created_by)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          [location.kelurahan, location.kecamatan, location.pembentukan || null, location.ancaman_bencana || null, location.sumber_dana || null, location.latitude, location.longitude, admin.id],
+        );
+      }
+    }
   } finally {
     conn.release();
   }
@@ -227,6 +310,7 @@ const ensureDefaultUsers = async () => {
 
     await ensureBaseSchema();
     await ensureDefaultUsers();
+    await ensureDefaultLocations();
     console.log('Database bootstrap selesai');
   } catch (err) {
     console.error('Gagal konek database:', err.message);

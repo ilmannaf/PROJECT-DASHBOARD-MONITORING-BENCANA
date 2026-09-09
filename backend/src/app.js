@@ -99,6 +99,9 @@ app.use('/api/unexpected-expenditures', unexpectedExpenditureRoutes);
 const bttPenerimaRoutes = require('./routes/bttPenerimaRoutes');
 app.use('/api/btt-penerima', bttPenerimaRoutes);
 
+const locationRoutes = require('./routes/locationRoutes');
+app.use('/api/locations', locationRoutes);
+
 // 404 handler untuk route yang tidak ada
 app.use((req, res) => {
   res.status(404).json({ message: 'Endpoint tidak ditemukan' });

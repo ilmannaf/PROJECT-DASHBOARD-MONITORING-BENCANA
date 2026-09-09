@@ -46,3 +46,13 @@ export const exportReportsExcel = async (filters = {}) => {
   link.click();
   window.URL.revokeObjectURL(url);
 };
+
+export const updateReportData = async (id, payload) => {
+  const { data } = await api.put(`/reports/${id}`, payload);
+  return data;
+};
+
+export const createAdminReport = async (payload) => {
+  const { data } = await api.post('/reports/admin', payload);
+  return data;
+};
