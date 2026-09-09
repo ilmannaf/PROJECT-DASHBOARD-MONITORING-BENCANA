@@ -96,6 +96,9 @@ app.use('/api/water-supply-settings', waterSupplySettingsRoutes);
 const unexpectedExpenditureRoutes = require('./routes/unexpectedExpenditureRoutes');
 app.use('/api/unexpected-expenditures', unexpectedExpenditureRoutes);
 
+const bttPenerimaRoutes = require('./routes/bttPenerimaRoutes');
+app.use('/api/btt-penerima', bttPenerimaRoutes);
+
 // 404 handler untuk route yang tidak ada
 app.use((req, res) => {
   res.status(404).json({ message: 'Endpoint tidak ditemukan' });
