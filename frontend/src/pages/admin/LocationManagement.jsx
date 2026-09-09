@@ -246,7 +246,7 @@ export default function LocationManagement() {
           </div>
         </div>
         {adminUser && <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-          <button onClick={handleExport} className="btn btn-secondary flex items-center justify-center gap-2 px-5 py-3 bg-white border-slate-200 shadow-sm">
+          <button onClick={handleExport} className="btn flex items-center justify-center gap-2 px-5 py-3 bg-green-200 text-green-900 border border-green-400 hover:bg-green-300 hover:border-green-500 shadow-sm">
             <Download className="w-5 h-5" /> Export Excel
           </button>
           <button

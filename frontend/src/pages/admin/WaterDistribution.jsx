@@ -373,13 +373,18 @@ export default function WaterDistribution() {
           </div>
         </div>
         {adminUser && (
-          <button
-            onClick={() => { if (showForm) resetForm(); else setShowForm(true); }}
-            className="btn btn-primary flex items-center gap-2 shadow-lg shadow-brand-500/25 px-5 py-3"
-          >
+          <div className="flex items-center gap-3">
+            <button onClick={handleExport} className="btn flex items-center gap-2 px-5 py-3 bg-green-200 text-green-900 border border-green-400 hover:bg-green-300 hover:border-green-500 shadow-sm">
+              <Download className="w-5 h-5" /> Export Excel
+            </button>
+            <button
+              onClick={() => { if (showForm) resetForm(); else setShowForm(true); }}
+              className="btn btn-primary flex items-center gap-2 shadow-lg shadow-brand-500/25 px-5 py-3"
+            >
             {showForm ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
             {showForm ? "Tutup Form" : "Tambah Distribusi"}
-          </button>
+            </button>
+          </div>
         )}
       </div>
 
@@ -657,14 +662,6 @@ export default function WaterDistribution() {
             DAFTAR DISTRIBUSI
           </h2>
           <div className="flex items-center gap-3">
-            <button
-              onClick={handleExport}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition"
-              title="Ekspor semua data ke Excel"
-            >
-              <Download className="w-4 h-4" />
-              Ekspor Excel
-            </button>
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input

@@ -222,13 +222,18 @@ export default function UnexpectedExpenditure() {
           </div>
         </div>
         {adminUser && (
-          <button
-            onClick={() => { if (showForm) resetForm(); else setShowForm(true); }}
-            className="btn btn-primary flex items-center gap-2 shadow-lg shadow-brand-500/25 px-5 py-3"
-          >
-            {showForm ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
-            {showForm ? "Tutup Form" : "Tambah Data"}
-          </button>
+          <div className="flex items-center gap-3">
+            <button onClick={handleExport} className="btn flex items-center gap-2 px-5 py-3 bg-green-200 text-green-900 border border-green-400 hover:bg-green-300 hover:border-green-500 shadow-sm">
+              <Download className="w-5 h-5" /> Export Excel
+            </button>
+            <button
+              onClick={() => { if (showForm) resetForm(); else setShowForm(true); }}
+              className="btn btn-primary flex items-center gap-2 shadow-lg shadow-brand-500/25 px-5 py-3"
+            >
+              {showForm ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+              {showForm ? "Tutup Form" : "Tambah Data"}
+            </button>
+          </div>
         )}
       </div>
 
@@ -366,9 +371,6 @@ export default function UnexpectedExpenditure() {
             </div>
             {penerimaList.length > 0 && (
               <div className="flex items-center gap-2">
-                {adminUser && <button onClick={handleExport} className="btn btn-secondary flex items-center gap-2 px-4 py-2 text-sm">
-                  <Download className="w-4 h-4" /> Export Excel
-                </button>}
                 <button onClick={handlePrint} className="btn btn-secondary flex items-center gap-2 px-4 py-2 text-sm">
                   <Printer className="w-4 h-4" /> Cetak Lampiran
                 </button>
