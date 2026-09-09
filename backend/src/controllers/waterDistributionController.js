@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const ExcelJS = require('exceljs');
 
 exports.getDistributions = async (req, res) => {
   try {
@@ -33,6 +34,62 @@ exports.getDistributionById = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Terjadi kesalahan server' });
+  }
+};
+
+exports.exportDistributionsExcel = async (req, res) => {
+  try {
+    const [rows] = await pool.query(`
+      SELECT distribution_date, kelurahan, kecamatan, location_address, amount_liters, status
+      FROM water_distributions
+      ORDER BY distribution_date DESC, id DESC
+    `);
+
+    const statusLabels = {
+      selesai: 'Selesai',
+      dalam_proses: 'Dalam Proses',
+      dibatalkan: 'Dibatalkan',
+    };
+    const workbook = new ExcelJS.Workbook();
+    workbook.creator = 'BPBD Kota Semarang';
+    const worksheet = workbook.addWorksheet('Distribusi Air Bersih', {
+      views: [{ state: 'frozen', ySplit: 1 }],
+    });
+
+    worksheet.columns = [
+      { header: 'Tanggal', key: 'tanggal', width: 15 },
+      { header: 'Kelurahan', key: 'kelurahan', width: 22 },
+      { header: 'Kecamatan', key: 'kecamatan', width: 22 },
+      { header: 'Lokasi', key: 'lokasi', width: 38 },
+      { header: 'Liter', key: 'liter', width: 14 },
+      { header: 'Status', key: 'status', width: 18 },
+      { header: 'Aksi', key: 'aksi', width: 16 },
+    ];
+
+    const headerRow = worksheet.getRow(1);
+    headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+    headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0284C7' } };
+    headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+
+    rows.forEach((row) => {
+      worksheet.addRow({
+        tanggal: row.distribution_date ? new Date(row.distribution_date).toLocaleDateString('id-ID') : '',
+        kelurahan: row.kelurahan || '',
+        kecamatan: row.kecamatan || '',
+        lokasi: row.location_address || '',
+        liter: Number(row.amount_liters) || 0,
+        status: statusLabels[row.status] || row.status || '',
+        aksi: 'Lihat detail',
+      });
+    });
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename=distribusi-air-bersih.xlsx');
+    await workbook.xlsx.write(res);
+    res.end();
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Gagal export Excel' });
   }
 };
 

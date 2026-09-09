@@ -24,6 +24,7 @@ import {
   MapPin,
   Activity,
   Settings,
+  Download,
 } from "lucide-react";
 import AnimatedNumber from "../../components/AnimatedNumber";
 import { SkeletonTable } from "../../components/Skeleton";
@@ -332,6 +333,14 @@ export default function WaterDistribution() {
       setShowDetail(detail);
     } catch {
       alert("Gagal memuat detail");
+    }
+  };
+
+  const handleExport = async () => {
+    try {
+      await waterDistributionService.exportWaterDistributionsExcel();
+    } catch (err) {
+      alert(err.response?.data?.message || "Gagal mengekspor data distribusi");
     }
   };
 
@@ -647,15 +656,25 @@ export default function WaterDistribution() {
             <List className="w-5 h-5 text-blue-600" />
             DAFTAR DISTRIBUSI
           </h2>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Cari kelurahan, lokasi, atau kecamatan..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition text-sm w-64"
-            />
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleExport}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition"
+              title="Ekspor semua data ke Excel"
+            >
+              <Download className="w-4 h-4" />
+              Ekspor Excel
+            </button>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Cari kelurahan, lokasi, atau kecamatan..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 pr-4 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition text-sm w-64"
+              />
+            </div>
           </div>
         </div>
 

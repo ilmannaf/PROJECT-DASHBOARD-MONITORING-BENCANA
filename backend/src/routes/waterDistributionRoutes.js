@@ -7,7 +7,8 @@ const {
   createDistribution,
   updateDistribution,
   deleteDistribution,
-  getSummary
+  getSummary,
+  exportDistributionsExcel
 } = require('../controllers/waterDistributionController');
 
 // ========================================
@@ -15,6 +16,7 @@ const {
 // ========================================
 router.get('/', verifyToken, getDistributions);
 router.get('/summary', verifyToken, getSummary);
+router.get('/export', verifyToken, exportDistributionsExcel);
 router.get('/:id', verifyToken, getDistributionById);
 router.post('/', verifyToken, requireRole('admin'), createDistribution);
 router.patch('/:id', verifyToken, requireRole('admin'), updateDistribution);

@@ -16,6 +16,16 @@ const waterDistributionService = {
     return data;
   },
 
+  exportWaterDistributionsExcel: async () => {
+    const response = await api.get('/water-distributions/export', { responseType: 'blob' });
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'distribusi-air-bersih.xlsx';
+    link.click();
+    window.URL.revokeObjectURL(url);
+  },
+
   createWaterDistribution: async (payload) => {
     const { data } = await api.post('/water-distributions', payload);
     return data;
