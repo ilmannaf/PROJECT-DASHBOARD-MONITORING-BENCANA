@@ -36,7 +36,7 @@ const COMMANDS = [
   { id: 'activities', label: 'Kegiatan', path: '/admin/activities', icon: Calendar, category: 'Navigasi', shortcut: '8' },
   { id: 'water-distribution', label: 'Pendistribusian Air Bersih', path: '/admin/water-distribution', icon: Droplets, category: 'Navigasi' },
   { id: 'unexpected-expenditure', label: 'Belanja Tidak Terduga (BTT)', path: '/admin/unexpected-expenditure', icon: Weight, category: 'Navigasi' },
-  { id: 'locations', label: 'Lokasi SMAB & KATANA', path: '/admin/locations', icon: MapPinned, category: 'Navigasi' },
+  { id: 'locations', label: 'Peta Bencana', path: '/admin/locations', icon: MapPinned, category: 'Navigasi' },
   { id: 'info-board', label: 'Papan Informasi', path: '/admin/info-board', icon: Info, category: 'Navigasi', shortcut: '9' },
   { id: 'info-screen', label: 'Layar Papan Informasi', path: '/admin/papan-informasi', icon: Monitor, category: 'Navigasi' },
   { id: 'login-history', label: 'History Login', path: '/admin/login-history', icon: Clock, category: 'Navigasi', shortcut: '0' },

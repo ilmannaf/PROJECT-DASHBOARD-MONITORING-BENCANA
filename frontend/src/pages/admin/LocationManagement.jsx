@@ -241,7 +241,7 @@ export default function LocationManagement() {
           </div>
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-orange-600 mb-1">Pusat Data Spasial</p>
-            <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Lokasi & Peta Bencana</h1>
+            <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Peta Bencana</h1>
             <p className="text-slate-500 text-sm mt-1">Kelola titik lokasi yang ditampilkan pada peta publik</p>
           </div>
         </div>
@@ -281,11 +281,6 @@ export default function LocationManagement() {
           <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Mode Peta</p>
           <p className="text-lg font-extrabold text-slate-900 mt-2">Kota Semarang</p>
           <p className="text-xs text-slate-500 mt-1">batas wilayah aktif</p>
-        </div>
-        <div className="rounded-2xl bg-white border border-slate-200 p-4 shadow-sm">
-          <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Akses Data</p>
-          <p className="text-lg font-extrabold text-slate-900 mt-2">{adminUser ? 'Admin penuh' : 'Lihat saja'}</p>
-          <p className="text-xs text-slate-500 mt-1">sesuai peran akun</p>
         </div>
       </div>
 

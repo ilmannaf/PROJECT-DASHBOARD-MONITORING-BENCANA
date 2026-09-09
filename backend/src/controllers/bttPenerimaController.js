@@ -2,16 +2,19 @@ const pool = require('../config/db');
 
 exports.createBttPenerima = async (req, res) => {
   try {
-    const { btt_id, nama_penerima, jenis_bencana, tanggal_kejadian, kerusakan, persentase_kerusakan, alamat, kelurahan, kecamatan, besaran_bantuan } = req.body;
+    const { btt_id, nama_penerima, no_kk, nik, jenis_bencana, tanggal_kejadian, kategori_kerusakan, kerusakan, status_pendanaan, tanggal_pencairan, persentase_kerusakan, alamat, kelurahan, kecamatan, besaran_bantuan } = req.body;
 
-    if (!btt_id || !nama_penerima || !jenis_bencana || !tanggal_kejadian || !kerusakan || !alamat || !kelurahan || !kecamatan || !besaran_bantuan) {
-      return res.status(400).json({ message: 'Semua field wajib diisi' });
+    if (!btt_id || !nama_penerima || !jenis_bencana || !tanggal_kejadian || !alamat || !besaran_bantuan) {
+      return res.status(400).json({ message: 'Nama, tanggal kejadian, jenis bencana, alamat, dan besaran bantuan wajib diisi' });
+    }
+    if (!['belum_cair', 'cair', 'tidak_cair'].includes(status_pendanaan || 'belum_cair')) {
+      return res.status(400).json({ message: 'Status pendanaan tidak valid' });
     }
 
     const [result] = await pool.query(
-      `INSERT INTO btt_penerima (btt_id, nama_penerima, jenis_bencana, tanggal_kejadian, kerusakan, persentase_kerusakan, alamat, kelurahan, kecamatan, besaran_bantuan, created_by)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [btt_id, nama_penerima, jenis_bencana, tanggal_kejadian, kerusakan, persentase_kerusakan || 100, alamat, kelurahan, kecamatan, besaran_bantuan, req.user.id]
+      `INSERT INTO btt_penerima (btt_id, nama_penerima, no_kk, nik, jenis_bencana, tanggal_kejadian, kategori_kerusakan, kerusakan, status_pendanaan, tanggal_pencairan, persentase_kerusakan, alamat, kelurahan, kecamatan, besaran_bantuan, created_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [btt_id, nama_penerima, no_kk || null, nik || null, jenis_bencana, tanggal_kejadian, kategori_kerusakan || null, kerusakan || null, status_pendanaan || 'belum_cair', tanggal_pencairan || null, persentase_kerusakan || 100, alamat, kelurahan || null, kecamatan || null, besaran_bantuan, req.user.id]
     );
 
     res.status(201).json({ message: 'Data penerima berhasil ditambahkan', id: result.insertId });
@@ -47,11 +50,11 @@ exports.getBttPenerimaById = async (req, res) => {
 exports.updateBttPenerima = async (req, res) => {
   try {
     const { id } = req.params;
-    const { nama_penerima, jenis_bencana, tanggal_kejadian, kerusakan, persentase_kerusakan, alamat, kelurahan, kecamatan, besaran_bantuan } = req.body;
+    const { nama_penerima, no_kk, nik, jenis_bencana, tanggal_kejadian, kategori_kerusakan, kerusakan, status_pendanaan, tanggal_pencairan, persentase_kerusakan, alamat, kelurahan, kecamatan, besaran_bantuan } = req.body;
 
     await pool.query(
-      `UPDATE btt_penerima SET nama_penerima=?, jenis_bencana=?, tanggal_kejadian=?, kerusakan=?, persentase_kerusakan=?, alamat=?, kelurahan=?, kecamatan=?, besaran_bantuan=? WHERE id=?`,
-      [nama_penerima, jenis_bencana, tanggal_kejadian, kerusakan, persentase_kerusakan, alamat, kelurahan, kecamatan, besaran_bantuan, id]
+      `UPDATE btt_penerima SET nama_penerima=?, no_kk=?, nik=?, jenis_bencana=?, tanggal_kejadian=?, kategori_kerusakan=?, kerusakan=?, status_pendanaan=?, tanggal_pencairan=?, persentase_kerusakan=?, alamat=?, kelurahan=?, kecamatan=?, besaran_bantuan=? WHERE id=?`,
+      [nama_penerima, no_kk || null, nik || null, jenis_bencana, tanggal_kejadian, kategori_kerusakan || null, kerusakan || null, status_pendanaan || 'belum_cair', tanggal_pencairan || null, persentase_kerusakan || 100, alamat, kelurahan || null, kecamatan || null, besaran_bantuan, id]
     );
 
     res.json({ message: 'Data penerima berhasil diperbarui' });

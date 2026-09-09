@@ -44,9 +44,14 @@ export default function UnexpectedExpenditure() {
   const [form, setForm] = useState({
     disaster_record_id: "",
     nama_penerima: "",
+    no_kk: "",
+    nik: "",
     jenis_bencana: "",
     tanggal_kejadian: "",
+    kategori_kerusakan: "",
     kerusakan: "",
+    status_pendanaan: "belum_cair",
+    tanggal_pencairan: "",
     persentase_kerusakan: "100",
     alamat: "",
     kelurahan: "",
@@ -89,9 +94,14 @@ export default function UnexpectedExpenditure() {
     setForm({
       disaster_record_id: "",
       nama_penerima: "",
+      no_kk: "",
+      nik: "",
       jenis_bencana: "",
       tanggal_kejadian: "",
+      kategori_kerusakan: "",
       kerusakan: "",
+      status_pendanaan: "belum_cair",
+      tanggal_pencairan: "",
       persentase_kerusakan: "100",
       alamat: "",
       kelurahan: "",
@@ -122,9 +132,14 @@ export default function UnexpectedExpenditure() {
     setForm({
       disaster_record_id: p.btt_id || "",
       nama_penerima: p.nama_penerima,
+      no_kk: p.no_kk || "",
+      nik: p.nik || "",
       jenis_bencana: p.jenis_bencana,
       tanggal_kejadian: p.tanggal_kejadian ? new Date(p.tanggal_kejadian).toISOString().split("T")[0] : "",
+      kategori_kerusakan: p.kategori_kerusakan || "",
       kerusakan: p.kerusakan,
+      status_pendanaan: p.status_pendanaan || "belum_cair",
+      tanggal_pencairan: p.tanggal_pencairan ? new Date(p.tanggal_pencairan).toISOString().split("T")[0] : "",
       persentase_kerusakan: String(p.persentase_kerusakan),
       alamat: p.alamat,
       kelurahan: p.kelurahan,
@@ -221,11 +236,19 @@ export default function UnexpectedExpenditure() {
             </button>
           </div>
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="md:col-span-2">
+            <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
                 Nama Penerima <span className="text-red-500">*</span>
               </label>
               <input name="nama_penerima" value={form.nama_penerima} onChange={handleChange} required placeholder="Nama lengkap penerima" className={inputClass} />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">No. KK</label>
+              <input name="no_kk" value={form.no_kk} onChange={handleChange} placeholder="Nomor Kartu Keluarga" className={inputClass} />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">NIK</label>
+              <input name="nik" value={form.nik} onChange={handleChange} placeholder="Nomor Induk Kependudukan" className={inputClass} />
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -239,11 +262,27 @@ export default function UnexpectedExpenditure() {
               </label>
               <input name="tanggal_kejadian" type="date" value={form.tanggal_kejadian} onChange={handleChange} required className={inputClass} />
             </div>
-            <div>
+            <div className="md:col-span-2">
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Kerusakan <span className="text-red-500">*</span>
+                Kategori Kerusakan
               </label>
-              <input name="kerusakan" value={form.kerusakan} onChange={handleChange} required placeholder="Contoh: Meninggal Dunia, Luka Berat" className={inputClass} />
+              <input name="kategori_kerusakan" value={form.kategori_kerusakan} onChange={handleChange} placeholder="Contoh: Rumah rusak berat 70%" className={inputClass} />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Keterangan Kerusakan</label>
+              <textarea name="kerusakan" value={form.kerusakan} onChange={handleChange} rows={2} placeholder="Uraian kerusakan atau kondisi penerima" className={inputClass} />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Status Pendanaan <span className="text-red-500">*</span></label>
+              <select name="status_pendanaan" value={form.status_pendanaan} onChange={handleChange} required className={inputClass}>
+                <option value="belum_cair">Belum Cair</option>
+                <option value="cair">Cair</option>
+                <option value="tidak_cair">Tidak Cair</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Tanggal Pencairan</label>
+              <input name="tanggal_pencairan" type="date" value={form.tanggal_pencairan} onChange={handleChange} className={inputClass} />
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -344,13 +383,15 @@ export default function UnexpectedExpenditure() {
                 <tr className="bg-gray-50/80">
                   <th className="py-4 px-4 text-xs font-bold uppercase tracking-wider text-gray-500 text-center w-10">No</th>
                   <th className="py-4 px-4 text-xs font-bold uppercase tracking-wider text-gray-500">Nama Penerima</th>
+                  <th className="py-4 px-4 text-xs font-bold uppercase tracking-wider text-gray-500">No. KK</th>
+                  <th className="py-4 px-4 text-xs font-bold uppercase tracking-wider text-gray-500">NIK</th>
                   <th className="py-4 px-4 text-xs font-bold uppercase tracking-wider text-gray-500">Jenis Bencana</th>
                   <th className="py-4 px-4 text-xs font-bold uppercase tracking-wider text-gray-500 text-center">Tanggal Kejadian</th>
-                  <th className="py-4 px-4 text-xs font-bold uppercase tracking-wider text-gray-500">Kerusakan</th>
-                  <th className="py-4 px-4 text-xs font-bold uppercase tracking-wider text-gray-500 text-center">%</th>
+                  <th className="py-4 px-4 text-xs font-bold uppercase tracking-wider text-gray-500">Kategori Kerusakan</th>
                   <th className="py-4 px-4 text-xs font-bold uppercase tracking-wider text-gray-500">Alamat</th>
-                  <th className="py-4 px-4 text-xs font-bold uppercase tracking-wider text-gray-500">Kelurahan</th>
                   <th className="py-4 px-4 text-xs font-bold uppercase tracking-wider text-gray-500">Kecamatan</th>
+                  <th className="py-4 px-4 text-xs font-bold uppercase tracking-wider text-gray-500">Status Pendanaan</th>
+                  <th className="py-4 px-4 text-xs font-bold uppercase tracking-wider text-gray-500">Tanggal Pencairan</th>
                   <th className="py-4 px-4 text-xs font-bold uppercase tracking-wider text-gray-500 text-right">Besaran Bantuan</th>
                   {adminUser && <th className="py-4 px-4 text-xs font-bold uppercase tracking-wider text-gray-500 text-center">Aksi</th>}
                 </tr>
@@ -360,13 +401,15 @@ export default function UnexpectedExpenditure() {
                   <tr key={p.id} className="hover:bg-orange-50/40 transition-colors group">
                     <td className="py-4 px-4 text-center text-gray-500 font-medium">{idx + 1}</td>
                     <td className="py-4 px-4 font-semibold text-gray-900">{p.nama_penerima}</td>
+                    <td className="py-4 px-4 text-gray-600 text-xs">{p.no_kk || "-"}</td>
+                    <td className="py-4 px-4 text-gray-600 text-xs">{p.nik || "-"}</td>
                     <td className="py-4 px-4 text-gray-600">{p.jenis_bencana}</td>
                     <td className="py-4 px-4 text-center text-gray-600">{new Date(p.tanggal_kejadian).toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" })}</td>
-                    <td className="py-4 px-4 text-gray-600">{p.kerusakan}</td>
-                    <td className="py-4 px-4 text-center text-gray-600">{p.persentase_kerusakan}%</td>
+                    <td className="py-4 px-4 text-gray-600 text-xs">{p.kategori_kerusakan || p.kerusakan || "-"}</td>
                     <td className="py-4 px-4 text-gray-600 text-xs">{p.alamat}</td>
-                    <td className="py-4 px-4 text-gray-600">{p.kelurahan}</td>
                     <td className="py-4 px-4 text-gray-600">{p.kecamatan}</td>
+                    <td className="py-4 px-4 text-center"><span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold ${p.status_pendanaan === "cair" ? "bg-green-100 text-green-700" : p.status_pendanaan === "tidak_cair" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"}`}>{p.status_pendanaan === "cair" ? "Cair" : p.status_pendanaan === "tidak_cair" ? "Tidak Cair" : "Belum Cair"}</span></td>
+                    <td className="py-4 px-4 text-center text-gray-600 text-xs">{p.tanggal_pencairan ? new Date(p.tanggal_pencairan).toLocaleDateString("id-ID") : "-"}</td>
                     <td className="py-4 px-4 text-right font-semibold text-gray-900">
                       Rp {Number(p.besaran_bantuan).toLocaleString("id-ID")}
                     </td>
@@ -444,15 +487,16 @@ export default function UnexpectedExpenditure() {
           <thead>
             <tr>
               <th>NO</th>
-              <th>NAMA PENERIMA</th>
+              <th>NAMA KEPALA KELUARGA</th>
+              <th>NO. KK</th>
+              <th>NIK</th>
               <th>JENIS BENCANA</th>
               <th>TANGGAL KEJADIAN</th>
-              <th>KERUSAKAN</th>
-              <th>PERSENTASE KERUSAKAN</th>
-              <th>ALAMAT</th>
-              <th>KELURAHAN</th>
-              <th>KECAMATAN</th>
-              <th>BESARANYA BANTUAN</th>
+              <th>ALAMAT (RT/RW)</th>
+              <th>KATEGORI KERUSAKAN</th>
+              <th>STATUS PENDANAAN</th>
+              <th>TANGGAL PENCAIRAN</th>
+              <th>BESAR BANTUAN</th>
             </tr>
           </thead>
           <tbody>
@@ -460,20 +504,21 @@ export default function UnexpectedExpenditure() {
               <tr key={p.id}>
                 <td style={{ textAlign: "center" }}>{idx + 1}</td>
                 <td>{p.nama_penerima}</td>
+                <td>{p.no_kk || ""}</td>
+                <td>{p.nik || ""}</td>
                 <td>{p.jenis_bencana}</td>
                 <td style={{ textAlign: "center" }}>{new Date(p.tanggal_kejadian).toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" })}</td>
-                <td>{p.kerusakan}</td>
-                <td style={{ textAlign: "center" }}>{p.persentase_kerusakan}%</td>
                 <td>{p.alamat}</td>
-                <td>{p.kelurahan}</td>
-                <td>{p.kecamatan}</td>
+                <td>{p.kategori_kerusakan || p.kerusakan || ""}</td>
+                <td>{p.status_pendanaan === "cair" ? "Cair" : p.status_pendanaan === "tidak_cair" ? "Tidak Cair" : "Belum Cair"}</td>
+                <td>{p.tanggal_pencairan ? new Date(p.tanggal_pencairan).toLocaleDateString("id-ID") : ""}</td>
                 <td style={{ textAlign: "right" }}>Rp {Number(p.besaran_bantuan).toLocaleString("id-ID")}</td>
               </tr>
             ))}
           </tbody>
           <tfoot>
             <tr className="total-row">
-              <td colSpan="9" style={{ textAlign: "right", fontWeight: "bold" }}>TOTAL</td>
+              <td colSpan="10" style={{ textAlign: "right", fontWeight: "bold" }}>TOTAL</td>
               <td style={{ textAlign: "right", fontWeight: "bold" }}>Rp {totalBantuan.toLocaleString("id-ID")}</td>
             </tr>
           </tfoot>
