@@ -3,7 +3,7 @@ import unexpectedExpenditureService from "../../services/unexpectedExpenditureSe
 import bttPenerimaService from "../../services/bttPenerimaService";
 import { getDisasterRecords } from "../../services/disasterService";
 import { isAdmin } from "../../services/authService";
-import { Wallet, Search, Plus, X, Trash2, Eye, CheckCircle, Clock, Printer, Edit } from "lucide-react";
+import { Wallet, Search, Plus, X, Trash2, Eye, CheckCircle, Clock, Printer, Edit, Download } from "lucide-react";
 import AnimatedNumber from "../../components/AnimatedNumber";
 import { SkeletonTable } from "../../components/Skeleton";
 
@@ -188,6 +188,14 @@ export default function UnexpectedExpenditure() {
     printWindow.print();
   };
 
+  const handleExport = async () => {
+    try {
+      await bttPenerimaService.exportBttPenerima();
+    } catch (err) {
+      alert(err.response?.data?.message || "Gagal mengekspor data BTT");
+    }
+  };
+
   const filteredPenerima = penerimaList.filter((p) => {
     const q = searchTerm.toLowerCase();
     return (
@@ -357,9 +365,14 @@ export default function UnexpectedExpenditure() {
               <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider">Daftar Usulan Nama Penerima Bantuan Sosial</h3>
             </div>
             {penerimaList.length > 0 && (
-              <button onClick={handlePrint} className="btn btn-secondary flex items-center gap-2 px-4 py-2 text-sm">
-                <Printer className="w-4 h-4" /> Cetak Lampiran
-              </button>
+              <div className="flex items-center gap-2">
+                {adminUser && <button onClick={handleExport} className="btn btn-secondary flex items-center gap-2 px-4 py-2 text-sm">
+                  <Download className="w-4 h-4" /> Export Excel
+                </button>}
+                <button onClick={handlePrint} className="btn btn-secondary flex items-center gap-2 px-4 py-2 text-sm">
+                  <Printer className="w-4 h-4" /> Cetak Lampiran
+                </button>
+              </div>
             )}
           </div>
           <div className="relative">

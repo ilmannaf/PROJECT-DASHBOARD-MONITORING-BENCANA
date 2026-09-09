@@ -24,6 +24,16 @@ const bttPenerimaService = {
   deleteBttPenerima: async (id) => {
     const response = await api.delete(`/btt-penerima/${id}`);
     return response.data;
+  },
+
+  exportBttPenerima: async () => {
+    const response = await api.get('/btt-penerima/export', { responseType: 'blob' });
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'rekapan-penerima-bantuan-btt.xlsx';
+    link.click();
+    window.URL.revokeObjectURL(url);
   }
 };
 

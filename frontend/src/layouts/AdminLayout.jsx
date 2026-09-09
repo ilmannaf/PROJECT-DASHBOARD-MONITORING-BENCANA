@@ -1,11 +1,9 @@
 import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { logout, getCurrentUser, isAdmin } from "../services/authService";
 import { getSocket } from "../services/socket";
 import { useTheme } from "../context/ThemeContext";
-import useKeyboardShortcuts from "../hooks/useKeyboardShortcuts";
 import CommandPalette from "../components/CommandPalette";
-import KeyboardShortcutsHelp from "../components/KeyboardShortcutsHelp";
 import {
   LayoutDashboard,
   FileText,
@@ -28,7 +26,6 @@ import {
   UserCircle,
   UserCheck,
   Home,
-  Keyboard,
   Sun,
   Moon,
   Droplets,
@@ -91,7 +88,6 @@ export default function AdminLayout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
-  const [shortcutsHelpOpen, setShortcutsHelpOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [notifOpen, setNotifOpen] = useState(false);
   const searchInputRef = useRef(null);
@@ -125,40 +121,6 @@ export default function AdminLayout() {
       return () => document.removeEventListener("click", handleClick);
     }
   }, [userDropdownOpen]);
-
-  // Keyboard shortcuts
-  const toggleSidebar = useCallback(() => setSidebarCollapsed((p) => !p), []);
-  const expandSidebar = useCallback(() => setSidebarCollapsed(false), []);
-  const collapseSidebar = useCallback(() => setSidebarCollapsed(true), []);
-  const focusSearch = useCallback(() => searchInputRef.current?.focus(), []);
-
-  // Navigation shortcuts (1-0) — map ke MENU_ITEMS paths
-  const navigationShortcuts = MENU_ITEMS.slice(0, 10).map((item, index) => ({
-    key: String(index === 9 ? 0 : index + 1),
-    action: () => navigate(item.path),
-  }));
-
-  useKeyboardShortcuts([
-    // Command Palette
-    { key: 'k', ctrl: true, action: () => setCommandPaletteOpen((p) => !p), allowWhenTyping: true },
-    // Shortcuts Help
-    { key: '?', action: () => setShortcutsHelpOpen((p) => !p), allowWhenTyping: true },
-    // Navigation 1-0
-    ...navigationShortcuts,
-    // Sidebar toggle
-    { key: '[', action: collapseSidebar },
-    { key: ']', action: expandSidebar },
-    // Search focus
-    { key: '/', action: focusSearch },
-    // Dark mode toggle
-    { key: 'd', action: toggleTheme },
-    // Escape — tutup semua modal
-    { key: 'Escape', action: () => {
-      setCommandPaletteOpen(false);
-      setShortcutsHelpOpen(false);
-      setNotifOpen(false);
-    }, allowWhenTyping: true },
-  ]);
 
   // Socket — real-time notifications
   useEffect(() => {
@@ -370,15 +332,6 @@ export default function AdminLayout() {
 
             {/* Right: Notifications + User */}
             <div className="flex items-center gap-1">
-              {/* Keyboard Shortcuts */}
-              <button
-                onClick={() => setShortcutsHelpOpen(true)}
-                className="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:hover:text-gray-200 dark:hover:bg-white/10 rounded transition-all hidden sm:flex"
-                title="Keyboard Shortcuts ( ? )"
-              >
-                <Keyboard className="w-5 h-5" />
-              </button>
-
               {/* Command Palette */}
               <button
                 onClick={() => setCommandPaletteOpen(true)}
@@ -555,16 +508,10 @@ export default function AdminLayout() {
         </footer>
       </div>
 
-      {/* Keyboard Shortcuts Components */}
       <CommandPalette
         open={commandPaletteOpen}
         onClose={() => setCommandPaletteOpen(false)}
-        onShowShortcuts={() => setShortcutsHelpOpen(true)}
         onToggleDarkMode={toggleTheme}
-      />
-      <KeyboardShortcutsHelp
-        open={shortcutsHelpOpen}
-        onClose={() => setShortcutsHelpOpen(false)}
       />
     </div>
   );

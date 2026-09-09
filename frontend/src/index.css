@@ -57,6 +57,39 @@ button:disabled {
   @apply bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300 hover:scale-[1.02] active:scale-[0.98];
 }
 
+/* Shared dark theme for admin surfaces, forms, tables, and overlays. */
+.dark body {
+  background-color: #0f172a;
+  color: #e2e8f0;
+}
+
+.dark .bg-white { background-color: #1e293b; }
+.dark .bg-gray-50, .dark .bg-gray-50\/80 { background-color: #172033; }
+.dark .bg-gray-100 { background-color: #273449; }
+.dark .bg-gray-200 { background-color: #334155; }
+.dark .text-gray-900, .dark .text-gray-800 { color: #f8fafc; }
+.dark .text-gray-700 { color: #e2e8f0; }
+.dark .text-gray-600 { color: #cbd5e1; }
+.dark .text-gray-500 { color: #94a3b8; }
+.dark .text-gray-400 { color: #94a3b8; }
+.dark .border-gray-100, .dark .border-gray-200, .dark .border-gray-300 { border-color: #334155; }
+.dark input, .dark textarea, .dark select {
+  background-color: #1e293b;
+  color: #f8fafc;
+  border-color: #475569;
+}
+.dark input::placeholder, .dark textarea::placeholder { color: #94a3b8; }
+.dark .btn-secondary {
+  background-color: #1e293b;
+  color: #e2e8f0;
+  border-color: #475569;
+}
+.dark .btn-secondary:hover { background-color: #334155; border-color: #64748b; }
+.dark .hover\:bg-gray-50:hover { background-color: #273449; }
+.dark .hover\:bg-gray-100:hover { background-color: #334155; }
+.dark .divide-gray-50 > :not([hidden]) ~ :not([hidden]) { border-color: #334155; }
+.dark .shadow-sm, .dark .shadow-xl, .dark .shadow-lg { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); }
+
 .btn-danger {
   @apply bg-red-500 text-white hover:bg-red-600 hover:shadow-md transition-all duration-200 hover:scale-[1.02] active:scale-[0.98];
 }
@@ -1293,25 +1326,7 @@ html.dark .fixed .bg-gray-100.rounded {
   color: #94a3b8 !important;
 }
 
-/* Keyboard Shortcuts Help modal */
-html.dark .fixed .bg-white.rounded-2xl.shadow-2xl {
-  background-color: #1e293b !important;
-  border-color: #334155 !important;
-}
-
-/* Keyboard Shortcuts Help header icon bg */
-html.dark .bg-blue-50.rounded-lg {
-  background-color: rgba(59, 130, 246, 0.15) !important;
-}
-
-/* Keyboard Shortcuts kbd badges */
-html.dark .bg-gray-100.border.border-gray-200.rounded {
-  background-color: #334155 !important;
-  border-color: #475569 !important;
-  color: #94a3b8 !important;
-}
-
-/* Keyboard Shortcuts footer */
+/* Dark overlay footer */
 html.dark .bg-gray-50\/50 {
   background-color: #0f172a !important;
   border-color: #334155 !important;

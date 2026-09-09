@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const ExcelJS = require('exceljs');
 
 exports.createBttPenerima = async (req, res) => {
   try {
@@ -73,5 +74,78 @@ exports.deleteBttPenerima = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Terjadi kesalahan server' });
+  }
+};
+
+exports.exportBttPenerima = async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM btt_penerima ORDER BY id ASC');
+    const workbook = new ExcelJS.Workbook();
+    workbook.creator = 'BPBD Kota Semarang';
+    const worksheet = workbook.addWorksheet('Penerima BTT', { views: [{ state: 'frozen', ySplit: 4 }] });
+
+    worksheet.mergeCells('A1:M1');
+    worksheet.getCell('A1').value = 'DATA REKAPAN PENERIMAAN BANTUAN BENCANA BPBD KOTA SEMARANG 2026';
+    worksheet.getCell('A1').font = { bold: true, size: 14, color: { argb: 'FF1F2937' } };
+    worksheet.getCell('A1').alignment = { horizontal: 'center', vertical: 'middle' };
+    worksheet.getRow(1).height = 28;
+    worksheet.mergeCells('A2:M2');
+    worksheet.getCell('A2').value = `Dibuat: ${new Date().toLocaleDateString('id-ID')}`;
+    worksheet.getCell('A2').alignment = { horizontal: 'center' };
+    worksheet.mergeCells('A3:M3');
+    worksheet.getCell('A3').value = 'Rekap data penerima bantuan bencana';
+
+    worksheet.columns = [
+      { header: 'No', key: 'no', width: 6 },
+      { header: 'Hari/Tanggal Kejadian', key: 'tanggal_kejadian', width: 22 },
+      { header: 'Nama Kepala Keluarga', key: 'nama_penerima', width: 28 },
+      { header: 'No. KK', key: 'no_kk', width: 22 },
+      { header: 'NIK', key: 'nik', width: 22 },
+      { header: 'Jenis Bencana', key: 'jenis_bencana', width: 24 },
+      { header: 'Alamat (RT/RW)', key: 'alamat', width: 42 },
+      { header: 'Kategori Kerusakan', key: 'kategori_kerusakan', width: 36 },
+      { header: 'Status Pendanaan', key: 'status_pendanaan', width: 20 },
+      { header: 'Hari/Tanggal Pencairan', key: 'tanggal_pencairan', width: 22 },
+      { header: 'Besar Bantuan', key: 'besaran_bantuan', width: 18 },
+      { header: 'Kelurahan', key: 'kelurahan', width: 20 },
+      { header: 'Kecamatan', key: 'kecamatan', width: 20 },
+    ];
+    const headerRow = worksheet.getRow(4);
+    headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' } };
+    headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE65100' } };
+    headerRow.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+    headerRow.height = 32;
+
+    rows.forEach((row, index) => worksheet.addRow({
+      no: index + 1,
+      tanggal_kejadian: row.tanggal_kejadian ? new Date(row.tanggal_kejadian).toLocaleDateString('id-ID') : '',
+      nama_penerima: row.nama_penerima,
+      no_kk: row.no_kk || '',
+      nik: row.nik || '',
+      jenis_bencana: row.jenis_bencana,
+      alamat: row.alamat,
+      kategori_kerusakan: row.kategori_kerusakan || row.kerusakan || '',
+      status_pendanaan: row.status_pendanaan === 'cair' ? 'Cair' : row.status_pendanaan === 'tidak_cair' ? 'Tidak Cair' : 'Belum Cair',
+      tanggal_pencairan: row.tanggal_pencairan ? new Date(row.tanggal_pencairan).toLocaleDateString('id-ID') : '',
+      besaran_bantuan: Number(row.besaran_bantuan) || 0,
+      kelurahan: row.kelurahan || '',
+      kecamatan: row.kecamatan || '',
+    }));
+    worksheet.getColumn('besaran_bantuan').numFmt = 'Rp #,##0';
+    worksheet.autoFilter = { from: 'A4', to: 'M4' };
+    worksheet.eachRow((row, rowNumber) => {
+      if (rowNumber > 4) {
+        row.alignment = { vertical: 'top', wrapText: true };
+        row.border = { bottom: { style: 'hair', color: { argb: 'FFD9E2EC' } } };
+      }
+    });
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', 'attachment; filename="rekapan-penerima-bantuan-btt.xlsx"');
+    await workbook.xlsx.write(res);
+    res.end();
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Gagal mengekspor data BTT' });
   }
 };

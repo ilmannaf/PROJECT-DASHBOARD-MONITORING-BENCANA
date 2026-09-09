@@ -43,12 +43,11 @@ const COMMANDS = [
   { id: 'profile', label: 'Profil Saya', path: '/admin/profile', icon: UserCircle, category: 'Navigasi' },
   { id: 'petugas-profiles', label: 'Profil Petugas', path: '/admin/petugas-profiles', icon: UserCheck, category: 'Navigasi' },
   // Aksi
-  { id: 'shortcuts-help', label: 'Lihat Keyboard Shortcuts', path: null, icon: Search, category: 'Aksi', shortcut: '?' },
   { id: 'dark-mode', label: 'Toggle Dark Mode', path: null, icon: Search, category: 'Aksi', shortcut: 'D', action: 'darkmode' },
   { id: 'logout', label: 'Keluar', path: null, icon: LogOut, category: 'Aksi', action: 'logout' },
 ];
 
-export default function CommandPalette({ open, onClose, onShowShortcuts, onToggleDarkMode }) {
+export default function CommandPalette({ open, onClose, onToggleDarkMode }) {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -100,11 +99,6 @@ export default function CommandPalette({ open, onClose, onShowShortcuts, onToggl
     if (cmd.action === 'darkmode') {
       onToggleDarkMode?.();
       onClose();
-      return;
-    }
-    if (cmd.id === 'shortcuts-help') {
-      onClose();
-      onShowShortcuts?.();
       return;
     }
     if (cmd.path) {
