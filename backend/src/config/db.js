@@ -248,9 +248,28 @@ const ensureBaseSchema = async () => {
     await addColumnIfNotExists('users', 'bio', 'TEXT');
     await addColumnIfNotExists('users', 'status', "ENUM('on_duty','off_duty','resting') DEFAULT 'on_duty'");
     await addColumnIfNotExists('users', 'photo_url', 'VARCHAR(255)');
+    await addColumnIfNotExists('water_distributions', 'distribution_date', "DATE NOT NULL DEFAULT '1970-01-01'");
+    await addColumnIfNotExists('water_distributions', 'location_address', "VARCHAR(255) NOT NULL DEFAULT ''");
+    await addColumnIfNotExists('water_distributions', 'latitude', 'DECIMAL(10, 6)');
+    await addColumnIfNotExists('water_distributions', 'longitude', 'DECIMAL(11, 6)');
+    await addColumnIfNotExists('water_distributions', 'amount_liters', 'INT NOT NULL DEFAULT 0');
     await addColumnIfNotExists('water_distributions', 'total_supply', 'INT NOT NULL DEFAULT 0');
     await addColumnIfNotExists('water_distributions', 'tank_truck_count', 'INT NOT NULL DEFAULT 1');
     await addColumnIfNotExists('water_distributions', 'documentation_photo', 'VARCHAR(255)');
+    await addColumnIfNotExists('water_distributions', 'notes', 'TEXT');
+
+    // Fix old schema: make disaster_record_id nullable if it exists (old migration had NOT NULL)
+    try {
+      const [distCols] = await conn.query("SHOW COLUMNS FROM water_distributions LIKE 'disaster_record_id'");
+      if (distCols.length > 0) {
+        await conn.query('ALTER TABLE water_distributions MODIFY COLUMN disaster_record_id INT NULL');
+      }
+    } catch (_) {}
+
+    // Fix old schema: update status ENUM to match new values
+    try {
+      await conn.query("ALTER TABLE water_distributions MODIFY COLUMN status ENUM('selesai', 'dalam_proses', 'dibatalkan') DEFAULT 'selesai'");
+    } catch (_) {}
     await conn.query('ALTER TABLE katana_locations MODIFY COLUMN pembentukan VARCHAR(30)');
     await addColumnIfNotExists('btt_penerima', 'no_kk', 'VARCHAR(30)');
     await addColumnIfNotExists('btt_penerima', 'nik', 'VARCHAR(30)');
