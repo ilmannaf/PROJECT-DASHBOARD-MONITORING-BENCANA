@@ -176,6 +176,8 @@ CREATE TABLE water_distributions (
   latitude DECIMAL(10, 6),
   longitude DECIMAL(11, 6),
   amount_liters INT NOT NULL DEFAULT 0,
+  tank_truck_count INT NOT NULL DEFAULT 1,
+  documentation_photo VARCHAR(255),
   total_supply INT NOT NULL DEFAULT 0,
   notes TEXT,
   status ENUM('selesai', 'dalam_proses', 'dibatalkan') DEFAULT 'selesai',

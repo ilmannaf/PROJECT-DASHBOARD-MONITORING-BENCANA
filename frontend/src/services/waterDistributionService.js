@@ -27,12 +27,16 @@ const waterDistributionService = {
   },
 
   createWaterDistribution: async (payload) => {
-    const { data } = await api.post('/water-distributions', payload);
+    const { data } = await api.post('/water-distributions', payload, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
     return data;
   },
 
   updateWaterDistribution: async (id, payload) => {
-    const { data } = await api.patch(`/water-distributions/${id}`, payload);
+    const { data } = await api.patch(`/water-distributions/${id}`, payload, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
     return data;
   },
 

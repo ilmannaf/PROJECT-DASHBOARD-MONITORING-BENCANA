@@ -112,7 +112,8 @@ app.use((err, req, res, next) => {
   console.error(err);
   // handle multer file limit errors dengan pesan user-friendly
   if (err.code === 'LIMIT_FILE_SIZE') {
-    return res.status(400).json({ message: 'Ukuran foto maksimal 5MB per file' });
+    const isWaterDistribution = req.originalUrl?.includes('/water-distributions');
+    return res.status(400).json({ message: isWaterDistribution ? 'Foto dokumentasi maksimal 2 MB' : 'Ukuran foto maksimal 5MB per file' });
   }
   if (err.code === 'LIMIT_FILE_COUNT' || err.code === 'LIMIT_UNEXPECTED_FILE') {
     return res.status(400).json({ message: 'Maksimal 5 foto' });

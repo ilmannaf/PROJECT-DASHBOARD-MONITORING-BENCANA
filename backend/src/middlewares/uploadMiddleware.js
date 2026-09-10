@@ -24,10 +24,25 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
+const jpgFileFilter = (req, file, cb) => {
+  if (['image/jpeg', 'image/jpg'].includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(new Error('Foto dokumentasi harus berformat JPG'), false);
+  }
+};
+
 const upload = multer({
   storage,
   fileFilter,
   limits: { fileSize: 5 * 1024 * 1024 }, // max 5MB per file, max 5 files validated in controller
 });
 
+const uploadJpgUnder2Mb = multer({
+  storage,
+  fileFilter: jpgFileFilter,
+  limits: { fileSize: 2 * 1024 * 1024 },
+});
+
 module.exports = upload;
+module.exports.uploadJpgUnder2Mb = uploadJpgUnder2Mb;

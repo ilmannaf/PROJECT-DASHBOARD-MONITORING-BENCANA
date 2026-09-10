@@ -288,7 +288,7 @@ export default function UnexpectedExpenditure() {
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Status Pendanaan <span className="text-red-500">*</span></label>
               <select name="status_pendanaan" value={form.status_pendanaan} onChange={handleChange} required className={inputClass}>
-                <option value="belum_cair">Belum Cair</option>
+                <option value="belum_cair">Dalam Proses</option>
                 <option value="cair">Cair</option>
                 <option value="tidak_cair">Tidak Cair</option>
               </select>
@@ -423,7 +423,7 @@ export default function UnexpectedExpenditure() {
                     <td className="py-4 px-4 text-gray-600 text-xs">{p.kategori_kerusakan || p.kerusakan || "-"}</td>
                     <td className="py-4 px-4 text-gray-600 text-xs">{p.alamat}</td>
                     <td className="py-4 px-4 text-gray-600">{p.kecamatan}</td>
-                    <td className="py-4 px-4 text-center"><span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold ${p.status_pendanaan === "cair" ? "bg-green-100 text-green-700" : p.status_pendanaan === "tidak_cair" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"}`}>{p.status_pendanaan === "cair" ? "Cair" : p.status_pendanaan === "tidak_cair" ? "Tidak Cair" : "Belum Cair"}</span></td>
+                    <td className="py-4 px-4 text-center"><span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold ${p.status_pendanaan === "cair" ? "bg-green-100 text-green-700" : p.status_pendanaan === "tidak_cair" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"}`}>{p.status_pendanaan === "cair" ? "Cair" : p.status_pendanaan === "tidak_cair" ? "Tidak Cair" : "Dalam Proses"}</span></td>
                     <td className="py-4 px-4 text-center text-gray-600 text-xs">{p.tanggal_pencairan ? new Date(p.tanggal_pencairan).toLocaleDateString("id-ID") : "-"}</td>
                     <td className="py-4 px-4 text-right font-semibold text-gray-900">
                       Rp {Number(p.besaran_bantuan).toLocaleString("id-ID")}
@@ -525,7 +525,7 @@ export default function UnexpectedExpenditure() {
                 <td style={{ textAlign: "center" }}>{new Date(p.tanggal_kejadian).toLocaleDateString("id-ID", { day: "2-digit", month: "long", year: "numeric" })}</td>
                 <td>{p.alamat}</td>
                 <td>{p.kategori_kerusakan || p.kerusakan || ""}</td>
-                <td>{p.status_pendanaan === "cair" ? "Cair" : p.status_pendanaan === "tidak_cair" ? "Tidak Cair" : "Belum Cair"}</td>
+                <td>{p.status_pendanaan === "cair" ? "Cair" : p.status_pendanaan === "tidak_cair" ? "Tidak Cair" : "Dalam Proses"}</td>
                 <td>{p.tanggal_pencairan ? new Date(p.tanggal_pencairan).toLocaleDateString("id-ID") : ""}</td>
                 <td style={{ textAlign: "right" }}>Rp {Number(p.besaran_bantuan).toLocaleString("id-ID")}</td>
               </tr>

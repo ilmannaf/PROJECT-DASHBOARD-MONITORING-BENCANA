@@ -34,6 +34,7 @@ const inputClass =
 
 const SEMARANG_CENTER = [-6.997, 110.44];
 const SEMARANG_ZOOM = 12;
+const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000/api").replace(/\/api\/?$/, "");
 
 const SEMARANG_RING = semarangGeojson.features[0].geometry.coordinates[0];
 const SEMARANG_LATLNG = SEMARANG_RING.map(([lng, lat]) => [lat, lng]);
@@ -106,6 +107,7 @@ function LocationMarker({ position, onPositionChange }) {
 export default function WaterDistribution() {
   const adminUser = isAdmin();
   const [items, setItems] = useState([]);
+  const [documentationPhoto, setDocumentationPhoto] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showContent, setShowContent] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -131,11 +133,21 @@ export default function WaterDistribution() {
     latitude: "",
     longitude: "",
     amount_liters: "",
+    tank_truck_count: "1",
     total_supply: "",
     notes: "",
   });
 
   const geocodeTimerRef = useRef(null);
+  const formRef = useRef(null);
+
+  useEffect(() => {
+    if (!showForm || !editId || !formRef.current) return;
+
+    requestAnimationFrame(() => {
+      formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }, [showForm, editId]);
 
   const geocodeAndUpdate = useCallback(async (query, isDetailed = false) => {
     const result = await geocodeAddress(query);
@@ -240,9 +252,11 @@ export default function WaterDistribution() {
       latitude: "",
       longitude: "",
       amount_liters: "",
+      tank_truck_count: "1",
       total_supply: "",
       notes: "",
     });
+    setDocumentationPhoto(null);
     setShowForm(false);
     setEditId(null);
   };
@@ -250,18 +264,18 @@ export default function WaterDistribution() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const amount = parseInt(form.amount_liters) || 0;
-    if (amount > 5000) {
-      alert("Jumlah air maksimal 5.000 liter");
+    if (!Number.isInteger(Number(form.tank_truck_count)) || Number(form.tank_truck_count) < 1) {
+      alert("Jumlah truk tangki minimal 1");
+      return;
+    }
+    if (documentationPhoto && (!['image/jpeg', 'image/jpg'].includes(documentationPhoto.type) || documentationPhoto.size > 2 * 1024 * 1024)) {
+      alert("Foto dokumentasi harus berformat JPG dan maksimal 2 MB");
       return;
     }
     try {
-      const payload = {
-        ...form,
-        latitude: parseFloat(form.latitude) || null,
-        longitude: parseFloat(form.longitude) || null,
-        amount_liters: amount,
-        total_supply: parseInt(form.total_supply) || 0,
-      };
+      const payload = new FormData();
+      Object.entries({ ...form, latitude: parseFloat(form.latitude) || "", longitude: parseFloat(form.longitude) || "", amount_liters: amount, total_supply: parseInt(form.total_supply) || 0 }).forEach(([key, value]) => payload.append(key, value));
+      if (documentationPhoto) payload.append("documentation_photo", documentationPhoto);
       if (editId) {
         await waterDistributionService.updateWaterDistribution(editId, payload);
       } else {
@@ -284,9 +298,11 @@ export default function WaterDistribution() {
       latitude: item.latitude || "",
       longitude: item.longitude || "",
       amount_liters: item.amount_liters || "",
+      tank_truck_count: item.tank_truck_count || "1",
       total_supply: item.total_supply || "",
       notes: item.notes || "",
     });
+    setDocumentationPhoto(null);
     setEditId(item.id);
     setShowForm(true);
   };
@@ -376,7 +392,7 @@ export default function WaterDistribution() {
       </div>
 
       {showForm && adminUser && (
-        <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/60 border border-gray-100 p-8 mb-8 animate-slide-in">
+        <div ref={formRef} className="scroll-mt-6 bg-white rounded-3xl shadow-xl shadow-gray-200/60 border border-gray-100 p-8 mb-8 animate-slide-in">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-gray-900">
               {editId ? "Edit Data Distribusi" : "Formulir Pendistribusian Air Bersih"}
@@ -445,8 +461,16 @@ export default function WaterDistribution() {
             </div>
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">Jumlah Air Didistribusikan (Liter)</label>
-              <input type="number" name="amount_liters" value={form.amount_liters} onChange={handleChange} placeholder="Jumlah liter" max="5000" min="0" className={inputClass} />
-              <p className="text-xs text-gray-400 mt-1">Maksimal 5.000 liter</p>
+              <input type="number" name="amount_liters" value={form.amount_liters} onChange={handleChange} placeholder="Contoh: 7000" min="0" className={inputClass} />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Jumlah Truk Tangki <span className="text-red-500">*</span></label>
+              <input type="number" name="tank_truck_count" value={form.tank_truck_count} onChange={handleChange} required min="1" step="1" placeholder="Contoh: 1 atau 2" className={inputClass} />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Foto Dokumentasi Kegiatan</label>
+              <input type="file" accept="image/jpeg,image/jpg" onChange={(e) => setDocumentationPhoto(e.target.files[0] || null)} className={inputClass} />
+              <p className="text-xs text-gray-400 mt-1">Format JPG, maksimal 2 MB</p>
             </div>
 
             <div className="md:col-span-2">
@@ -605,12 +629,12 @@ export default function WaterDistribution() {
       </div>
 
       {/* Map Section */}
-      <div className="mb-8">
+      <div className="mb-24 lg:mr-20">
         <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
           <Map className="w-5 h-5 text-blue-600" />
           PETA DISTRIBUSI
         </h2>
-        <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/60 border border-gray-100 overflow-hidden h-[650px]">
+        <div className="relative isolate bg-white rounded-3xl shadow-xl shadow-gray-200/60 border border-gray-100 overflow-hidden h-[min(650px,calc(100vh-220px))] min-h-[460px]">
           {loading ? (
             <div className="flex items-center justify-center h-full bg-gray-50">
               <div className="animate-pulse text-gray-400">Memuat peta...</div>
@@ -651,13 +675,14 @@ export default function WaterDistribution() {
                 <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-500">Kecamatan</th>
                 <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-500">Lokasi</th>
                 <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-500 text-center">Liter</th>
+                <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-500">Jumlah Truk</th>
 
                 <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-500 text-center">Aksi</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
               {loading ? (
-                <SkeletonTable rows={5} cols={7} />
+                <SkeletonTable rows={5} cols={8} />
               ) : filteredItems.length > 0 ? (
                 filteredItems.map((item) => {
                   return (
@@ -671,6 +696,16 @@ export default function WaterDistribution() {
                       <td className="py-4 px-6 text-sm text-gray-600">{item.kecamatan || "-"}</td>
                       <td className="py-4 px-6 text-sm text-gray-600 max-w-xs truncate">{item.location_address || "-"}</td>
                       <td className="py-4 px-6 text-center text-sm font-medium text-gray-700">{item.amount_liters || "-"}</td>
+                      <td className="py-4 px-6 text-sm text-gray-600">{item.tank_truck_count || "-"}</td>
+                      <td className="py-4 px-6">
+                        {item.documentation_photo ? (
+                          <img
+                            src={`${API_BASE}${item.documentation_photo}`}
+                            alt="Dokumentasi kegiatan"
+                            className="w-16 h-12 object-cover rounded-lg border border-gray-200 shadow-sm"
+                          />
+                        ) : <span className="text-sm text-gray-400">-</span>}
+                      </td>
                       <td className="py-4 px-6">
                         <div className="flex justify-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
                           <button onClick={() => handleViewDetail(item.id)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Detail">
@@ -693,7 +728,7 @@ export default function WaterDistribution() {
                 })
               ) : (
                 <tr>
-                  <td colSpan="6" className="py-20 text-center">
+                  <td colSpan="8" className="py-20 text-center">
                     <div className="flex flex-col items-center gap-4">
                       <Droplets className="w-10 h-10 text-gray-300" />
                       <div>
@@ -771,6 +806,17 @@ export default function WaterDistribution() {
               <div><span className="font-semibold text-gray-700">Alamat Lokasi:</span> <span>{showDetail.location_address || "-"}</span></div>
               <div className="flex justify-between"><span className="font-semibold text-gray-700">Koordinat:</span> <span>{showDetail.latitude ? `${parseFloat(showDetail.latitude).toFixed(4)}, ${parseFloat(showDetail.longitude).toFixed(4)}` : "-"}</span></div>
               <div className="flex justify-between"><span className="font-semibold text-gray-700">Jumlah Air Didistribusikan:</span> <span>{showDetail.amount_liters || "-"} Liter</span></div>
+              <div className="flex justify-between"><span className="font-semibold text-gray-700">Jumlah Truk Tangki:</span> <span>{showDetail.tank_truck_count || "-"}</span></div>
+              <div>
+                <span className="font-semibold text-gray-700">Foto Dokumentasi:</span>
+                {showDetail.documentation_photo ? (
+                  <img
+                    src={`${API_BASE}${showDetail.documentation_photo}`}
+                    alt="Dokumentasi kegiatan"
+                    className="mt-2 w-full max-h-72 object-contain rounded-xl border border-gray-200 bg-gray-50"
+                  />
+                ) : <span> -</span>}
+              </div>
               <div className="flex justify-between"><span className="font-semibold text-gray-700">Total Persediaan:</span> <span>{showDetail.total_supply || "-"} Liter</span></div>
               <div><span className="font-semibold text-gray-700">Catatan:</span> <span>{showDetail.notes || "-"}</span></div>
               <div><span className="font-semibold text-gray-700">Dibuat oleh:</span> <span>{showDetail.created_by_name || "-"}</span></div>

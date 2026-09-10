@@ -213,6 +213,8 @@ const ensureBaseSchema = async () => {
         latitude DECIMAL(10, 6),
         longitude DECIMAL(11, 6),
         amount_liters INT NOT NULL DEFAULT 0,
+        tank_truck_count INT NOT NULL DEFAULT 1,
+        documentation_photo VARCHAR(255),
         total_supply INT NOT NULL DEFAULT 0,
         notes TEXT,
         status ENUM('selesai', 'dalam_proses', 'dibatalkan') DEFAULT 'selesai',
@@ -247,6 +249,8 @@ const ensureBaseSchema = async () => {
     await addColumnIfNotExists('users', 'status', "ENUM('on_duty','off_duty','resting') DEFAULT 'on_duty'");
     await addColumnIfNotExists('users', 'photo_url', 'VARCHAR(255)');
     await addColumnIfNotExists('water_distributions', 'total_supply', 'INT NOT NULL DEFAULT 0');
+    await addColumnIfNotExists('water_distributions', 'tank_truck_count', 'INT NOT NULL DEFAULT 1');
+    await addColumnIfNotExists('water_distributions', 'documentation_photo', 'VARCHAR(255)');
     await conn.query('ALTER TABLE katana_locations MODIFY COLUMN pembentukan VARCHAR(30)');
     await addColumnIfNotExists('btt_penerima', 'no_kk', 'VARCHAR(30)');
     await addColumnIfNotExists('btt_penerima', 'nik', 'VARCHAR(30)');
