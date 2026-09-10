@@ -47,17 +47,11 @@ PROJECT-DASHBOARD-MONITORING-BENCANA/
 ### 1. Database Setup
 
 ```bash
-mysql -u root -p
-CREATE DATABASE sistem_kebencanaan;
-USE sistem_kebencanaan;
-SOURCE backend/database/schema.sql;
-SOURCE backend/database/seed.sql;
-SOURCE backend/database/migration_activity_time.sql;
-SOURCE backend/database/migration_info_board.sql;
-SOURCE backend/database/seed_info_board.sql;
+mysql -u root -p < backend/database/setup.sql
 ```
 
-Jika database sudah ada sebelumnya, jalankan migration di `backend/database/` sesuai urutan.
+> **Catatan:** `setup.sql` berisi schema lengkap + seed data. Untuk setup dari awal, cukup jalankan satu file ini.
+> Jika database sudah ada sebelumnya, jalankan migration di `backend/database/` sesuai urutan.
 
 ### 2. Backend
 
@@ -509,7 +503,7 @@ PERSONIL SURVEY LAPANGAN & ISI FORM SURVEY
 | `Cannot find module 'bcrypt'` | `cd backend && npm install` |
 | Port 5173 sudah dipakai | Ganti port di `vite.config.js` |
 | `Access denied for user` | Cek `.env` → pastikan `DB_PASSWORD` benar |
-| Login gagal | Pastikan sudah import `seed.sql` yang baru |
+| Login gagal | Pastikan sudah import `setup.sql` yang baru |
 
 ---
 

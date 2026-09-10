@@ -1,6 +1,7 @@
 -- ============================================================
 -- SEED DATA LENGKAP: Sistem Kebencanaan BPBD Kota Semarang
 -- Untuk development & testing
+-- Update terbaru: September 2026
 -- ============================================================
 
 USE sistem_kebencanaan;
@@ -13,8 +14,8 @@ INSERT INTO users (name, email, password, role, wilayah, bio, status) VALUES
 ('Petugas BPBD', 'petugas@bpbdsemarang.go.id', '$2b$10$mpquimwluN21a/LByqXx/euVylhBz/IoKDLXdk5MnnT2dMJbNNOVm', 'petugas', 'Semarang', 'Petugas Lapangan BPBD Kota Semarang', 'on_duty'),
 ('Ahmad Rizki', 'ahmad@bpbdsemarang.go.id', '$2b$10$mpquimwluN21a/LByqXx/euVylhBz/IoKDLXdk5MnnT2dMJbNNOVm', 'petugas', 'Semarang Selatan', 'Koordinator Bidang Penanggulangan Bencana', 'on_duty'),
 ('Dewi Lestari', 'dewi@bpbdsemarang.go.id', '$2b$10$mpquimwluN21a/LByqXx/euVylhBz/IoKDLXdk5MnnT2dMJbNNOVm', 'petugas', 'Semarang Utara', 'Staf Informasi dan Komunikasi', 'on_duty'),
-('Budi Santoso', 'budi@bpbdsemarang.go.id', '$2b$10$mpquimwluN21a/LByqXx/euVylhBz/IoKDLXdk5MnnT2dMJbNNOVm', 'petugas', 'Semarang Timur', 'Tim Reaksi Cepat BPBD', 'off_duty'),
-('Siti Rahayu', 'siti@bpbdsemarang.go.id', '$2b$10$mpquimwluN21a/LByqXx/euVylhBz/IoKDLXdk5MnnT2dMJbNNOVm', 'petugas', 'Semarang Barat', 'Koordinator Logistik', 'resting');
+('Budi Santoso', 'budi@bpbdsemarang.go.id', '$2b$10$mpquimwluN21a/LByqXx/euVylhBz/IoKDLXdk5MnnT2dMJbNNOVm', 'petugas', 'Semarang Timur', 'Tim Reaksi Cepat BPBD', 'on_duty'),
+('Siti Rahayu', 'siti@bpbdsemarang.go.id', '$2b$10$mpquimwluN21a/LByqXx/euVylhBz/IoKDLXdk5MnnT2dMJbNNOVm', 'petugas', 'Semarang Barat', 'Koordinator Logistik', 'on_duty');
 
 -- ============================================================
 -- 2. POSKO
@@ -37,7 +38,9 @@ INSERT INTO reports (tracking_code, reporter_user_id, reporter_name, reporter_ph
 ('BPBD-2026-0005', NULL, 'Agus Setiawan', '081112223333', 'Angin Puting Beliung', 'Angin kencang robohkan pohon dan atap rumah', -7.0100, 110.4300, 'Genuk, Semarang Utara', 'selesai', 2),
 ('BPBD-2026-0006', NULL, 'Maya Putri', '082223334444', 'Banjir', 'Luapan sungai banjir masuk permukiman warga', -6.9950, 110.4350, 'Karangturi, Semarang Timur', 'diverifikasi', 3),
 ('BPBD-2026-0007', NULL, 'Hendra Wijaya', '083334445555', 'Longsor', 'Longsor di area perbukitan mengancam rumah warga', -7.0200, 110.4200, 'Mijen, Semarang Barat', 'baru', NULL),
-('BPBD-2026-0008', NULL, 'Farah Amelia', '084445556666', 'Kebakaran', 'Kebakaran lahan kosong dekat pemukiman', -7.0050, 110.4420, 'Tembalang, Semarang', 'ditindaklanjuti', 4);
+('BPBD-2026-0008', NULL, 'Farah Amelia', '084445556666', 'Kebakaran', 'Kebakaran lahan kosong dekat pemukiman', -7.0050, 110.4420, 'Tembalang, Semarang', 'ditindaklanjuti', 4),
+('BPBD-2026-0009', NULL, 'Kusnanto', '085556667777', 'Banjir', 'Banjir merendam perkantoran dan pertokoan di Genuk', -7.0080, 110.4310, 'Genuk, Semarang', 'baru', NULL),
+('BPBD-2026-0010', NULL, 'Lestari Handayani', '086667778888', 'Longsor', 'Longsor susulan mengancam 10 rumah di Mijen', -7.0250, 110.4180, 'Mijen, Semarang Barat', 'diverifikasi', 5);
 
 -- ============================================================
 -- 4. REPORT LOGS (Riwayat Status Laporan)
@@ -52,7 +55,15 @@ INSERT INTO report_logs (report_id, status_from, status_to, note, updated_by, cr
 (5, NULL, 'baru', 'Laporan diterima', NULL, '2026-09-03 11:00:00'),
 (5, 'baru', 'diverifikasi', 'Diverifikasi', 2, '2026-09-03 11:30:00'),
 (5, 'diverifikasi', 'ditindaklanjuti', 'Penanganan dilakukan', 2, '2026-09-03 12:00:00'),
-(5, 'ditindaklanjuti', 'selesai', 'Selesai ditangani, jalan sudah bersih', 2, '2026-09-03 16:00:00');
+(5, 'ditindaklanjuti', 'selesai', 'Selesai ditangani, jalan sudah bersih', 2, '2026-09-03 16:00:00'),
+(6, NULL, 'baru', 'Laporan diterima', NULL, '2026-09-06 07:00:00'),
+(6, 'baru', 'diverifikasi', 'Diverifikasi oleh petugas', 3, '2026-09-06 08:00:00'),
+(7, NULL, 'baru', 'Laporan diterima', NULL, '2026-09-07 06:30:00'),
+(8, NULL, 'baru', 'Laporan diterima', NULL, '2026-09-07 10:00:00'),
+(8, 'baru', 'ditindaklanjuti', 'Tim dikerahkan ke lokasi', 4, '2026-09-07 10:30:00'),
+(9, NULL, 'baru', 'Laporan diterima', NULL, '2026-09-08 14:00:00'),
+(10, NULL, 'baru', 'Laporan diterima', NULL, '2026-09-08 15:00:00'),
+(10, 'baru', 'diverifikasi', 'Diverifikasi, longsor terjadi', 5, '2026-09-08 15:30:00');
 
 -- ============================================================
 -- 5. DISASTER RECORDS (Pendataan Bencana)
@@ -63,7 +74,9 @@ INSERT INTO disaster_records (disaster_date, disaster_time, location, kelurahan,
 ('2026-09-03', '11:00', 'Jl. Pandanaran No. 25', 'Pandean Lamper', 'Semarang Selatan', 'Siti Rahayu', '085612345678', 'Hujan deras mengguyur wilayah Semarang Selatan sejak pagi hari mengakibatkan sungai meluap dan merendam permukiman warga setempat.', 12, 0, 1, 3, 25, 30, 15, 2, 5, 20, 'Rp 15.000.000 / 5 rumah rusak ringan', 'Joko Widodo', '087812345678', 1),
 ('2026-09-04', '08:00', 'Jl. Raya Penggaron', 'Penggaron Kidul', 'Pedurungan', NULL, NULL, 'Banjir kiriman dari hulu menggenangi kawasan Padangan dan sekitarnya. Sejumlah warga mulai mengungsi ke posko darurat.', 30, 0, 0, 2, 100, 120, 50, 5, 15, 60, 'Rp 75.000.000 / 40 rumah terendam', 'Dewi Lestari', '082223334444', 2),
 ('2026-09-05', '16:30', 'Jl. Genuk Raya', 'Genuk', 'Genuk', 'Toko Berkah', '083334445555', 'Angin puting beliung dengan kecepatan tinggi merobohkan pohon tumbang dan merusak atap beberapa rumah serta warung di sepanjang jalan.', 0, 0, 1, 6, 15, 20, 10, 1, 3, 12, 'Rp 80.000.000 / 8 rumah rusak, 2 warung roboh', 'Agus Setiawan', '084445556666', 3),
-('2026-09-07', '02:00', 'Karangturi RT 02/RW 01', 'Karangturi', 'Semarang Timur', NULL, NULL, 'Luapan sungai banjir masuk permukiman warga akibat sedimentasi dan curah hujan tinggi. Beberapa rumah terendam setinggi pinggang orang dewasa.', 18, 0, 0, 1, 60, 70, 30, 3, 8, 35, 'Rp 40.000.000 / 20 rumah terendam', 'Rina Marlina', '081112223333', 1);
+('2026-09-07', '02:00', 'Karangturi RT 02/RW 01', 'Karangturi', 'Semarang Timur', NULL, NULL, 'Luapan sungai banjir masuk permukiman warga akibat sedimentasi dan curah hujan tinggi. Beberapa rumah terendam setinggi pinggang orang dewasa.', 18, 0, 0, 1, 60, 70, 30, 3, 8, 35, 'Rp 40.000.000 / 20 rumah terendam', 'Rina Marlina', '081112223333', 1),
+('2026-09-08', '09:00', 'Mijen RT 03/RW 05', 'Mijen', 'Semarang Barat', 'Hendra Wijaya', '083334445555', 'Longsor susulan terjadi di area perbukitan Mijen setelah hujan deras selama 3 hari berturut-turut. 5 rumah rusak berat dan akses jalan terputus.', 5, 0, 2, 3, 30, 25, 12, 2, 4, 18, 'Rp 120.000.000 / 5 rumah rusak berat', 'Hendra Wijaya', '083334445555', 5),
+('2026-09-08', '15:00', 'Jl. Raya Genuk No. 45', 'Genuk', 'Genuk', 'Kusnanto', '085556667777', 'Banjir merendam kawasan perkantoran dan pertokoan di Genuk akibat luapan sungai. Ketinggian air mencapai 60cm di beberapa titik.', 10, 0, 0, 1, 45, 50, 20, 2, 6, 28, 'Rp 95.000.000 / 15 toko terendam', 'Kusnanto', '085556667777', 4);
 
 -- ============================================================
 -- 6. ACTIVITIES (Laporan Kegiatan)
@@ -76,7 +89,13 @@ INSERT INTO activities (title, description, activity_date, activity_time, locati
 ('Pembersihan Material Longsor', 'Gotong royong bersama warga membersihkan material longsor di jalan Gunungpati.', '2026-09-03', '07:00', 'Gunungpati, Semarang', 3),
 ('Peninjauan Posko Darurat', 'Peninjauan langsung kondisi posko darurat dan kebutuhan pengungsi di Pedurungan.', '2026-09-04', '14:00', 'Penggaron Kidul, Pedurungan', 1),
 ('Pemadaman Api Kebakaran Lahan', 'Tim pemadam kebakaran BPBD berhasil memadamkan api kebakaran lahan kosong seluas 500m2.', '2026-09-05', '16:00', 'Tembalang, Semarang', 4),
-('Rapat Evaluasi Penanganan Bencana', 'Rapat evaluasi internal membahas efektivitas penanganan banjir dan longsor bulan September.', '2026-09-08', '09:00', 'Ruang Rapat BPBD', 1);
+('Rapat Evaluasi Penanganan Bencana', 'Rapat evaluasi internal membahas efektivitas penanganan banjir dan longsor bulan September.', '2026-09-08', '09:00', 'Ruang Rapat BPBD', 1),
+('Evakuasi Warga Terdampak Longsor Mijen', 'Tim TRC mengevakuasi 18 KK dari area longsor Mijen yang terancam longsor susulan.', '2026-09-08', '10:00', 'Mijen, Semarang Barat', 5),
+('Pendistribusian Air Bersih ke Posko Pedurungan', 'Pengiriman 4000 liter air bersih ke posko pengungsi banjir Pedurungan yang kehabisan pasokan air.', '2026-09-09', '08:00', 'Penggaron Kidul, Pedurungan', 3),
+('Assessment Kerusakan Infrastruktur', 'Tim asesmen meninjau kerusakan jalan dan drainase di 3 lokasi terdampak banjir.', '2026-09-09', '09:00', 'Genuk & Pedurungan, Semarang', 2),
+('Koordinasi dengan Dinas PU', 'Rapat koordinasi dengan Dinas PU terkait perbaikan infrastruktur jalan dan drainase pasca banjir.', '2026-09-10', '08:00', 'Ruang Rapat BPBD', 1),
+('Patroli Malam Wilayah Rawan Banjir', 'Patroli malam di wilayah rawan banjir Semarang Utara dan Pedurungan pasca hujan deras.', '2026-09-10', '20:00', 'Semarang Utara & Pedurungan', 5),
+('Pengecekan Stok Logistik Darurat', 'Pengecekan dan pendataan ulang stok logistik di seluruh posko untuk memastikan kesiapsiagaan.', '2026-09-10', '10:00', 'Gudang Logistik BPBD', 6);
 
 -- ============================================================
 -- 7. INFO BOARD (Papan Informasi)
@@ -99,7 +118,16 @@ INSERT INTO info_board (title, info_date, start_time, end_time, location, descri
 ('Apel Pagi', '2026-09-07', '07:00', '07:30', 'Halaman Kantor BPBD', 'Apel pagi seluruh personel', 1, 1),
 ('Rapat Persiapan Minggu Depan', '2026-09-07', '08:00', '10:00', 'Ruang Rapat Utama', 'Perencanaan kegiatan dan penugasan minggu depan', 1, 1),
 ('Siaga Banjir Semarang Selatan', '2026-09-08', '06:00', '18:00', 'Kelurahan Pandean Lamper', 'Status siaga banjir untuk wilayah Semarang Selatan akibat hujan deras', 1, 1),
-('Apel Pagi', '2026-09-08', '07:00', '07:30', 'Halaman Kantor BPBD', 'Apel pagi seluruh personel', 1, 1);
+('Apel Pagi', '2026-09-08', '07:00', '07:30', 'Halaman Kantor BPBD', 'Apel pagi seluruh personel', 1, 1),
+('Evakuasi Darurat Longsor Mijen', '2026-09-08', '10:00', '15:00', 'Mijen, Semarang Barat', 'Evakuasi warga terdampak longsor susulan di area perbukitan Mijen', 1, 5),
+('Apel Pagi', '2026-09-09', '07:00', '07:30', 'Halaman Kantor BPBD', 'Apel pagi seluruh personel', 1, 1),
+('Rapat Koordinasi Pasca Bencana', '2026-09-09', '08:00', '10:00', 'Ruang Rapat Utama', 'Koordinasi penanganan pasca bencana banjir dan longsor', 1, 1),
+('Assessment Kerusakan', '2026-09-09', '09:00', '12:00', 'Genuk & Pedurungan', 'Tim asesmen meninjau kerusakan infrastruktur di lokasi terdampak', 1, 2),
+('Distribusi Air Bersih', '2026-09-09', '13:00', '16:00', 'Posko Pengungsi Pedurungan', 'Pendistribusian air bersih untuk pengungsi banjir', 1, 3),
+('Apel Pagi', '2026-09-10', '07:00', '07:30', 'Halaman Kantor BPBD', 'Apel pagi seluruh personel', 1, 1),
+('Koordinasi Dinas PU', '2026-09-10', '08:00', '10:00', 'Ruang Rapat BPBD', 'Koordinasi perbaikan infrastruktur jalan dan drainase', 1, 1),
+('Patroli Malam Siaga Banjir', '2026-09-10', '20:00', '06:00', 'Semarang Utara & Pedurungan', 'Patroli malam wilayah rawan banjir pasca hujan deras', 1, 5),
+('Pengecekan Stok Logistik', '2026-09-10', '10:00', '12:00', 'Gudang Logistik BPBD', 'Pengecekan dan pendataan ulang stok logistik', 1, 6);
 
 -- ============================================================
 -- 8. WATER DISTRIBUTIONS (Distribusi Air Bersih)
@@ -110,8 +138,11 @@ INSERT INTO water_distributions (distribution_date, kelurahan, kecamatan, locati
 ('2026-09-03', 'Pandean Lamper', 'Semarang Selatan', 'Jl. Pandanaran No. 25, depan Balai Warga', -6.9970, 110.4400, 2500, 0, 'Distribusi air bersih untuk warga terdampak banjir di RT 03/RW 02', 'selesai', 1),
 ('2026-09-04', 'Penggaron Kidul', 'Pedurungan', 'Jl. Raya Penggaron, Masjid Al-Ikhlas', -6.9800, 110.4500, 4000, 0, 'Distribusi air bersih untuk pengungsi banjir Pedurungan', 'selesai', 3),
 ('2026-09-05', 'Genuk', 'Genuk', 'Jl. Genuk Raya No. 30', -7.0100, 110.4300, 1500, 0, 'Distribusi air bersih untuk warga terdampak angin putting beliung', 'selesai', 2),
-('2026-09-07', 'Karangturi', 'Semarang Timur', 'Karangturi RT 02/RW 01, depan Balai RW', -6.9950, 110.4350, 3500, 0, 'Distribusi air bersih untuk warga terdampak banjir kiriman', 'dalam_proses', 1),
-('2026-09-08', 'Mijen', 'Semarang Barat', 'Jl. Raya Mijen No. 88', -7.0200, 110.4200, 2000, 0, 'Distribusi air bersih untuk warga terdampak longsor', 'dalam_proses', 4);
+('2026-09-07', 'Karangturi', 'Semarang Timur', 'Karangturi RT 02/RW 01, depan Balai RW', -6.9950, 110.4350, 3500, 0, 'Distribusi air bersih untuk warga terdampak banjir kiriman', 'selesai', 1),
+('2026-09-08', 'Mijen', 'Semarang Barat', 'Jl. Raya Mijen No. 88', -7.0200, 110.4200, 2000, 0, 'Distribusi air bersih untuk warga terdampak longsor', 'dalam_proses', 4),
+('2026-09-08', 'Genuk', 'Genuk', 'Jl. Raya Genuk No. 45, depan Kantor Kecamatan', -7.0080, 110.4310, 2500, 0, 'Distribusi air bersih untuk warga terdampak banjir Genuk', 'dalam_proses', 2),
+('2026-09-09', 'Penggaron Kidul', 'Pedurungan', 'Posko Pengungsi Pedurungan', -6.9800, 110.4500, 4500, 0, 'Distribusi air bersih lanjutan untuk pengungsi Pedurungan', 'dalam_proses', 3),
+('2026-09-09', 'Kaligawe', 'Semarang Utara', 'Jl. Kaligawe RT 04/RW 01', -6.9932, 110.4203, 3000, 0, 'Distribusi air bersih susulan untuk warga Kaligawe', 'selesai', 1);
 
 -- ============================================================
 -- 9. WATER SUPPLY SETTINGS
@@ -123,65 +154,89 @@ INSERT INTO water_supply_settings (total_supply, updated_by) VALUES
 -- 10. INVENTORY ITEMS
 -- ============================================================
 INSERT INTO inventory_items (name, category, item_condition, quantity, unit, posko_id) VALUES
-('Tenda Pengungsi', 'peralatan', 'baik', 15, 'unit', 1),
-('Beras', 'logistik', 'baik', 200, 'karung', 1),
-('Selimut', 'logistik', 'baik', 100, 'lembar', 2),
-('Obat P3K', 'p3k', 'baik', 50, 'kotak', 1),
-('Perahu Karet', 'peralatan', 'perlu_maintenance', 3, 'unit', 3),
-('Mie Instan', 'logistik', 'baik', 500, 'kotak', 1),
-('Air Mineral', 'logistik', 'baik', 300, 'dus', 2),
-('Jas Hujan', 'peralatan', 'baik', 80, 'lembar', 3),
-('Tali Tambang', 'peralatan', 'baik', 20, 'roll', 4),
+('Tenda Pengungsi', 'peralatan', 'baik', 20, 'unit', 1),
+('Beras', 'logistik', 'baik', 300, 'karung', 1),
+('Selimut', 'logistik', 'baik', 150, 'lembar', 2),
+('Obat P3K', 'p3k', 'baik', 60, 'kotak', 1),
+('Perahu Karet', 'peralatan', 'baik', 4, 'unit', 3),
+('Mie Instan', 'logistik', 'baik', 600, 'kotak', 1),
+('Air Mineral', 'logistik', 'baik', 400, 'dus', 2),
+('Jas Hujan', 'peralatan', 'baik', 100, 'lembar', 3),
+('Tali Tambang', 'peralatan', 'baik', 25, 'roll', 4),
 ('Kantong Mayat', 'p3k', 'baik', 10, 'buah', 1),
-('Dorongan Angkut', 'peralatan', 'baik', 5, 'unit', 2),
-(' genset Portable', 'peralatan', 'baik', 2, 'unit', 1),
-('Lilin', 'logistik', 'baik', 200, 'batang', 3),
-('Sabun Mandi', 'logistik', 'baik', 150, 'buah', 4),
-('Handuk', 'logistik', 'baik', 100, 'lembar', 5);
+('Dorongan Angkut', 'peralatan', 'baik', 6, 'unit', 2),
+('Genset Portable', 'peralatan', 'baik', 3, 'unit', 1),
+('Lilin', 'logistik', 'baik', 300, 'batang', 3),
+('Sabun Mandi', 'logistik', 'baik', 200, 'buah', 4),
+('Handuk', 'logistik', 'baik', 120, 'lembar', 5),
+('Tikar Lipat', 'logistik', 'baik', 50, 'lembar', 2),
+('Terpal', 'peralatan', 'baik', 30, 'lembar', 3),
+('Kursi Lipat', 'peralatan', 'baik', 20, 'unit', 1);
 
 -- ============================================================
 -- 11. VEHICLES
 -- ============================================================
 INSERT INTO vehicles (plate_number, type, status, last_service_date, posko_id) VALUES
-('H 1234 AB', 'Truk Serbaguna', 'siap', '2026-06-15', 1),
-('H 5678 CD', 'Ambulans', 'siap', '2026-07-01', 2),
-('H 9012 EF', 'Mobil Rescue', 'maintenance', '2026-05-20', 3),
-('H 1111 GH', 'Truk Tangki Air', 'siap', '2026-08-10', 1),
-('H 2222 IJ', 'Pickup Logistik', 'siap', '2026-07-20', 4),
-('H 3333 KL', 'Motor Patroli', 'siap', '2026-08-01', 5),
-('H 4444 MN', 'Mobil Operasional', 'rusak', '2026-04-15', 1),
-('H 5555 OP', 'Truk Evakuasi', 'siap', '2026-08-20', 3);
+('H 1234 AB', 'Truk Serbaguna', 'siap', '2026-08-15', 1),
+('H 5678 CD', 'Ambulans', 'siap', '2026-09-01', 2),
+('H 9012 EF', 'Mobil Rescue', 'siap', '2026-09-05', 3),
+('H 1111 GH', 'Truk Tangki Air', 'siap', '2026-09-08', 1),
+('H 2222 IJ', 'Pickup Logistik', 'siap', '2026-08-20', 4),
+('H 3333 KL', 'Motor Patroli', 'siap', '2026-09-01', 5),
+('H 4444 MN', 'Mobil Operasional', 'maintenance', '2026-09-08', 1),
+('H 5555 OP', 'Truk Evakuasi', 'siap', '2026-09-10', 3);
 
 -- ============================================================
 -- 12. AIR BERSIH PROPOSALS
 -- ============================================================
 INSERT INTO air_bersih_proposals (disaster_record_id, kelurahan, kecamatan, usulan_description, status, created_by) VALUES
 (1, 'Kaligawe', 'Semarang Utara', 'Kebutuhan air bersih untuk 50 KK terdampak banjir. Sumber air bersih terputus akibat kerusakan pipa PDAM.', 'selesai', 1),
-(3, 'Pandean Lamper', 'Semarang Selatan', 'Kebutuhan air bersih untuk 20 KK terdampak banjir di RT 03/RW 02. debit air PDAM sangat kecil.', 'diproses', 2),
-(4, 'Penggaron Kidul', 'Pedurungan', 'Kebutuhan mendesak air bersih untuk 60 KK pengungsi di posko darurat. Cadangan air sudah menipis.', 'pending', 3),
-(6, 'Karangturi', 'Semarang Timur', 'Kebutuhan air bersih untuk 35 KK terdampak banjir kiriman. Pipa PDAM belum normal.', 'pending', 1);
+(3, 'Pandean Lamper', 'Semarang Selatan', 'Kebutuhan air bersih untuk 20 KK terdampak banjir di RT 03/RW 02. Debit air PDAM sangat kecil.', 'selesai', 2),
+(4, 'Penggaron Kidul', 'Pedurungan', 'Kebutuhan mendesak air bersih untuk 60 KK pengungsi di posko darurat. Cadangan air sudah menipis.', 'diproses', 3),
+(6, 'Karangturi', 'Semarang Timur', 'Kebutuhan air bersih untuk 35 KK terdampak banjir kiriman. Pipa PDAM belum normal.', 'diproses', 1),
+(7, 'Mijen', 'Semarang Barat', 'Kebutuhan air bersih untuk 18 KK terdampak longsor. Sumber air terkontaminasi material longsor.', 'pending', 5),
+(8, 'Genuk', 'Genuk', 'Kebutuhan air bersih untuk 28 KK terdampak banjir. Pasokan air dari PDAM terganggu.', 'pending', 4);
 
 -- ============================================================
 -- 13. BANSOS PROPOSALS
 -- ============================================================
-INSERT INTO bansos_proposals (disaster_record_id, kelurahan, kecamatan, nama_penerima, nik_penerima, alamat_penerima, phone_penerima, usulan_description, status, created_by) VALUES
-(1, 'Kaligawe', 'Semarang Utara', 'Siti Rahayu', '3374015203850002', 'Jl. Kaligawe No. 100, RT 03/RW 02, Kaligawe', '085612345678', 'Bantuan sosial berupa sembako untuk keluarga terdampak banjir yang kehilangan pekerjaan sementara.', 'diverifikasi', 1),
-(2, 'Gunungpati', 'Gunungpati', 'Ahmad Hidayat', '3374016005900003', 'Gunungpati RT 05/RW 03, Gunungpati', '081112223333', 'Bantuan biaya pengobatan dan kebutuhan dasar untuk korban luka berat akibat longsor.', 'survey_dijadwalkan', 2),
-(3, 'Pandean Lamper', 'Semarang Selatan', 'Rina Marlina', '3374014508850001', 'Jl. Pandanaran No. 25, RT 01/RW 01, Pandean Lamper', '082223334444', 'Bantuan sembako dan kebutuhan bayi untuk keluarga dengan anak balita.', 'pending', 3),
-(4, 'Penggaron Kidul', 'Pedurungan', 'Budi Santoso', '3374015512900005', 'Jl. Raya Penggaron No. 12, Penggaron Kidul', '083334445555', 'Bantuan logistik untuk pengungsi banjir di posko darurat. Total 60 KK membutuhkan bantuan.', 'lolos_survey', 1),
-(5, 'Genuk', 'Genuk', 'Dewi Lestari', '3374014803950004', 'Jl. Genuk Raya No. 30, Genuk', '084445556666', 'Bantuan perbaikan rumah akibat kerusakan angin puting beliung.', 'selesai', 2);
+INSERT INTO bansos_proposals (disaster_record_id, kelurahan, kecamatan, nama_penerima, nik_penerima, alamat_penerima, phone_penerima, usulan_description, status, admin_notes, created_by) VALUES
+(1, 'Kaligawe', 'Semarang Utara', 'Siti Rahayu', '3374015203850002', 'Jl. Kaligawe No. 100, RT 03/RW 02, Kaligawe', '085612345678', 'Bantuan sosial berupa sembako untuk keluarga terdampak banjir yang kehilangan pekerjaan sementara.', 'selesai', 'Bantuan sudah disalurkan ke 50 KK terdampak', 1),
+(2, 'Gunungpati', 'Gunungpati', 'Ahmad Hidayat', '3374016005900003', 'Gunungpati RT 05/RW 03, Gunungpati', '081112223333', 'Bantuan biaya pengobatan dan kebutuhan dasar untuk korban luka berat akibat longsor.', 'proses_pencairan', 'Dana sedang dalam proses pencairan', 2),
+(3, 'Pandean Lamper', 'Semarang Selatan', 'Rina Marlina', '3374014508850001', 'Jl. Pandanaran No. 25, RT 01/RW 01, Pandean Lamper', '082223334444', 'Bantuan sembako dan kebutuhan bayi untuk keluarga dengan anak balita.', 'lolos_survey', 'Lolos survey, menunggu proses pencairan', 3),
+(4, 'Penggaron Kidul', 'Pedurungan', 'Budi Santoso', '3374015512900005', 'Jl. Raya Penggaron No. 12, Penggaron Kidul', '083334445555', 'Bantuan logistik untuk pengungsi banjir di posko darurat. Total 60 KK membutuhkan bantuan.', 'sedang_survey', 'Tim survey sedang melakukan verifikasi lapangan', 1),
+(5, 'Genuk', 'Genuk', 'Dewi Lestari', '3374014803950004', 'Jl. Genuk Raya No. 30, Genuk', '084445556666', 'Bantuan perbaikan rumah akibat kerusakan angin puting beliung.', 'selesai', 'Bantuan perbaikan rumah sudah disalurkan', 2),
+(6, 'Karangturi', 'Semarang Timur', 'Maya Putri', '3374014207950006', 'Karangturi RT 02/RW 01, Karangturi', '082223334444', 'Bantuan sembako untuk 35 KK terdampak banjir kiriman di Karangturi.', 'survey_dijadwalkan', 'Survey dijadwalkan pada 11 September 2026', 3),
+(7, 'Mijen', 'Semarang Barat', 'Hendra Wijaya', '3374015812900007', 'Mijen RT 03/RW 05, Mijen', '083334445555', 'Bantuan darurat untuk 18 KK terdampak longsor Mijen yang kehilangan tempat tinggal.', 'diverifikasi', 'Diverifikasi, prioritas tinggi', 5),
+(8, 'Genuk', 'Genuk', 'Kusnanto', '3374015503850008', 'Jl. Raya Genuk No. 45, Genuk', '085556667777', 'Bantuan kerugian usaha akibat banjir yang merendam toko dan perkantoran.', 'pending', NULL, 4);
 
 -- ============================================================
 -- 14. INFRASTRUKTUR PROPOSALS
 -- ============================================================
-INSERT INTO infrastruktur_proposals (disaster_record_id, kelurahan, kecamatan, usulan_description, status, aset_milik_opd_lain, opd_nama, created_by) VALUES
-(1, 'Kaligawe', 'Semarang Utara', 'Perbaikan jalan lingkungan RT 03/RW 02 yang rusak akibat banjir. Jalan sepanjang 500 meter perlu diperbaiki.', 'diverifikasi', 0, NULL, 1),
-(2, 'Gunungpati', 'Gunungpati', 'Rehabilitasi jalan akses utama yang tertutup material longsor. Diperlukan alat berat untuk pembersihan.', 'dalam_pengerjaan', 0, NULL, 2),
-(4, 'Penggaron Kidul', 'Pedurungan', 'Perbaikan saluran drainase yang tersumbat akibat sedimentasi banjir. Panjang saluran 300 meter.', 'pending', 1, 'Dinas PU', 3),
-(6, 'Karangturi', 'Semarang Timur', 'Pemasangan bronjong di bantaran sungai untuk mencegah banjir susulan. Panjang 200 meter.', 'pending', 0, NULL, 1);
+INSERT INTO infrastruktur_proposals (disaster_record_id, kelurahan, kecamatan, usulan_description, status, aset_milik_opd_lain, opd_nama, admin_notes, created_by) VALUES
+(1, 'Kaligawe', 'Semarang Utara', 'Perbaikan jalan lingkungan RT 03/RW 02 yang rusak akibat banjir. Jalan sepanjang 500 meter perlu diperbaiki.', 'dalam_pengerjaan', 0, NULL, 'Pengerjaan sudah dimulai, target selesai 2 minggu', 1),
+(2, 'Gunungpati', 'Gunungpati', 'Rehabilitasi jalan akses utama yang tertutup material longsor. Diperlukan alat berat untuk pembersihan.', 'selesai', 0, NULL, 'Pekerjaan sudah selesai, jalan bisa dilalui', 2),
+(4, 'Penggaron Kidul', 'Pedurungan', 'Perbaikan saluran drainase yang tersumbat akibat sedimentasi banjir. Panjang saluran 300 meter.', 'sedang_survey', 1, 'Dinas PU', 'Tim survey dari Dinas PU sudah turun ke lapangan', 3),
+(6, 'Karangturi', 'Semarang Timur', 'Pemasangan bronjong di bantaran sungai untuk mencegah banjir susulan. Panjang 200 meter.', 'survey_dijadwalkan', 0, NULL, NULL, 1),
+(7, 'Mijen', 'Semarang Barat', 'Perbaikan jalan akses Mijen yang terputus akibat longsor. Diperlukan pembersihan material dan penanganan tanggul.', 'diverifikasi', 0, NULL, 'Diverifikasi, menunggu anggaran', 5),
+(8, 'Genuk', 'Genuk', 'Perbaikan saluran drainase utama yang tersumbat di kawasan Genuk. Panjang 400 meter, kedalaman 1.5 meter.', 'pending', 1, 'Dinas PU', NULL, 4);
 
 -- ============================================================
--- 15. STATUS HISTORY (Riwayat Status Usulan)
+-- 15. SURVEYS (untuk Bansos & Infrastruktur)
+-- ============================================================
+INSERT INTO surveys (proposal_type, proposal_id, personil_id, survey_date, hasil_survey, keterangan, status) VALUES
+('bansos', 1, 2, '2026-09-03', 'lolos', 'Keluarga terdampak banjir, kehilangan pekerjaan sementara. Layak mendapat bantuan.', 'selesai'),
+('bansos', 2, 3, '2026-09-04', 'lolos', 'Korban luka berat membutuhkan biaya pengobatan serius. Layak mendapat bantuan.', 'selesai'),
+('bansos', 3, 5, '2026-09-09', 'lolos', 'Keluarga dengan anak balita, rumah terendam banjir. Layak mendapat bantuan.', 'selesai'),
+('bansos', 4, 2, '2026-09-10', NULL, 'Tim survey sedang melakukan verifikasi di lokasi pengungsi.', 'sedang_survey'),
+('bansos', 5, 3, '2026-09-06', 'lolos', 'Rumah rusak akibat angin puting beliung, atap dan dinding rusak. Layak mendapat bantuan.', 'selesai'),
+('infrastruktur', 1, 2, '2026-09-03', 'lolos', 'Jalan lingkungan rusak parah, diperlukan perbaikan segera. Aset milik Pemerintah Kota.', 'selesai'),
+('infrastruktur', 2, 3, '2026-09-04', 'lolos', 'Jalan akses utama tertutup material longsor. Diperlukan alat berat untuk pembersihan.', 'selesai'),
+('infrastruktur', 3, 5, '2026-09-10', NULL, 'Tim survey Dinas PU sedang melakukan pengukuran di lokasi.', 'sedang_survey'),
+('infrastruktur', 5, 2, '2026-09-09', NULL, 'Menunggu jadwal survey dari tim BPBD.', 'dijadwalkan');
+
+-- ============================================================
+-- 16. STATUS HISTORY (Riwayat Status Usulan)
 -- ============================================================
 INSERT INTO status_history (proposal_type, proposal_id, status_from, status_to, note, updated_by, created_at) VALUES
 -- Air Bersih
@@ -190,28 +245,73 @@ INSERT INTO status_history (proposal_type, proposal_id, status_from, status_to, 
 ('air_bersih', 1, 'diproses', 'selesai', 'Air bersih sudah didistribusikan', 1, '2026-09-02 08:00:00'),
 ('air_bersih', 2, NULL, 'pending', 'Usulan dibuat', 2, '2026-09-03 08:00:00'),
 ('air_bersih', 2, 'pending', 'diproses', 'Sedang diproses', 2, '2026-09-03 14:00:00'),
+('air_bersih', 2, 'diproses', 'selesai', 'Air bersih sudah didistribusikan', 2, '2026-09-04 10:00:00'),
+('air_bersih', 3, NULL, 'pending', 'Usulan dibuat', 3, '2026-09-04 09:00:00'),
+('air_bersih', 3, 'pending', 'diproses', 'Sedang diproses tim logistik', 3, '2026-09-05 08:00:00'),
+('air_bersih', 4, NULL, 'pending', 'Usulan dibuat', 1, '2026-09-07 10:00:00'),
+('air_bersih', 4, 'pending', 'diproses', 'Dikoordinasikan dengan PDAM', 1, '2026-09-08 08:00:00'),
+('air_bersih', 5, NULL, 'pending', 'Usulan dibuat', 5, '2026-09-08 11:00:00'),
+('air_bersih', 6, NULL, 'pending', 'Usulan dibuat', 4, '2026-09-08 16:00:00'),
 -- Bansos
 ('bansos', 1, NULL, 'pending', 'Usulan bansos dibuat', 1, '2026-09-01 11:00:00'),
 ('bansos', 1, 'pending', 'diverifikasi', 'Diverifikasi oleh admin', 1, '2026-09-02 09:00:00'),
+('bansos', 1, 'diverifikasi', 'survey_dijadwalkan', 'Survey dijadwalkan', 1, '2026-09-02 10:00:00'),
+('bansos', 1, 'survey_dijadwalkan', 'sedang_survey', 'Tim survey turun ke lapangan', 2, '2026-09-03 08:00:00'),
+('bansos', 1, 'sedang_survey', 'lolos_survey', 'Lolos survey, layak mendapat bantuan', 2, '2026-09-03 14:00:00'),
+('bansos', 1, 'lolos_survey', 'proses_pencairan', 'Dana dalam proses pencairan', 1, '2026-09-04 08:00:00'),
+('bansos', 1, 'proses_pencairan', 'selesai', 'Bantuan sudah disalurkan', 1, '2026-09-05 10:00:00'),
 ('bansos', 2, NULL, 'pending', 'Usulan bansos dibuat', 2, '2026-09-02 10:00:00'),
 ('bansos', 2, 'pending', 'diverifikasi', 'Diverifikasi', 2, '2026-09-03 08:00:00'),
 ('bansos', 2, 'diverifikasi', 'survey_dijadwalkan', 'Survey dijadwalkan minggu depan', 2, '2026-09-03 10:00:00'),
+('bansos', 2, 'survey_dijadwalkan', 'sedang_survey', 'Tim survey turun ke lokasi', 3, '2026-09-04 08:00:00'),
+('bansos', 2, 'sedang_survey', 'lolos_survey', 'Lolos survey', 3, '2026-09-04 14:00:00'),
+('bansos', 2, 'lolos_survey', 'proses_pencairan', 'Dana sedang dalam proses pencairan', 1, '2026-09-05 08:00:00'),
+('bansos', 3, NULL, 'pending', 'Usulan bansos dibuat', 3, '2026-09-03 09:00:00'),
+('bansos', 3, 'pending', 'diverifikasi', 'Diverifikasi', 3, '2026-09-04 08:00:00'),
+('bansos', 3, 'diverifikasi', 'survey_dijadwalkan', 'Survey dijadwalkan', 3, '2026-09-04 10:00:00'),
+('bansos', 3, 'survey_dijadwalkan', 'sedang_survey', 'Tim survey turun ke lapangan', 5, '2026-09-09 08:00:00'),
+('bansos', 3, 'sedang_survey', 'lolos_survey', 'Lolos survey, layak mendapat bantuan', 5, '2026-09-09 14:00:00'),
 ('bansos', 4, NULL, 'pending', 'Usulan dibuat', 1, '2026-09-04 08:00:00'),
 ('bansos', 4, 'pending', 'diverifikasi', 'Diverifikasi', 1, '2026-09-04 10:00:00'),
 ('bansos', 4, 'diverifikasi', 'survey_dijadwalkan', 'Survey dijadwalkan', 1, '2026-09-05 08:00:00'),
-('bansos', 4, 'survey_dijadwalkan', 'sedang_survey', 'Tim survey turun ke lapangan', 1, '2026-09-06 08:00:00'),
-('bansos', 4, 'sedang_survey', 'lolos_survey', 'Lolos survey, layak mendapat bantuan', 1, '2026-09-07 14:00:00'),
+('bansos', 4, 'survey_dijadwalkan', 'sedang_survey', 'Tim survey turun ke lapangan', 2, '2026-09-10 08:00:00'),
 ('bansos', 5, NULL, 'pending', 'Usulan dibuat', 2, '2026-09-05 09:00:00'),
-('bansos', 5, 'pending', 'selesai', 'Bantuan sudah disalurkan', 2, '2026-09-07 16:00:00'),
+('bansos', 5, 'pending', 'diverifikasi', 'Diverifikasi', 2, '2026-09-05 10:00:00'),
+('bansos', 5, 'diverifikasi', 'survey_dijadwalkan', 'Survey dijadwalkan', 2, '2026-09-05 11:00:00'),
+('bansos', 5, 'survey_dijadwalkan', 'sedang_survey', 'Tim survey ke lokasi', 3, '2026-09-06 08:00:00'),
+('bansos', 5, 'sedang_survey', 'lolos_survey', 'Lolos survey', 3, '2026-09-06 14:00:00'),
+('bansos', 5, 'lolos_survey', 'proses_pencairan', 'Dana cair', 1, '2026-09-07 08:00:00'),
+('bansos', 5, 'proses_pencairan', 'selesai', 'Bantuan sudah disalurkan', 2, '2026-09-07 16:00:00'),
+('bansos', 6, NULL, 'pending', 'Usulan dibuat', 3, '2026-09-07 11:00:00'),
+('bansos', 6, 'pending', 'diverifikasi', 'Diverifikasi', 3, '2026-09-08 08:00:00'),
+('bansos', 6, 'diverifikasi', 'survey_dijadwalkan', 'Survey dijadwalkan 11 September', 1, '2026-09-08 10:00:00'),
+('bansos', 7, NULL, 'pending', 'Usulan dibuat', 5, '2026-09-08 12:00:00'),
+('bansos', 7, 'pending', 'diverifikasi', 'Diverifikasi, prioritas tinggi', 5, '2026-09-08 14:00:00'),
+('bansos', 8, NULL, 'pending', 'Usulan dibuat', 4, '2026-09-08 16:00:00'),
 -- Infrastruktur
 ('infrastruktur', 1, NULL, 'pending', 'Usulan infrastruktur dibuat', 1, '2026-09-01 12:00:00'),
 ('infrastruktur', 1, 'pending', 'diverifikasi', 'Diverifikasi oleh admin', 1, '2026-09-02 08:00:00'),
+('infrastruktur', 1, 'diverifikasi', 'survey_dijadwalkan', 'Survey dijadwalkan', 1, '2026-09-02 09:00:00'),
+('infrastruktur', 1, 'survey_dijadwalkan', 'sedang_survey', 'Tim survey ke lokasi', 2, '2026-09-03 08:00:00'),
+('infrastruktur', 1, 'sedang_survey', 'lolos_survey', 'Lolos survey', 2, '2026-09-03 14:00:00'),
+('infrastruktur', 1, 'lolos_survey', 'dalam_pengerjaan', 'Pengerjaan dimulai', 1, '2026-09-05 08:00:00'),
 ('infrastruktur', 2, NULL, 'pending', 'Usulan dibuat', 2, '2026-09-02 11:00:00'),
 ('infrastruktur', 2, 'pending', 'diverifikasi', 'Diverifikasi', 2, '2026-09-03 08:00:00'),
 ('infrastruktur', 2, 'diverifikasi', 'survey_dijadwalkan', 'Survey dijadwalkan', 2, '2026-09-03 10:00:00'),
-('infrastruktur', 2, 'survey_dijadwalkan', 'sedang_survey', 'Tim survey ke lokasi', 2, '2026-09-04 08:00:00'),
-('infrastruktur', 2, 'sedang_survey', 'lolos_survey', 'Lolos survey', 2, '2026-09-05 14:00:00'),
-('infrastruktur', 2, 'lolos_survey', 'dalam_pengerjaan', 'Pengerjaan dimulai', 2, '2026-09-06 08:00:00');
+('infrastruktur', 2, 'survey_dijadwalkan', 'sedang_survey', 'Tim survey ke lokasi', 3, '2026-09-04 08:00:00'),
+('infrastruktur', 2, 'sedang_survey', 'lolos_survey', 'Lolos survey', 3, '2026-09-05 14:00:00'),
+('infrastruktur', 2, 'lolos_survey', 'dalam_pengerjaan', 'Pengerjaan dimulai', 2, '2026-09-06 08:00:00'),
+('infrastruktur', 2, 'dalam_pengerjaan', 'selesai', 'Pekerjaan selesai, jalan bisa dilalui', 2, '2026-09-08 16:00:00'),
+('infrastruktur', 3, NULL, 'pending', 'Usulan dibuat', 3, '2026-09-04 09:00:00'),
+('infrastruktur', 3, 'pending', 'diverifikasi', 'Diverifikasi, aset milik Dinas PU', 3, '2026-09-05 08:00:00'),
+('infrastruktur', 3, 'diverifikasi', 'survey_dijadwalkan', 'Survey dijadwalkan dengan Dinas PU', 1, '2026-09-05 10:00:00'),
+('infrastruktur', 3, 'survey_dijadwalkan', 'sedang_survey', 'Tim survey Dinas PU ke lokasi', 5, '2026-09-10 08:00:00'),
+('infrastruktur', 4, NULL, 'pending', 'Usulan dibuat', 1, '2026-09-07 12:00:00'),
+('infrastruktur', 4, 'pending', 'diverifikasi', 'Diverifikasi', 1, '2026-09-08 08:00:00'),
+('infrastruktur', 4, 'diverifikasi', 'survey_dijadwalkan', 'Survey dijadwalkan', 1, '2026-09-08 10:00:00'),
+('infrastruktur', 5, NULL, 'pending', 'Usulan dibuat', 5, '2026-09-08 13:00:00'),
+('infrastruktur', 5, 'pending', 'diverifikasi', 'Diverifikasi, menunggu anggaran', 5, '2026-09-09 08:00:00'),
+('infrastruktur', 6, NULL, 'pending', 'Usulan dibuat', 4, '2026-09-08 17:00:00');
 
 -- ============================================================
 -- SELESAI! Berikut akun yang bisa digunakan:

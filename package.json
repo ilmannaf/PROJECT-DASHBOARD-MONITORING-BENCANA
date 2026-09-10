@@ -1,8 +1,13 @@
 {
-  "dependencies": {
-    "framer-motion": "^13.1.1",
-    "leaflet": "^1.9.4",
-    "lucide-react": "^1.34.0",
-    "react-leaflet": "^5.0.0"
+  "name": "dashboard-monitoring-bencana",
+  "version": "1.0.0",
+  "description": "Dashboard Monitoring Bencana BPBD Kota Semarang",
+  "scripts": {
+    "start": "cd backend && node src/server.js",
+    "dev": "cd backend && nodemon src/server.js",
+    "install:all": "cd backend && npm install && cd ../frontend && npm install"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

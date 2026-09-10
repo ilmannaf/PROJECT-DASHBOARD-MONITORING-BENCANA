@@ -1,5 +1,6 @@
 -- ============================================
--- Schema Database: Sistem Kebencanaan BPBD
+-- Schema Database: Sistem Kebencanaan BPBD Kota Semarang
+-- File ini hanya berisi struktur tabel (tanpa seed data)
 -- ============================================
 
 USE sistem_kebencanaan;
@@ -10,9 +11,19 @@ CREATE TABLE users (
   name VARCHAR(100) NOT NULL,
   email VARCHAR(100) NOT NULL UNIQUE,
   password VARCHAR(255) NOT NULL,
-  role ENUM('admin', 'petugas') NOT NULL DEFAULT 'petugas',
+  role ENUM('admin', 'petugas', 'pelapor') NOT NULL DEFAULT 'petugas',
   wilayah VARCHAR(100),
+  bio TEXT,
+  status ENUM('on_duty', 'off_duty', 'resting') DEFAULT 'on_duty',
+  photo_url VARCHAR(500),
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Tabel POSKO
+CREATE TABLE posko (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  address VARCHAR(255)
 );
 
 -- Tabel REPORTS (laporan bencana dari publik)
@@ -58,37 +69,6 @@ CREATE TABLE report_photos (
   FOREIGN KEY (report_id) REFERENCES reports(id) ON DELETE CASCADE
 );
 
--- Tabel POSKO
-CREATE TABLE posko (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(100) NOT NULL,
-  address VARCHAR(255)
-);
-
--- Tabel INVENTORY_ITEMS (logistik & peralatan)
-CREATE TABLE inventory_items (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(100) NOT NULL,
-  category ENUM('logistik', 'peralatan', 'p3k') NOT NULL,
-  item_condition ENUM('baik', 'rusak', 'perlu_maintenance') DEFAULT 'baik',
-  quantity INT NOT NULL DEFAULT 0,
-  unit VARCHAR(20),
-  posko_id INT,
-  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  FOREIGN KEY (posko_id) REFERENCES posko(id) ON DELETE SET NULL
-);
-
--- Tabel VEHICLES (kesiapan kendaraan)
-CREATE TABLE vehicles (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  plate_number VARCHAR(20) NOT NULL UNIQUE,
-  type VARCHAR(50),
-  status ENUM('siap', 'maintenance', 'rusak') DEFAULT 'siap',
-  last_service_date DATE,
-  posko_id INT,
-  FOREIGN KEY (posko_id) REFERENCES posko(id) ON DELETE SET NULL
-);
-
 -- Tabel ACTIVITIES (laporan kegiatan)
 CREATE TABLE activities (
   id INT AUTO_INCREMENT PRIMARY KEY,
@@ -103,12 +83,7 @@ CREATE TABLE activities (
   FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
 );
 
-ALTER TABLE activities
-ADD COLUMN activity_time TIME DEFAULT NULL
-AFTER activity_date;
-
 -- Tabel INFO_BOARD (Papan Informasi)
--- Berbeda dari activities, info_board bisa banyak entries per hari dengan jam spesifik
 CREATE TABLE info_board (
   id INT AUTO_INCREMENT PRIMARY KEY,
   title VARCHAR(200) NOT NULL,
@@ -117,7 +92,6 @@ CREATE TABLE info_board (
   end_time TIME DEFAULT NULL,
   location VARCHAR(200),
   description TEXT,
-  priority ENUM('tinggi', 'sedang', 'rendah') DEFAULT 'sedang',
   is_active TINYINT(1) DEFAULT 1,
   created_by INT,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -150,10 +124,35 @@ CREATE TABLE disaster_records (
   kerugian TEXT,
   sumber_info_nama VARCHAR(100),
   sumber_info_phone VARCHAR(20),
+  photos JSON,
   created_by INT,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Tabel INVENTORY_ITEMS (logistik & peralatan)
+CREATE TABLE inventory_items (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  category ENUM('logistik', 'peralatan', 'p3k') NOT NULL,
+  item_condition ENUM('baik', 'rusak', 'perlu_maintenance') DEFAULT 'baik',
+  quantity INT NOT NULL DEFAULT 0,
+  unit VARCHAR(20),
+  posko_id INT,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (posko_id) REFERENCES posko(id) ON DELETE SET NULL
+);
+
+-- Tabel VEHICLES (kesiapan kendaraan)
+CREATE TABLE vehicles (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  plate_number VARCHAR(20) NOT NULL UNIQUE,
+  type VARCHAR(50),
+  status ENUM('siap', 'maintenance', 'rusak') DEFAULT 'siap',
+  last_service_date DATE,
+  posko_id INT,
+  FOREIGN KEY (posko_id) REFERENCES posko(id) ON DELETE SET NULL
 );
 
 -- Tabel LOGIN_HISTORY (histori login admin)
@@ -186,7 +185,17 @@ CREATE TABLE water_distributions (
   FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
 );
 
--- Tabel LOKASI SMAB (Satuan Pendidikan Aman Bencana)
+-- Tabel WATER SUPPLY SETTINGS
+CREATE TABLE water_supply_settings (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  total_supply INT NOT NULL DEFAULT 0,
+  updated_by INT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Tabel SMAB (Satuan Pendidikan Aman Bencana)
 CREATE TABLE smab_locations (
   id INT AUTO_INCREMENT PRIMARY KEY,
   nama_sekolah VARCHAR(200) NOT NULL,
@@ -202,7 +211,7 @@ CREATE TABLE smab_locations (
   FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
 );
 
--- Tabel LOKASI KATANA (FPRB Kelurahan)
+-- Tabel KATANA (FPRB Kelurahan)
 CREATE TABLE katana_locations (
   id INT AUTO_INCREMENT PRIMARY KEY,
   kelurahan VARCHAR(150) NOT NULL,
@@ -219,7 +228,7 @@ CREATE TABLE katana_locations (
   FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
 );
 
--- Tabel PENERIMA BANTUAN BTT
+-- Tabel BANTUAN LANGSUNG TUNAI (BLT / BTT)
 CREATE TABLE btt_penerima (
   id INT AUTO_INCREMENT PRIMARY KEY,
   btt_id INT NOT NULL DEFAULT 1,
@@ -241,4 +250,97 @@ CREATE TABLE btt_penerima (
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- ============================================================
+-- TABEL BIDANG 3: DISTRIBUSI BANTUAN
+-- ============================================================
+
+-- Tabel USULAN AIR BERSIH
+CREATE TABLE air_bersih_proposals (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  disaster_record_id INT NOT NULL,
+  kelurahan VARCHAR(100) NOT NULL,
+  kecamatan VARCHAR(100),
+  usulan_description TEXT,
+  status ENUM('pending', 'diproses', 'selesai') DEFAULT 'pending',
+  bukti_dukung_url VARCHAR(500),
+  created_by INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (disaster_record_id) REFERENCES disaster_records(id) ON DELETE CASCADE,
+  FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Tabel USULAN BANSOS
+CREATE TABLE bansos_proposals (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  disaster_record_id INT NOT NULL,
+  kelurahan VARCHAR(100) NOT NULL,
+  kecamatan VARCHAR(100),
+  nama_penerima VARCHAR(150),
+  nik_penerima VARCHAR(20),
+  alamat_penerima TEXT,
+  phone_penerima VARCHAR(20),
+  usulan_description TEXT,
+  surat_pengajuan_url VARCHAR(500),
+  bukti_dukung_url VARCHAR(500),
+  status ENUM('pending', 'diverifikasi', 'survey_dijadwalkan', 'sedang_survey', 'lolos_survey', 'tidak_lolos', 'proses_pencairan', 'selesai') DEFAULT 'pending',
+  admin_notes TEXT,
+  created_by INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (disaster_record_id) REFERENCES disaster_records(id) ON DELETE CASCADE,
+  FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Tabel USULAN INFRASTRUKTUR
+CREATE TABLE infrastruktur_proposals (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  disaster_record_id INT NOT NULL,
+  kelurahan VARCHAR(100) NOT NULL,
+  kecamatan VARCHAR(100),
+  usulan_description TEXT,
+  status ENUM('pending', 'diverifikasi', 'survey_dijadwalkan', 'sedang_survey', 'lolos_survey', 'tidak_lolos', 'dalam_pengerjaan', 'selesai') DEFAULT 'pending',
+  aset_milik_opd_lain BOOLEAN DEFAULT FALSE,
+  opd_nama VARCHAR(150),
+  bukti_dukung_url VARCHAR(500),
+  admin_notes TEXT,
+  created_by INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (disaster_record_id) REFERENCES disaster_records(id) ON DELETE CASCADE,
+  FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Tabel SURVEY (untuk Bansos & Infrastruktur)
+CREATE TABLE surveys (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  proposal_type ENUM('bansos', 'infrastruktur') NOT NULL,
+  proposal_id INT NOT NULL,
+  personil_id INT,
+  surat_tugas_url VARCHAR(500),
+  form_survey_url VARCHAR(500),
+  survey_date DATE,
+  hasil_survey ENUM('lolos', 'tidak_lolos') DEFAULT NULL,
+  keterangan TEXT,
+  foto_dokumentasi_url VARCHAR(500),
+  status ENUM('dijadwalkan', 'sedang_survey', 'selesai') DEFAULT 'dijadwalkan',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (personil_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+-- Tabel STATUS HISTORY (Status Berjenjang)
+CREATE TABLE status_history (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  proposal_type ENUM('bansos', 'infrastruktur', 'air_bersih', 'water_distribution') NOT NULL,
+  proposal_id INT NOT NULL,
+  status_from VARCHAR(50),
+  status_to VARCHAR(50) NOT NULL,
+  note TEXT,
+  bukti_dukung_url VARCHAR(500),
+  updated_by INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
 );
