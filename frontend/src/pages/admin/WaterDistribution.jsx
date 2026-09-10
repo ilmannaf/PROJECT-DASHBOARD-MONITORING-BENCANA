@@ -29,12 +29,6 @@ import {
 import AnimatedNumber from "../../components/AnimatedNumber";
 import { SkeletonTable } from "../../components/Skeleton";
 
-const STATUS_OPTIONS = [
-  { value: "selesai", label: "Selesai", color: "bg-green-100 text-green-600" },
-  { value: "dalam_proses", label: "Dalam Proses", color: "bg-blue-100 text-blue-600" },
-  { value: "dibatalkan", label: "Dibatalkan", color: "bg-red-100 text-red-600" },
-];
-
 const inputClass =
   "w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition shadow-sm bg-white";
 
@@ -122,9 +116,6 @@ export default function WaterDistribution() {
   const [searchTerm, setSearchTerm] = useState("");
   const [summary, setSummary] = useState({
     totalData: 0,
-    inProcess: 0,
-    selesai: 0,
-    dibatalkan: 0,
     totalLiters: 0,
     totalSupply: 0,
     tersedia: 0,
@@ -142,7 +133,6 @@ export default function WaterDistribution() {
     amount_liters: "",
     total_supply: "",
     notes: "",
-    status: "selesai",
   });
 
   const geocodeTimerRef = useRef(null);
@@ -197,9 +187,6 @@ export default function WaterDistribution() {
       .then((data) => {
         setSummary({
           totalData: parseInt(data.totalData) || 0,
-          inProcess: parseInt(data.inProcess) || 0,
-          selesai: parseInt(data.selesai) || 0,
-          dibatalkan: parseInt(data.dibatalkan) || 0,
           totalLiters: parseInt(data.totalLiters) || 0,
           totalSupply: parseInt(data.totalSupply) || 0,
           tersedia: parseInt(data.tersedia) || 0,
@@ -255,7 +242,6 @@ export default function WaterDistribution() {
       amount_liters: "",
       total_supply: "",
       notes: "",
-      status: "selesai",
     });
     setShowForm(false);
     setEditId(null);
@@ -300,20 +286,9 @@ export default function WaterDistribution() {
       amount_liters: item.amount_liters || "",
       total_supply: item.total_supply || "",
       notes: item.notes || "",
-      status: item.status || "selesai",
     });
     setEditId(item.id);
     setShowForm(true);
-  };
-
-  const handleStatusChange = async (id, status) => {
-    try {
-      await waterDistributionService.updateWaterDistributionStatus(id, { status });
-      loadItems();
-      loadSummary();
-    } catch {
-      alert("Gagal update status");
-    }
   };
 
   const handleDelete = async (id) => {
@@ -349,10 +324,9 @@ export default function WaterDistribution() {
     return (
       item.kelurahan?.toLowerCase().includes(q) ||
       item.location_address?.toLowerCase().includes(q) ||
-      item.kecamatan?.toLowerCase().includes(q) ||
-      item.status?.toLowerCase().includes(q)
+      item.kecamatan?.toLowerCase().includes(q)
     );
-  });
+  }).sort((a, b) => new Date(b.distribution_date) - new Date(a.distribution_date));
 
   const formatNumber = (num) => {
     return Number(num)?.toLocaleString('id-ID') || "0";
@@ -474,14 +448,7 @@ export default function WaterDistribution() {
               <input type="number" name="amount_liters" value={form.amount_liters} onChange={handleChange} placeholder="Jumlah liter" max="5000" min="0" className={inputClass} />
               <p className="text-xs text-gray-400 mt-1">Maksimal 5.000 liter</p>
             </div>
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Status</label>
-              <select name="status" value={form.status} onChange={handleChange} className={inputClass}>
-                {STATUS_OPTIONS.map((s) => (
-                  <option key={s.value} value={s.value}>{s.label}</option>
-                ))}
-              </select>
-            </div>
+
             <div className="md:col-span-2">
               <label className="block text-sm font-semibold text-gray-700 mb-2">Catatan</label>
               <textarea name="notes" value={form.notes} onChange={handleChange} rows={3} placeholder="Catatan tambahan..." className={inputClass} />
@@ -684,7 +651,7 @@ export default function WaterDistribution() {
                 <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-500">Kecamatan</th>
                 <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-500">Lokasi</th>
                 <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-500 text-center">Liter</th>
-                <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-500 text-center">Status</th>
+
                 <th className="py-4 px-6 text-xs font-bold uppercase tracking-wider text-gray-500 text-center">Aksi</th>
               </tr>
             </thead>
@@ -693,7 +660,6 @@ export default function WaterDistribution() {
                 <SkeletonTable rows={5} cols={7} />
               ) : filteredItems.length > 0 ? (
                 filteredItems.map((item) => {
-                  const statusInfo = STATUS_OPTIONS.find((s) => s.value === item.status) || STATUS_OPTIONS[0];
                   return (
                     <tr key={item.id} className="hover:bg-cyan-50/40 transition-colors group">
                       <td className="py-4 px-6 text-sm text-gray-600">
@@ -705,23 +671,6 @@ export default function WaterDistribution() {
                       <td className="py-4 px-6 text-sm text-gray-600">{item.kecamatan || "-"}</td>
                       <td className="py-4 px-6 text-sm text-gray-600 max-w-xs truncate">{item.location_address || "-"}</td>
                       <td className="py-4 px-6 text-center text-sm font-medium text-gray-700">{item.amount_liters || "-"}</td>
-                      <td className="py-4 px-6 text-center">
-                        {adminUser ? (
-                          <select
-                            value={item.status}
-                            onChange={(e) => handleStatusChange(item.id, e.target.value)}
-                            className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold ${statusInfo.color} border-0 cursor-pointer focus:ring-2 focus:ring-brand-500`}
-                          >
-                            {STATUS_OPTIONS.map((s) => (
-                              <option key={s.value} value={s.value}>{s.label}</option>
-                            ))}
-                          </select>
-                        ) : (
-                          <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold ${statusInfo.color}`}>
-                            {statusInfo.label}
-                          </span>
-                        )}
-                      </td>
                       <td className="py-4 px-6">
                         <div className="flex justify-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity">
                           <button onClick={() => handleViewDetail(item.id)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Detail">
@@ -744,7 +693,7 @@ export default function WaterDistribution() {
                 })
               ) : (
                 <tr>
-                  <td colSpan="7" className="py-20 text-center">
+                  <td colSpan="6" className="py-20 text-center">
                     <div className="flex flex-col items-center gap-4">
                       <Droplets className="w-10 h-10 text-gray-300" />
                       <div>

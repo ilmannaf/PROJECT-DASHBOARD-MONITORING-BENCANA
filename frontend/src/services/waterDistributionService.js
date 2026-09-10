@@ -36,11 +36,6 @@ const waterDistributionService = {
     return data;
   },
 
-  updateWaterDistributionStatus: async (id, payload) => {
-    const { data } = await api.patch(`/water-distributions/${id}`, payload);
-    return data;
-  },
-
   deleteWaterDistribution: async (id) => {
     const { data } = await api.delete(`/water-distributions/${id}`);
     return data;

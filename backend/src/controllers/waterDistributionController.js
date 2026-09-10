@@ -95,7 +95,7 @@ exports.exportDistributionsExcel = async (req, res) => {
 
 exports.createDistribution = async (req, res) => {
   try {
-    const { distribution_date, kelurahan, kecamatan, location_address, latitude, longitude, amount_liters, total_supply, notes, status } = req.body;
+    const { distribution_date, kelurahan, kecamatan, location_address, latitude, longitude, amount_liters, total_supply, notes } = req.body;
 
     if (!distribution_date || !kelurahan || !kecamatan || !location_address) {
       return res.status(400).json({ message: 'Tanggal, kelurahan, kecamatan, dan alamat wajib diisi' });
@@ -104,7 +104,7 @@ exports.createDistribution = async (req, res) => {
     const [result] = await pool.query(
       `INSERT INTO water_distributions (distribution_date, kelurahan, kecamatan, location_address, latitude, longitude, amount_liters, total_supply, notes, status, created_by)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [distribution_date, kelurahan, kecamatan, location_address, latitude || null, longitude || null, amount_liters || 0, total_supply || 0, notes || null, status || 'selesai', req.user.id]
+      [distribution_date, kelurahan, kecamatan, location_address, latitude || null, longitude || null, amount_liters || 0, total_supply || 0, notes || null, 'selesai', req.user.id]
     );
 
     res.status(201).json({ message: 'Data pendistribusian air bersih berhasil ditambahkan', id: result.insertId });
@@ -117,7 +117,7 @@ exports.createDistribution = async (req, res) => {
 exports.updateDistribution = async (req, res) => {
   try {
     const { id } = req.params;
-    const { distribution_date, kelurahan, kecamatan, location_address, latitude, longitude, amount_liters, total_supply, notes, status } = req.body;
+    const { distribution_date, kelurahan, kecamatan, location_address, latitude, longitude, amount_liters, total_supply, notes } = req.body;
 
     const [existing] = await pool.query('SELECT * FROM water_distributions WHERE id = ?', [id]);
     if (existing.length === 0) {
@@ -134,10 +134,9 @@ exports.updateDistribution = async (req, res) => {
         longitude = COALESCE(?, longitude),
         amount_liters = COALESCE(?, amount_liters),
         total_supply = COALESCE(?, total_supply),
-        notes = COALESCE(?, notes),
-        status = COALESCE(?, status)
+        notes = COALESCE(?, notes)
        WHERE id = ?`,
-      [distribution_date, kelurahan, kecamatan, location_address, latitude, longitude, amount_liters, total_supply, notes, status, id]
+      [distribution_date, kelurahan, kecamatan, location_address, latitude, longitude, amount_liters, total_supply, notes, id]
     );
 
     res.json({ message: 'Data pendistribusian air bersih berhasil diperbarui' });
