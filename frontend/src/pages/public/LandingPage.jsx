@@ -17,8 +17,11 @@ import {
   AlertTriangle,
   Zap,
   ArrowRight,
+  Sun,
+  Moon,
 } from "lucide-react";
 import AnimatedNumber from "../../components/AnimatedNumber";
+import { useTheme } from "../../context/ThemeContext";
 import api from "../../services/api";
 
 const GALERI_IMAGES = [
@@ -441,6 +444,7 @@ function LatestReportCard() {
 
 export default function LandingPage() {
   const navigate = useNavigate();
+  const { isDark, toggleTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const sectionsRef = useRef(null);
@@ -572,6 +576,17 @@ export default function LandingPage() {
 
             <div className="hidden items-center gap-3 md:flex">
               <button
+                onClick={toggleTheme}
+                className={`rounded-full p-2 transition-all duration-200 ${
+                  scrolled
+                    ? "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                    : "text-white/80 hover:bg-white/10 hover:text-white"
+                }`}
+                aria-label="Toggle dark mode"
+              >
+                {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              </button>
+              <button
                 onClick={() => navigate("/admin/login")}
                 className={`rounded-xl px-5 py-2 text-[13px] font-semibold transition-all duration-300 ${
                   scrolled
@@ -623,6 +638,13 @@ export default function LandingPage() {
                 className="block w-full rounded-xl px-4 py-3 text-left text-sm font-medium text-gray-700 transition hover:bg-gray-50"
               >
                 Kontak
+              </button>
+              <button
+                onClick={toggleTheme}
+                className="flex items-center gap-3 w-full rounded-xl px-4 py-3 text-left text-sm font-medium text-gray-700 transition hover:bg-gray-50"
+              >
+                {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                {isDark ? "Mode Terang" : "Mode Gelap"}
               </button>
               <button
                 onClick={() => { navigate("/admin/login"); setMobileMenuOpen(false); }}
@@ -799,26 +821,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="relative overflow-hidden bg-gradient-to-br from-brand-500 via-brand-600 to-orange-500 py-20 text-white">
-        <div className="absolute top-0 left-0 w-full overflow-hidden leading-[0] rotate-180">
-          <svg
-            viewBox="0 0 1440 100"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="relative block w-[calc(100%+2px)] h-[50px] lg:h-[60px]"
-            preserveAspectRatio="none"
-          >
-            <path
-              d="M0 50C240 100 480 0 720 50C960 100 1200 0 1440 50V100H0V50Z"
-              fill="white"
-            />
-          </svg>
-        </div>
-
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute -top-20 -right-20 h-[350px] w-[350px] rounded-full bg-white/[0.06] blur-3xl" />
-          <div className="absolute -bottom-20 -left-20 h-[300px] w-[300px] rounded-full bg-orange-400/10 blur-3xl" />
-          <div className="absolute top-1/2 left-1/4 h-[200px] w-[200px] rounded-full bg-amber-400/5 blur-3xl" />
+      <section className="relative overflow-hidden bg-gradient-to-br from-brand-500 to-orange-500 py-20 text-white">
+        <div className="absolute inset-0 pointer-events-none">
           <div
             className="absolute inset-0 opacity-[0.03]"
             style={{
