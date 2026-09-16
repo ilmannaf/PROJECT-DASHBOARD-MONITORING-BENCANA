@@ -1,5 +1,6 @@
 import { Outlet, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { logout, getCurrentUser, isAdmin } from "../services/authService";
 import { getSocket } from "../services/socket";
 import { useTheme } from "../context/ThemeContext";
@@ -220,15 +221,26 @@ export default function AdminLayout() {
               to={item.path}
               onClick={closeMobile}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-150 ${
+                `relative flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
                   isActive
-                    ? "bg-white/10 text-white"
+                    ? "bg-white/10 text-white shadow-lg shadow-black/10"
                     : "text-gray-400 hover:bg-white/5 hover:text-gray-200"
                 }`
               }
             >
-              <Icon className="w-[18px] h-[18px] shrink-0" />
-              <span className={`flex-1 ${sidebarCollapsed ? "hidden" : ""}`}>{item.label}</span>
+              {({ isActive }) => (
+                <>
+                  {isActive && (
+                    <motion.div
+                      layoutId="sidebar-active"
+                      className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-brand-500 rounded-r-full"
+                      transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                    />
+                  )}
+                  <Icon className="w-[18px] h-[18px] shrink-0" />
+                  <span className={`flex-1 ${sidebarCollapsed ? "hidden" : ""}`}>{item.label}</span>
+                </>
+              )}
             </NavLink>
           );
         })}
@@ -262,7 +274,7 @@ export default function AdminLayout() {
     <div className="min-h-screen bg-[#f4f6f9] flex">
       {/* Desktop Sidebar */}
       <aside
-        className={`hidden lg:flex flex-col h-screen fixed top-0 left-0 z-30 bg-[#343a40] text-white transition-all duration-300 ${
+        className={`hidden lg:flex flex-col h-screen fixed top-0 left-0 z-30 bg-[#343a40] text-white transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
           sidebarCollapsed ? "w-[60px]" : "w-64"
         }`}
       >
@@ -297,9 +309,9 @@ export default function AdminLayout() {
       </div>
 
       {/* Main Content */}
-      <div className={`flex-1 min-w-0 transition-all duration-300 ${sidebarCollapsed ? "lg:ml-[60px]" : "lg:ml-64"}`}>
+      <div className={`flex-1 min-w-0 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${sidebarCollapsed ? "lg:ml-[60px]" : "lg:ml-64"}`}>
         {/* Top Navbar */}
-        <nav className="sticky top-0 z-20 bg-white border-b border-gray-200 adminlte-navbar">
+        <nav className="sticky top-0 z-20 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 adminlte-navbar transition-colors duration-300">
           <div className="flex items-center justify-between px-4 py-0 h-[57px]">
             {/* Left: Toggle + Search */}
             <div className="flex items-center gap-2">
@@ -481,22 +493,40 @@ export default function AdminLayout() {
         </nav>
 
         {/* Content Header (Breadcrumb) */}
-        <div className="bg-white border-b border-gray-200 px-4 py-3">
+        <div className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4 py-3 transition-colors duration-300">
           <div className="flex items-center justify-between">
-            <h1 className="text-xl font-semibold text-gray-800">{currentBreadcrumb}</h1>
-            <nav className="flex items-center text-sm text-gray-500">
+            <motion.h1
+              key={currentBreadcrumb}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              className="text-xl font-semibold text-gray-800 dark:text-gray-100"
+            >
+              {currentBreadcrumb}
+            </motion.h1>
+            <nav className="flex items-center text-sm text-gray-500 dark:text-gray-400">
               <Home className="w-3.5 h-3.5 mr-1" />
               <span className="mx-1">/</span>
               <NavLink to="/admin/dashboard" className="text-blue-600 hover:underline">Home</NavLink>
               <span className="mx-1">/</span>
-              <span className="text-gray-600">{currentBreadcrumb}</span>
+              <span className="text-gray-600 dark:text-gray-300">{currentBreadcrumb}</span>
             </nav>
           </div>
         </div>
 
         {/* Main Content Area */}
         <main className="p-4">
-          <Outlet />
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={location.pathname}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <Outlet />
+            </motion.div>
+          </AnimatePresence>
         </main>
 
         {/* Footer */}

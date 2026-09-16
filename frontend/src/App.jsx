@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ThemeProvider } from './context/ThemeContext';
 import ToastContainer from './components/Toast';
+import LoadingBar from './components/LoadingBar';
 import Login from './pages/admin/Login';
 import Dashboard from './pages/admin/Dashboard';
 import ReportsManagement from './pages/admin/ReportsManagement';
@@ -43,15 +44,42 @@ function ScrollToTop() {
 }
 
 const pageVariants = {
-  initial: { opacity: 0, y: 8 },
-  animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -8 },
+  initial: {
+    opacity: 0,
+    y: 12,
+    scale: 0.995,
+  },
+  animate: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.35,
+      ease: [0.22, 1, 0.36, 1],
+      staggerChildren: 0.05,
+    },
+  },
+  exit: {
+    opacity: 0,
+    y: -8,
+    scale: 0.995,
+    transition: {
+      duration: 0.2,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  },
 };
 
-const pageTransition = {
-  type: 'tween',
-  ease: [0.22, 1, 0.36, 1],
-  duration: 0.25,
+const childVariants = {
+  initial: { opacity: 0, y: 16 },
+  animate: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.4,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  },
 };
 
 function PageWrapper({ children }) {
@@ -61,12 +89,13 @@ function PageWrapper({ children }) {
       initial="initial"
       animate="animate"
       exit="exit"
-      transition={pageTransition}
     >
       {children}
     </motion.div>
   );
 }
+
+export { childVariants };
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -124,6 +153,7 @@ function App() {
     <ThemeProvider>
       <BrowserRouter>
         <ScrollToTop />
+        <LoadingBar />
         <ToastContainer />
         <WhatsAppFloat />
         <AnimatedRoutes />
