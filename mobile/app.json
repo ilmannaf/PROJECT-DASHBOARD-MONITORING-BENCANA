@@ -1,16 +1,21 @@
 {
   "expo": {
-    "name": "PROJECT-DASHBOARD-MONITORING-BENCANA",
-    "slug": "PROJECT-DASHBOARD-MONITORING-BENCANA",
+    "name": "Monitoring Bencana",
+    "slug": "monitoring-bencana",
     "version": "1.0.0",
+    "description": "Pelaporan dan pemantauan bencana secara real-time.",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "projectdashboardmonitoringbencana",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/expo.icon"
+      "icon": "./assets/expo.icon",
+      "bundleIdentifier": "com.monitoringbencana.mobile",
+      "buildNumber": "1"
     },
     "android": {
+      "package": "com.monitoringbencana.mobile",
+      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
