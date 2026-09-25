@@ -12,14 +12,27 @@ const allowedOrigins = (
   .map((o) => o.trim())
   .filter(Boolean);
 
-// Ensure Vercel domain is always allowed
-if (!allowedOrigins.includes("https://sibeb-semar.vercel.app")) {
-  allowedOrigins.push("https://sibeb-semar.vercel.app");
-}
-
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+
+      // Allow configured origins
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+
+      // Allow all Vercel preview and production URLs
+      if (/^https:\/\/.*\.vercel\.app$/.test(origin)) return callback(null, true);
+
+      // Allow localhost
+      if (/^http:\/\/localhost:\d+$/.test(origin)) return callback(null, true);
+
+      // Allow local IPs
+      if (/^http:\/\/(192\.168|10\.|172\.(1[6-9]|2\d|3[01]))\.\d+\.\d+(:\d+)?$/.test(origin)) {
+        return callback(null, true);
+      }
+
+      callback(new Error("CORS: origin tidak diizinkan"));
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
