@@ -1,151 +1,522 @@
-const express = require("express");
-const cors = require("cors");
-const helmet = require("helmet");
-const path = require("path");
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const path = require('path');
 
 const app = express();
 
-const allowedOrigins = (
-  process.env.CLIENT_URL || "https://sibeb-semar.vercel.app"
-)
-  .split(",")
-  .map((o) => o.trim())
+/* =========================================================
+   CORS CONFIGURATION
+   ========================================================= */
+
+// Ambil CLIENT_URL dari environment Railway
+// Contoh:
+// CLIENT_URL=https://sibeb-semar.vercel.app
+//
+// Bisa juga beberapa origin:
+// CLIENT_URL=https://sibeb-semar.vercel.app,http://localhost:5173
+
+const allowedOrigins = (process.env.CLIENT_URL || 'http://localhost:5173')
+  .split(',')
+  .map((origin) => origin.trim())
   .filter(Boolean);
 
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
+console.log('======================================');
+console.log('CORS Allowed Origins:');
+console.log(allowedOrigins);
+console.log('======================================');
 
-      // Allow configured origins
-      if (allowedOrigins.includes(origin)) return callback(null, true);
 
-      // Allow all Vercel preview and production URLs
-      if (/^https:\/\/.*\.vercel\.app$/.test(origin)) return callback(null, true);
-
-      // Allow localhost
-      if (/^http:\/\/localhost:\d+$/.test(origin)) return callback(null, true);
-
-      // Allow local IPs
-      if (/^http:\/\/(192\.168|10\.|172\.(1[6-9]|2\d|3[01]))\.\d+\.\d+(:\d+)?$/.test(origin)) {
-        return callback(null, true);
-      }
-
-      callback(new Error("CORS: origin tidak diizinkan"));
-    },
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  }),
-);
+/* =========================================================
+   HELMET
+   ========================================================= */
 
 app.use(
   helmet({
-    crossOriginResourcePolicy: { policy: "cross-origin" },
+    crossOriginResourcePolicy: {
+      policy: 'cross-origin',
+    },
+
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
+
         baseUri: ["'self'"],
-        fontSrc: ["'self'", "https:", "data:"],
+
+        fontSrc: [
+          "'self'",
+          'https:',
+          'data:',
+        ],
+
+        formAction: ["'self'"],
+
         frameAncestors: ["'self'"],
-        imgSrc: ["'self'", "data:", "blob:", "http:", "https:"],
+
+        imgSrc: [
+          "'self'",
+          'data:',
+          'blob:',
+          'http:',
+          'https:',
+        ],
+
         objectSrc: ["'none'"],
-        scriptSrc: ["'self'"],
-        scriptSrcAttr: ["'none'"],
-        styleSrc: ["'self'", "https:", "'unsafe-inline'"],
+
+        scriptSrc: [
+          "'self'",
+        ],
+
+        scriptSrcAttr: [
+          "'none'",
+        ],
+
+        styleSrc: [
+          "'self'",
+          'https:',
+          "'unsafe-inline'",
+        ],
+
         upgradeInsecureRequests: [],
       },
     },
-  }),
+  })
 );
-app.use(express.json({ limit: "1mb" }));
-app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 
-// Biar foto yang diupload bisa diakses lewat URL
-app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
-app.get("/api/health", (req, res) => {
-  res.json({ status: "ok", message: "Server backend berjalan" });
-});
+/* =========================================================
+   CORS
+   ========================================================= */
 
-const authRoutes = require("./routes/authRoutes");
-app.use("/api/auth", authRoutes);
+const corsOptions = {
+  origin: (origin, callback) => {
 
-const reportRoutes = require("./routes/reportRoutes");
-app.use("/api/reports", reportRoutes);
+    // Request tanpa Origin
+    // Contoh: Postman, curl, server-to-server
+    if (!origin) {
+      return callback(null, true);
+    }
 
-const inventoryRoutes = require("./routes/inventoryRoutes");
-app.use("/api/inventory", inventoryRoutes);
+    // Origin yang terdaftar di CLIENT_URL
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
 
-const vehicleRoutes = require("./routes/vehicleRoutes");
-app.use("/api/vehicles", vehicleRoutes);
+    // Izinkan localhost dengan port berapa pun
+    // Contoh:
+    // http://localhost:3000
+    // http://localhost:5173
+    // http://localhost:8080
 
-const activityRoutes = require("./routes/activityRoutes");
-app.use("/api/activities", activityRoutes);
+    if (/^http:\/\/localhost:\d+$/.test(origin)) {
+      return callback(null, true);
+    }
 
-const infoBoardRoutes = require("./routes/infoBoardRoutes");
-app.use("/api/info-board", infoBoardRoutes);
+    // Izinkan 127.0.0.1
+    if (/^http:\/\/127\.0\.0\.1:\d+$/.test(origin)) {
+      return callback(null, true);
+    }
 
-const poskoRoutes = require("./routes/poskoRoutes");
-app.use("/api/posko", poskoRoutes);
+    // Izinkan IP lokal:
+    // 192.168.x.x
+    // 10.x.x.x
+    // 172.16.x.x - 172.31.x.x
 
-const disasterRoutes = require("./routes/disasterRoutes");
-app.use("/api/disaster-records", disasterRoutes);
+    if (
+      /^http:\/\/192\.168\.\d+\.\d+(:\d+)?$/.test(origin) ||
+      /^http:\/\/10\.\d+\.\d+\.\d+(:\d+)?$/.test(origin) ||
+      /^http:\/\/172\.(1[6-9]|2\d|3[01])\.\d+\.\d+(:\d+)?$/.test(origin)
+    ) {
+      return callback(null, true);
+    }
 
-const userRoutes = require("./routes/userRoutes");
-app.use("/api/users", userRoutes);
+    console.log('======================================');
+    console.log('CORS BLOCKED');
+    console.log('Origin:', origin);
+    console.log('Allowed:', allowedOrigins);
+    console.log('======================================');
 
-const profileRoutes = require("./routes/profileRoutes");
-app.use("/api/profile", profileRoutes);
-
-const publicRoutes = require("./routes/publicRoutes");
-app.use("/api/public", publicRoutes);
-
-const bidang3Routes = require("./routes/bidang3Routes");
-app.use("/api/bidang3", bidang3Routes);
-
-const waterDistributionRoutes = require("./routes/waterDistributionRoutes");
-app.use("/api/water-distributions", waterDistributionRoutes);
-
-const waterSupplySettingsRoutes = require("./routes/waterSupplySettingsRoutes");
-app.use("/api/water-supply-settings", waterSupplySettingsRoutes);
-
-const unexpectedExpenditureRoutes = require("./routes/unexpectedExpenditureRoutes");
-app.use("/api/unexpected-expenditures", unexpectedExpenditureRoutes);
-
-const bttPenerimaRoutes = require("./routes/bttPenerimaRoutes");
-app.use("/api/btt-penerima", bttPenerimaRoutes);
-
-const locationRoutes = require("./routes/locationRoutes");
-app.use("/api/locations", locationRoutes);
-
-// 404 handler untuk route yang tidak ada
-app.use((req, res) => {
-  res.status(404).json({ message: "Endpoint tidak ditemukan" });
-});
-
-// Global error handler (menangkap error dari multer dll)
-app.use((err, req, res, next) => {
-  console.error(err);
-  // handle multer file limit errors dengan pesan user-friendly
-  if (err.code === "LIMIT_FILE_SIZE") {
-    const isWaterDistribution = req.originalUrl?.includes(
-      "/water-distributions",
+    return callback(
+      new Error(`CORS: origin tidak diizinkan - ${origin}`)
     );
-    return res
-      .status(400)
-      .json({
-        message: isWaterDistribution
-          ? "Foto dokumentasi maksimal 2 MB"
-          : "Ukuran foto maksimal 5MB per file",
-      });
-  }
-  if (err.code === "LIMIT_FILE_COUNT" || err.code === "LIMIT_UNEXPECTED_FILE") {
-    return res.status(400).json({ message: "Maksimal 5 foto" });
-  }
-  res.status(err.status || 500).json({
-    message: err.message || "Terjadi kesalahan server",
+  },
+
+  methods: [
+    'GET',
+    'POST',
+    'PUT',
+    'PATCH',
+    'DELETE',
+    'OPTIONS',
+  ],
+
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+  ],
+
+  credentials: true,
+
+  optionsSuccessStatus: 204,
+};
+
+
+// Pasang CORS sebelum semua route
+app.use(cors(corsOptions));
+
+
+/* =========================================================
+   BODY PARSER
+   ========================================================= */
+
+app.use(
+  express.json({
+    limit: '1mb',
+  })
+);
+
+app.use(
+  express.urlencoded({
+    extended: true,
+    limit: '1mb',
+  })
+);
+
+
+/* =========================================================
+   STATIC UPLOADS
+   ========================================================= */
+
+// Foto yang diupload dapat diakses melalui:
+// https://domain-backend.com/uploads/nama-file.jpg
+
+app.use(
+  '/uploads',
+  express.static(
+    path.join(__dirname, '../uploads')
+  )
+);
+
+
+/* =========================================================
+   HEALTH CHECK
+   ========================================================= */
+
+app.get('/api/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    message: 'Server backend berjalan',
+    cors: allowedOrigins,
   });
 });
+
+
+/* =========================================================
+   AUTH ROUTES
+   ========================================================= */
+
+const authRoutes = require('./routes/authRoutes');
+
+app.use(
+  '/api/auth',
+  authRoutes
+);
+
+
+/* =========================================================
+   REPORT ROUTES
+   ========================================================= */
+
+const reportRoutes = require('./routes/reportRoutes');
+
+app.use(
+  '/api/reports',
+  reportRoutes
+);
+
+
+/* =========================================================
+   INVENTORY ROUTES
+   ========================================================= */
+
+const inventoryRoutes = require('./routes/inventoryRoutes');
+
+app.use(
+  '/api/inventory',
+  inventoryRoutes
+);
+
+
+/* =========================================================
+   VEHICLE ROUTES
+   ========================================================= */
+
+const vehicleRoutes = require('./routes/vehicleRoutes');
+
+app.use(
+  '/api/vehicles',
+  vehicleRoutes
+);
+
+
+/* =========================================================
+   ACTIVITY ROUTES
+   ========================================================= */
+
+const activityRoutes = require('./routes/activityRoutes');
+
+app.use(
+  '/api/activities',
+  activityRoutes
+);
+
+
+/* =========================================================
+   INFO BOARD ROUTES
+   ========================================================= */
+
+const infoBoardRoutes = require('./routes/infoBoardRoutes');
+
+app.use(
+  '/api/info-board',
+  infoBoardRoutes
+);
+
+
+/* =========================================================
+   POSKO ROUTES
+   ========================================================= */
+
+const poskoRoutes = require('./routes/poskoRoutes');
+
+app.use(
+  '/api/posko',
+  poskoRoutes
+);
+
+
+/* =========================================================
+   DISASTER ROUTES
+   ========================================================= */
+
+const disasterRoutes = require('./routes/disasterRoutes');
+
+app.use(
+  '/api/disaster-records',
+  disasterRoutes
+);
+
+
+/* =========================================================
+   USER ROUTES
+   ========================================================= */
+
+const userRoutes = require('./routes/userRoutes');
+
+app.use(
+  '/api/users',
+  userRoutes
+);
+
+
+/* =========================================================
+   PROFILE ROUTES
+   ========================================================= */
+
+const profileRoutes = require('./routes/profileRoutes');
+
+app.use(
+  '/api/profile',
+  profileRoutes
+);
+
+
+/* =========================================================
+   PUBLIC ROUTES
+   ========================================================= */
+
+const publicRoutes = require('./routes/publicRoutes');
+
+app.use(
+  '/api/public',
+  publicRoutes
+);
+
+
+/* =========================================================
+   BIDANG 3 ROUTES
+   ========================================================= */
+
+const bidang3Routes = require('./routes/bidang3Routes');
+
+app.use(
+  '/api/bidang3',
+  bidang3Routes
+);
+
+
+/* =========================================================
+   WATER DISTRIBUTION ROUTES
+   ========================================================= */
+
+const waterDistributionRoutes = require('./routes/waterDistributionRoutes');
+
+app.use(
+  '/api/water-distributions',
+  waterDistributionRoutes
+);
+
+
+/* =========================================================
+   WATER SUPPLY SETTINGS ROUTES
+   ========================================================= */
+
+const waterSupplySettingsRoutes = require(
+  './routes/waterSupplySettingsRoutes'
+);
+
+app.use(
+  '/api/water-supply-settings',
+  waterSupplySettingsRoutes
+);
+
+
+/* =========================================================
+   UNEXPECTED EXPENDITURE ROUTES
+   ========================================================= */
+
+const unexpectedExpenditureRoutes = require(
+  './routes/unexpectedExpenditureRoutes'
+);
+
+app.use(
+  '/api/unexpected-expenditures',
+  unexpectedExpenditureRoutes
+);
+
+
+/* =========================================================
+   BTT PENERIMA ROUTES
+   ========================================================= */
+
+const bttPenerimaRoutes = require(
+  './routes/bttPenerimaRoutes'
+);
+
+app.use(
+  '/api/btt-penerima',
+  bttPenerimaRoutes
+);
+
+
+/* =========================================================
+   LOCATION ROUTES
+   ========================================================= */
+
+const locationRoutes = require(
+  './routes/locationRoutes'
+);
+
+app.use(
+  '/api/locations',
+  locationRoutes
+);
+
+
+/* =========================================================
+   404 HANDLER
+   ========================================================= */
+
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: 'Endpoint tidak ditemukan',
+    method: req.method,
+    path: req.originalUrl,
+  });
+});
+
+
+/* =========================================================
+   GLOBAL ERROR HANDLER
+   ========================================================= */
+
+app.use((err, req, res, next) => {
+
+  console.error('======================================');
+  console.error('SERVER ERROR');
+  console.error('Message:', err.message);
+  console.error('Code:', err.code);
+  console.error('URL:', req.originalUrl);
+  console.error('Method:', req.method);
+  console.error('======================================');
+
+
+  /* -----------------------------------------
+     CORS ERROR
+     ----------------------------------------- */
+
+  if (
+    err.message &&
+    err.message.startsWith('CORS:')
+  ) {
+    return res.status(403).json({
+      success: false,
+      message: err.message,
+    });
+  }
+
+
+  /* -----------------------------------------
+     MULTER FILE SIZE
+     ----------------------------------------- */
+
+  if (err.code === 'LIMIT_FILE_SIZE') {
+
+    const isWaterDistribution =
+      req.originalUrl?.includes(
+        '/water-distributions'
+      );
+
+    return res.status(400).json({
+      success: false,
+      message: isWaterDistribution
+        ? 'Foto dokumentasi maksimal 2 MB'
+        : 'Ukuran foto maksimal 5MB per file',
+    });
+  }
+
+
+  /* -----------------------------------------
+     MULTER FILE COUNT
+     ----------------------------------------- */
+
+  if (
+    err.code === 'LIMIT_FILE_COUNT' ||
+    err.code === 'LIMIT_UNEXPECTED_FILE'
+  ) {
+    return res.status(400).json({
+      success: false,
+      message: 'Maksimal 5 foto',
+    });
+  }
+
+
+  /* -----------------------------------------
+     DEFAULT ERROR
+     ----------------------------------------- */
+
+  return res.status(err.status || 500).json({
+    success: false,
+    message:
+      err.message ||
+      'Terjadi kesalahan server',
+  });
+});
+
+
+/* =========================================================
+   EXPORT APP
+   ========================================================= */
 
 module.exports = app;
