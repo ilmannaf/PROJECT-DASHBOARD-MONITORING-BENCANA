@@ -18,6 +18,15 @@ if (!allowedOrigins.includes("https://sibeb-semar.vercel.app")) {
 }
 
 app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  }),
+);
+
+app.use(
   helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
     contentSecurityPolicy: {
@@ -25,7 +34,6 @@ app.use(
         defaultSrc: ["'self'"],
         baseUri: ["'self'"],
         fontSrc: ["'self'", "https:", "data:"],
-        formAction: ["'self'"],
         frameAncestors: ["'self'"],
         imgSrc: ["'self'", "data:", "blob:", "http:", "https:"],
         objectSrc: ["'none'"],
@@ -34,26 +42,6 @@ app.use(
         styleSrc: ["'self'", "https:", "'unsafe-inline'"],
         upgradeInsecureRequests: [],
       },
-    },
-  }),
-);
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Izinkan request tanpa origin (mobile apps, curl, Postman)
-      if (!origin) return callback(null, true);
-      // Izinkan semua origin yang sudah didaftarkan
-      if (allowedOrigins.includes(origin)) return callback(null, true);
-      // Izinkan semua localhost dengan port berapapun
-      if (/^http:\/\/localhost:\d+$/.test(origin)) return callback(null, true);
-      // Izinkan semua IP lokal (192.168.x.x, 10.x.x.x, 172.16-31.x.x)
-      if (
-        /^http:\/\/(192\.168|10\.|172\.(1[6-9]|2\d|3[01]))\.\d+\.\d+(:\d+)?$/.test(
-          origin,
-        )
-      )
-        return callback(null, true);
-      callback(new Error("CORS: origin tidak diizinkan"));
     },
   }),
 );
