@@ -12,6 +12,11 @@ const allowedOrigins = (
   .map((o) => o.trim())
   .filter(Boolean);
 
+// Ensure Vercel domain is always allowed
+if (!allowedOrigins.includes("https://sibeb-semar.vercel.app")) {
+  allowedOrigins.push("https://sibeb-semar.vercel.app");
+}
+
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
