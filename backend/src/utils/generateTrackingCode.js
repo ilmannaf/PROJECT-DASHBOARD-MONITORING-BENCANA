@@ -1,6 +1,8 @@
+const crypto = require('crypto');
+
 function generateTrackingCode() {
   const year = new Date().getFullYear();
-  const random = Math.floor(1000 + Math.random() * 9000); // 4 digit acak
+  const random = crypto.randomBytes(4).toString('hex').toUpperCase();
   return `BPBD-${year}-${random}`;
 }
 

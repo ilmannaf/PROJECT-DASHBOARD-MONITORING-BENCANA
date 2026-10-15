@@ -6,6 +6,7 @@ import 'leaflet/dist/leaflet.css';
 import semarangGeojson from '../../assets/kota_semarang.json';
 import api from '../../services/api';
 import { isAdmin } from '../../services/authService';
+import { useTheme } from '../../context/ThemeContextValue';
 import {
   createLocation,
   deleteLocation,
@@ -105,6 +106,7 @@ const typeConfig = {
 
 export default function LocationManagement() {
   const adminUser = isAdmin();
+  const { isDark } = useTheme();
   const [type, setType] = useState('smab');
   const [locations, setLocations] = useState([]);
   const [form, setForm] = useState(EMPTY_FORM);
@@ -233,7 +235,7 @@ export default function LocationManagement() {
   };
 
   return (
-    <div className="p-5 lg:p-8 animate-fade-in bg-gradient-to-b from-slate-50 to-white min-h-full">
+    <div className={`admin-map-page p-5 lg:p-8 animate-fade-in bg-gradient-to-b from-slate-50 to-white min-h-full ${isDark ? 'is-dark' : ''}`}>
       <div className="flex flex-col xl:flex-row xl:items-end justify-between mb-8 gap-5">
         <div className="flex items-center gap-3">
           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-orange-500 to-orange-700 text-white flex items-center justify-center shadow-lg shadow-orange-500/25">
@@ -376,10 +378,11 @@ export default function LocationManagement() {
         </div>
         <div className="h-[380px] w-full">
           <MapContainer center={SEMARANG_CENTER} zoom={SEMARANG_ZOOM} minZoom={5} maxZoom={18} className="h-full w-full">
-            <TileLayer
-              attribution='&copy; OpenStreetMap contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
+             <TileLayer
+               key={isDark ? 'dark' : 'light'}
+               attribution='&copy; OpenStreetMap contributors'
+url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+             />
             <Polygon
               positions={[WORLD_RECT, SEMARANG_LATLNG]}
               pathOptions={{ stroke: false, fillColor: '#0f172a', fillOpacity: 0.35, fillRule: 'evenodd' }}

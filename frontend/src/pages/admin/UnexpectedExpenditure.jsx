@@ -3,7 +3,7 @@ import unexpectedExpenditureService from "../../services/unexpectedExpenditureSe
 import bttPenerimaService from "../../services/bttPenerimaService";
 import { getDisasterRecords } from "../../services/disasterService";
 import { isAdmin } from "../../services/authService";
-import { Wallet, Search, Plus, X, Trash2, Eye, CheckCircle, Clock, Printer, Edit, Download } from "lucide-react";
+import { Wallet, Search, Plus, X, Trash2, CheckCircle, Printer, Edit, Download } from "lucide-react";
 import AnimatedNumber from "../../components/AnimatedNumber";
 import { SkeletonTable } from "../../components/Skeleton";
 
@@ -32,12 +32,11 @@ function terbilang(angka) {
 export default function UnexpectedExpenditure() {
   const adminUser = isAdmin();
   const [items, setItems] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [, setLoading] = useState(true);
   const [showContent, setShowContent] = useState(false);
   const [showForm, setShowForm] = useState(false);
-  const [showDetail, setShowDetail] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [disasterRecords, setDisasterRecords] = useState([]);
+  const [, setDisasterRecords] = useState([]);
   const [penerimaList, setPenerimaList] = useState([]);
   const [penerimaLoading, setPenerimaLoading] = useState(false);
   const [editPenerima, setEditPenerima] = useState(null);
@@ -83,9 +82,12 @@ export default function UnexpectedExpenditure() {
   };
 
   useEffect(() => {
-    loadItems();
-    loadPenerima();
-    getDisasterRecords().then(setDisasterRecords).catch(console.error);
+    const timer = setTimeout(() => {
+      loadItems();
+      loadPenerima();
+      getDisasterRecords().then(setDisasterRecords).catch(console.error);
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });

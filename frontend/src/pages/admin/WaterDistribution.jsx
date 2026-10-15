@@ -14,12 +14,9 @@ import {
   Trash2,
   Eye,
   CheckCircle,
-  Clock,
-  AlertCircle,
   Edit3,
   Map,
   List,
-  Camera,
   FileText,
   MapPin,
   Activity,
@@ -28,13 +25,13 @@ import {
 } from "lucide-react";
 import AnimatedNumber from "../../components/AnimatedNumber";
 import { SkeletonTable } from "../../components/Skeleton";
+import { getProtectedFileUrl } from "../../services/fileService";
 
 const inputClass =
   "w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition shadow-sm bg-white";
 
 const SEMARANG_CENTER = [-6.997, 110.44];
 const SEMARANG_ZOOM = 12;
-const API_BASE = (import.meta.env.VITE_API_URL || "http://localhost:5000/api").replace(/\/api\/?$/, "");
 
 const SEMARANG_RING = semarangGeojson.features[0].geometry.coordinates[0];
 const SEMARANG_LATLNG = SEMARANG_RING.map(([lng, lat]) => [lat, lng]);
@@ -149,7 +146,9 @@ export default function WaterDistribution() {
     });
   }, [showForm, editId]);
 
-  const geocodeAndUpdate = useCallback(async (query, isDetailed = false) => {
+  const { kelurahan, kecamatan, location_address } = form;
+
+  const geocodeAndUpdate = useCallback(async (query) => {
     const result = await geocodeAddress(query);
     if (result) {
       setForm((prev) => ({ ...prev, latitude: result.lat, longitude: result.lng }));
@@ -158,8 +157,6 @@ export default function WaterDistribution() {
 
   useEffect(() => {
     if (geocodeTimerRef.current) clearTimeout(geocodeTimerRef.current);
-
-    const { kelurahan, kecamatan, location_address } = form;
 
     if (location_address && location_address.length > 5) {
       geocodeTimerRef.current = setTimeout(() => {
@@ -178,7 +175,7 @@ export default function WaterDistribution() {
     return () => {
       if (geocodeTimerRef.current) clearTimeout(geocodeTimerRef.current);
     };
-  }, [form.kelurahan, form.kecamatan, form.location_address, geocodeAndUpdate]);
+  }, [kelurahan, kecamatan, location_address, geocodeAndUpdate]);
 
 
   const loadItems = () => {
@@ -237,8 +234,11 @@ export default function WaterDistribution() {
   };
 
   useEffect(() => {
-    loadItems();
-    loadSummary();
+    const timer = setTimeout(() => {
+      loadItems();
+      loadSummary();
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
@@ -700,7 +700,7 @@ export default function WaterDistribution() {
                       <td className="py-4 px-6">
                         {item.documentation_photo ? (
                           <img
-                            src={`${API_BASE}${item.documentation_photo}`}
+                            src={getProtectedFileUrl(item.documentation_photo)}
                             alt="Dokumentasi kegiatan"
                             className="w-16 h-12 object-cover rounded-lg border border-gray-200 shadow-sm"
                           />
@@ -811,7 +811,7 @@ export default function WaterDistribution() {
                 <span className="font-semibold text-gray-700">Foto Dokumentasi:</span>
                 {showDetail.documentation_photo ? (
                   <img
-                    src={`${API_BASE}${showDetail.documentation_photo}`}
+                    src={getProtectedFileUrl(showDetail.documentation_photo)}
                     alt="Dokumentasi kegiatan"
                     className="mt-2 w-full max-h-72 object-contain rounded-xl border border-gray-200 bg-gray-50"
                   />

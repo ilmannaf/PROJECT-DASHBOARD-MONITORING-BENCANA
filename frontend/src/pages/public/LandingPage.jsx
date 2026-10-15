@@ -5,9 +5,6 @@ import {
   Mail,
   MapPin,
   Clock,
-  Shield,
-  CheckCircle,
-  Star,
   Waves,
   Mountain,
   Flame,
@@ -16,12 +13,10 @@ import {
   TreePine,
   AlertTriangle,
   Zap,
-  ArrowRight,
   Sun,
   Moon,
 } from "lucide-react";
-import AnimatedNumber from "../../components/AnimatedNumber";
-import { useTheme } from "../../context/ThemeContext";
+import { useTheme } from "../../context/ThemeContextValue";
 import api from "../../services/api";
 
 const GALERI_IMAGES = [
@@ -44,10 +39,18 @@ function FotoHighlight() {
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [dragDelta, setDragDelta] = useState(0);
+  const [containerWidth, setContainerWidth] = useState(1);
   const [isHovered, setIsHovered] = useState(false);
   const containerRef = useRef(null);
   const timerRef = useRef(null);
   const total = GALERI_IMAGES.length;
+
+  useEffect(() => {
+    const updateWidth = () => setContainerWidth(containerRef.current?.offsetWidth || 1);
+    updateWidth();
+    window.addEventListener("resize", updateWidth);
+    return () => window.removeEventListener("resize", updateWidth);
+  }, []);
 
   const goTo = useCallback(
     (idx) => {
@@ -107,7 +110,7 @@ function FotoHighlight() {
 
     if (absDiff === 1) {
       const dragOffset = isDragging
-        ? (dragDelta / (containerRef.current?.offsetWidth || 1)) * 30 * sign
+        ? (dragDelta / (containerWidth)) * 30 * sign
         : 0;
       return {
         transform: `translateX(${sign * 55 + dragOffset}%) translateZ(-80px) rotateY(${sign * -30}deg) scale(0.88)`,
@@ -175,7 +178,7 @@ function FotoHighlight() {
             className="absolute inset-0 flex items-center justify-center"
             style={{
               transformStyle: "preserve-3d",
-              transform: `translateX(${isDragging ? (dragDelta / (containerRef.current?.offsetWidth || 1)) * 8 : 0}%)`,
+              transform: `translateX(${isDragging ? (dragDelta / (containerWidth)) * 8 : 0}%)`,
               transition: isDragging
                 ? "none"
                 : "transform 0.5s cubic-bezier(0.4,0,0.2,1)",
@@ -339,7 +342,7 @@ function FotoHighlight() {
   );
 }
 
-function LatestReportCard() {
+export function LatestReportCard() {
   const [latest, setLatest] = useState(null);
 
   useEffect(() => {
@@ -482,7 +485,7 @@ export default function LandingPage() {
     );
 
     const timer2 = setTimeout(() => {
-      document.querySelectorAll(".reveal").forEach((el, i) => {
+      document.querySelectorAll(".reveal").forEach((el) => {
         if (!el.dataset.delaySet) {
           el.dataset.delaySet = "1";
           const parent = el.closest("[data-stagger-group]");

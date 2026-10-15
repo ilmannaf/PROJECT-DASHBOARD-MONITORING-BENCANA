@@ -25,19 +25,6 @@ export default function TrackStatus() {
   const [showHistoryItems, setShowHistoryItems] = useState(false);
   const formRef = useRef(null);
 
-  useEffect(() => {
-    const t = setTimeout(() => setShowContent(true), 80);
-    const history = JSON.parse(localStorage.getItem('trackHistory') || '[]');
-    setSearchHistory(history);
-
-    const codeFromUrl = searchParams.get('code');
-    if (codeFromUrl) {
-      setCode(codeFromUrl);
-      performSearch(codeFromUrl);
-    }
-    return () => clearTimeout(t);
-  }, []);
-
   const performSearch = async (searchCode) => {
     setError('');
     setResult(null);
@@ -66,6 +53,20 @@ export default function TrackStatus() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowContent(true);
+      const history = JSON.parse(localStorage.getItem('trackHistory') || '[]');
+      setSearchHistory(history);
+      const codeFromUrl = searchParams.get('code');
+      if (codeFromUrl) {
+        setCode(codeFromUrl);
+        performSearch(codeFromUrl);
+      }
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [searchParams]);
 
   const handleSearch = async (e) => {
     e.preventDefault();

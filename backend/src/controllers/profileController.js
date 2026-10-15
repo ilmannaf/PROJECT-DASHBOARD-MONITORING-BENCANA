@@ -2,6 +2,15 @@ const pool = require('../config/db');
 const fs = require('fs');
 const path = require('path');
 
+const removeUploadFile = (fileUrl) => {
+  if (!fileUrl) return;
+  const filename = path.basename(fileUrl);
+  for (const directory of ['../../uploads', '../../uploads/public', '../../uploads/private']) {
+    const filePath = path.join(__dirname, directory, filename);
+    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+  }
+};
+
 // GET /api/profile/me - Ambil profil sendiri
 exports.getMyProfile = async (req, res) => {
   try {
@@ -35,13 +44,8 @@ exports.updateMyProfile = async (req, res) => {
     // Handle upload foto baru
     if (req.file) {
       // Hapus foto lama jika ada
-      if (photoUrl) {
-        const oldPath = path.join(__dirname, '../../uploads', path.basename(photoUrl));
-        if (fs.existsSync(oldPath)) {
-          fs.unlinkSync(oldPath);
-        }
-      }
-      photoUrl = `/uploads/${req.file.filename}`;
+      if (photoUrl) removeUploadFile(photoUrl);
+      photoUrl = `/api/files/${req.file.filename}`;
     }
 
     await pool.query(

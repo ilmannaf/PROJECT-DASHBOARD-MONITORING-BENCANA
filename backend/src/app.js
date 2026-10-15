@@ -2,6 +2,9 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const path = require('path');
+const { apiLimiter } = require('./middlewares/rateLimit');
+const fileRoutes = require('./routes/fileRoutes');
+const { serveUpload } = require('./controllers/fileController');
 
 const app = express();
 
@@ -263,6 +266,7 @@ const corsOptions = {
  * Pasang CORS SEBELUM route-route API.
  */
 app.use(cors(corsOptions));
+app.use('/api', apiLimiter);
 
 
 /* =========================================================
@@ -287,15 +291,9 @@ app.use(
    UPLOADS
    ========================================================= */
 
-// File upload dapat diakses:
-// /uploads/nama-file.jpg
-
-app.use(
-  '/uploads',
-  express.static(
-    path.join(__dirname, '../uploads')
-  )
-);
+app.use('/uploads', express.static(path.join(__dirname, '../uploads/public')));
+app.get('/uploads/:filename', serveUpload);
+app.use('/api/files', fileRoutes);
 
 
 /* =========================================================

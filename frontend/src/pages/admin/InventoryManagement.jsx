@@ -49,8 +49,11 @@ export default function InventoryManagement() {
   };
 
   useEffect(() => {
-    loadItems();
-    getPosko().then(setPoskoList).catch(console.error);
+    const timer = setTimeout(() => {
+      loadItems();
+      getPosko().then(setPoskoList).catch(console.error);
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleChange = (e) =>

@@ -38,7 +38,8 @@ export default function ActivityManagement() {
   };
 
   useEffect(() => {
-    loadActivities();
+    const timer = setTimeout(loadActivities, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });

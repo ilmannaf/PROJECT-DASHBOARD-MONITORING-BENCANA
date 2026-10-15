@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import { getReportStats } from '../../services/reportService';
 import { getSocket } from '../../services/socket';
-import { showToast } from '../../components/Toast';
+import { showToast } from '../../services/toastService';
 import AnimatedNumber from '../../components/AnimatedNumber';
 import { SkeletonStatCards, SkeletonPulse } from '../../components/Skeleton';
 import {
@@ -18,7 +18,6 @@ import {
   MapPin,
   Users,
   TrendingUp,
-  ArrowRight,
 } from 'lucide-react';
 
 const STATUS_LABELS = {
@@ -35,12 +34,6 @@ const STATUS_COLORS = {
   selesai: '#198754',
 };
 
-const STATUS_BG = {
-  baru: 'bg-red-500',
-  diverifikasi: 'bg-yellow-500',
-  ditindaklanjuti: 'bg-blue-500',
-  selesai: 'bg-green-500',
-};
 
 const STATUS_TEXT_BG = {
   baru: 'text-bg-danger',

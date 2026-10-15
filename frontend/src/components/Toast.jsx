@@ -1,15 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { CheckCircle, AlertTriangle, Info, X } from "lucide-react";
 import React from "react";
-
-let toastId = 0;
-let listeners = [];
-
-export function showToast(message, type = "info") {
-  const id = ++toastId;
-  listeners.forEach((fn) => fn({ id, message, type }));
-  return id;
-}
+import { subscribeToasts } from "../services/toastService";
 
 const TYPE_STYLE = {
   success: { bg: "bg-emerald-50 border-emerald-100", text: "text-emerald-700", icon: CheckCircle },
@@ -60,10 +52,7 @@ export default function ToastContainer() {
 
   useEffect(() => {
     const handler = (toast) => setToasts((prev) => [...prev, toast]);
-    listeners.push(handler);
-    return () => {
-      listeners = listeners.filter((fn) => fn !== handler);
-    };
+    return subscribeToasts(handler);
   }, []);
 
   if (toasts.length === 0) return null;

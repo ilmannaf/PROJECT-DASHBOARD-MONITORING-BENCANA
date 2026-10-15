@@ -65,15 +65,13 @@ export default function PapanInformasi() {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [lastRefresh, setLastRefresh] = useState(new Date());
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isDark, setIsDark] = useState(false);
+  const [isDark, setIsDark] = useState(() => localStorage.getItem("papan-informasi-dark") === "true");
 
   const fetchData = useCallback(async () => {
     try {
       const data = await getInfoBoard();
       setItems(data);
-      setLastRefresh(new Date());
     } catch (err) {
       console.error("Gagal memuat data:", err);
     } finally {
@@ -82,9 +80,12 @@ export default function PapanInformasi() {
   }, []);
 
   useEffect(() => {
-    fetchData();
+    const timer = setTimeout(() => fetchData(), 0);
     const interval = setInterval(fetchData, REFRESH_INTERVAL);
-    return () => clearInterval(interval);
+    return () => {
+      clearTimeout(timer);
+      clearInterval(interval);
+    };
   }, [fetchData]);
 
   useEffect(() => {
@@ -93,13 +94,18 @@ export default function PapanInformasi() {
   }, []);
 
   useEffect(() => {
-    const saved = localStorage.getItem("papan-informasi-dark");
-    if (saved !== null) setIsDark(saved === "true");
-  }, []);
-
-  useEffect(() => {
     localStorage.setItem("papan-informasi-dark", String(isDark));
   }, [isDark]);
+
+  const toggleFullscreen = useCallback(() => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen();
+      setIsFullscreen(false);
+    }
+  }, []);
 
   useEffect(() => {
     const handleKey = (e) => {
@@ -108,17 +114,7 @@ export default function PapanInformasi() {
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, []);
-
-  const toggleFullscreen = () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
-      setIsFullscreen(true);
-    } else {
-      document.exitFullscreen();
-      setIsFullscreen(false);
-    }
-  };
+  }, [toggleFullscreen]);
 
   // Filter hari ini saja, sort by start_time ascending
   const todayItems = items

@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import bidang3Service from "../../services/bidang3Service";
 import { getDisasterRecords } from "../../services/disasterService";
 import { isAdmin } from "../../services/authService";
-import { Droplets, Search, Plus, X, Trash2, Eye, CheckCircle, Clock, AlertCircle } from "lucide-react";
+import { Droplets, Search, Plus, X, Trash2, Eye, CheckCircle, Clock } from "lucide-react";
 import AnimatedNumber from "../../components/AnimatedNumber";
 import { SkeletonTable } from "../../components/Skeleton";
+import { getProtectedFileUrl } from "../../services/fileService";
 
 const STATUS_OPTIONS = [
   { value: "pending", label: "Pending", color: "bg-gray-100 text-gray-600" },
@@ -44,8 +45,11 @@ export default function AirBersihManagement() {
   };
 
   useEffect(() => {
-    loadItems();
-    getDisasterRecords().then(setDisasterRecords).catch(console.error);
+    const timer = setTimeout(() => {
+      loadItems();
+      getDisasterRecords().then(setDisasterRecords).catch(console.error);
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
@@ -339,7 +343,7 @@ export default function AirBersihManagement() {
               {showDetail.bukti_dukung_url && (
                 <div>
                   <span className="font-semibold text-gray-700">Bukti Dukung:</span>
-                  <img src={showDetail.bukti_dukung_url} alt="Bukti" className="mt-2 rounded-lg max-h-48" />
+                  <img src={getProtectedFileUrl(showDetail.bukti_dukung_url)} alt="Bukti" className="mt-2 rounded-lg max-h-48" />
                 </div>
               )}
               {showDetail.status_history?.length > 0 && (

@@ -156,7 +156,7 @@ exports.createBansosProposal = async (req, res) => {
     }
 
     // Handle file upload surat pengajuan
-    const surat_pengajuan_url = req.file ? `/uploads/${req.file.filename}` : null;
+    const surat_pengajuan_url = req.file ? `/api/files/${req.file.filename}` : null;
 
     const [result] = await pool.query(
       `INSERT INTO bansos_proposals (disaster_record_id, kelurahan, kecamatan, nama_penerima, nik_penerima, alamat_penerima, phone_penerima, usulan_description, surat_pengajuan_url, created_by)
@@ -449,8 +449,8 @@ exports.createSurvey = async (req, res) => {
     }
 
     // Handle file uploads
-    const surat_tugas_url = req.files?.surat_tugas ? `/uploads/${req.files.surat_tugas[0].filename}` : null;
-    const form_survey_url = req.files?.form_survey ? `/uploads/${req.files.form_survey[0].filename}` : null;
+    const surat_tugas_url = req.files?.surat_tugas ? `/api/files/${req.files.surat_tugas[0].filename}` : null;
+    const form_survey_url = req.files?.form_survey ? `/api/files/${req.files.form_survey[0].filename}` : null;
 
     const [result] = await pool.query(
       `INSERT INTO surveys (proposal_type, proposal_id, personil_id, surat_tugas_url, form_survey_url, survey_date, keterangan)
@@ -483,7 +483,7 @@ exports.updateSurvey = async (req, res) => {
     }
 
     // Handle foto dokumentasi upload
-    const foto_dokumentasi_url = req.file ? `/uploads/${req.file.filename}` : null;
+    const foto_dokumentasi_url = req.file ? `/api/files/${req.file.filename}` : null;
 
     await pool.query(
       `UPDATE surveys SET

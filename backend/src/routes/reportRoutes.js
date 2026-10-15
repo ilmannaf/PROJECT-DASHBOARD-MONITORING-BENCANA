@@ -2,14 +2,15 @@ const express = require('express');
 const router = express.Router();
 const { createReport, createAdminReport, getReports, getReportStats, getMyReports, getReportByTrackingCode, updateReportStatus, updateReportData, deleteReport, getPublicReports, exportReportsExcel } = require('../controllers/reportController');
 const { verifyToken, optionalVerifyToken, requireRole } = require('../middlewares/authMiddleware');
-const { reportLimiter } = require('../middlewares/rateLimit');
+const { reportLimiter, trackingLimiter } = require('../middlewares/rateLimit');
 const upload = require('../middlewares/uploadMiddleware');
+const publicUpload = upload.publicUpload;
 
 // Publik - gak perlu login
 router.get('/public', getPublicReports);
-router.post('/', reportLimiter, optionalVerifyToken, upload.fields([{ name: 'photo', maxCount: 1 }, { name: 'photos', maxCount: 5 }]), createReport);
-router.post('/with-photos', reportLimiter, optionalVerifyToken, upload.array('photos', 5), createReport);
-router.get('/track/:code', getReportByTrackingCode);
+router.post('/', reportLimiter, optionalVerifyToken, publicUpload.fields([{ name: 'photo', maxCount: 1 }, { name: 'photos', maxCount: 5 }]), createReport);
+router.post('/with-photos', reportLimiter, optionalVerifyToken, publicUpload.array('photos', 5), createReport);
+router.get('/track/:code', trackingLimiter, getReportByTrackingCode);
 router.post('/admin', verifyToken, requireRole('admin'), createAdminReport);
 
 // User yang login

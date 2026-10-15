@@ -104,12 +104,9 @@ cd frontend && npm run build && npm run preview
 
 ---
 
-## Default Credentials
+## Initial Users
 
-| Email | Password | Role |
-|-------|----------|------|
-| admin@ilmannafia.go.id | admin123 | admin |
-| petugas@bpbdsemarang.go.id | admin123 | petugas |
+Default users are not created automatically. For a fresh local database, set `SEED_DEFAULT_USERS=true` and provide `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD`, `SEED_PETUGAS_EMAIL`, and `SEED_PETUGAS_PASSWORD` in `backend/.env`, then restart the backend. Disable `SEED_DEFAULT_USERS` after the initial setup.
 
 ---
 

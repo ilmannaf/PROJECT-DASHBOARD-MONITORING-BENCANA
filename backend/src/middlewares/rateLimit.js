@@ -24,4 +24,12 @@ const authLimiter = rateLimit({
   message: { message: 'Terlalu banyak percobaan login, coba lagi dalam 15 menit' },
 });
 
-module.exports = { apiLimiter, reportLimiter, authLimiter };
+const trackingLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { message: 'Terlalu banyak permintaan pelacakan, coba lagi nanti' },
+});
+
+module.exports = { apiLimiter, reportLimiter, authLimiter, trackingLimiter };

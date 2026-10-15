@@ -1,6 +1,17 @@
 const pool = require('../config/db');
 const generateTrackingCode = require('../utils/generateTrackingCode');
 const ExcelJS = require('exceljs');
+const fs = require('fs');
+const path = require('path');
+
+const removeStoredUpload = (fileUrl) => {
+  if (!fileUrl) return;
+  const filename = path.basename(fileUrl);
+  for (const directory of ['../../uploads', '../../uploads/public', '../../uploads/private']) {
+    const filePath = path.join(__dirname, directory, filename);
+    if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+  }
+};
 
 // Helper untuk ambil daftar foto dari request (support photo single + photos array max 5)
 function extractUploadedFiles(req) {
@@ -17,6 +28,14 @@ function extractUploadedFiles(req) {
   return files;
 }
 
+function removeUploadedFiles(files) {
+  for (const file of files) {
+    try {
+      if (file?.path && fs.existsSync(file.path)) fs.unlinkSync(file.path);
+    } catch (_) {}
+  }
+}
+
 // CREATE - Submit laporan baru (publik, tanpa login)
 exports.createReport = async (req, res) => {
   const conn = await pool.getConnection();
@@ -29,6 +48,7 @@ exports.createReport = async (req, res) => {
 
     const files = extractUploadedFiles(req);
     if (files.length > 5) {
+      removeUploadedFiles(files);
       return res.status(400).json({ message: 'Maksimal 5 foto' });
     }
 
@@ -69,6 +89,7 @@ exports.createReport = async (req, res) => {
     });
   } catch (err) {
     await conn.rollback();
+    removeUploadedFiles(extractUploadedFiles(req));
     console.error(err);
     res.status(500).json({ message: 'Terjadi kesalahan server' });
   } finally {
@@ -203,13 +224,18 @@ exports.getReportByTrackingCode = async (req, res) => {
   try {
     const { code } = req.params;
 
-    const [rows] = await pool.query('SELECT * FROM reports WHERE tracking_code = ?', [code]);
+    const [rows] = await pool.query(
+      `SELECT id, tracking_code, disaster_type, description, latitude, longitude,
+              address, status, photo_url, created_at, updated_at
+       FROM reports WHERE tracking_code = ?`,
+      [code]
+    );
     if (rows.length === 0) {
       return res.status(404).json({ message: 'Laporan tidak ditemukan' });
     }
 
     const [logs] = await pool.query(
-      'SELECT * FROM report_logs WHERE report_id = ? ORDER BY created_at ASC',
+      'SELECT id, status_from, status_to, note, created_at FROM report_logs WHERE report_id = ? ORDER BY created_at ASC',
       [rows[0].id]
     );
     const [photos] = await pool.query('SELECT photo_url FROM report_photos WHERE report_id = ? ORDER BY id ASC', [rows[0].id]);
@@ -229,7 +255,9 @@ exports.getPublicReports = async (req, res) => {
     const [rows] = await pool.query(
       `SELECT id, tracking_code, disaster_type, description, latitude, longitude, address, status, photo_url, created_at, updated_at
        FROM reports
-       ORDER BY created_at DESC`
+       WHERE latitude IS NOT NULL AND longitude IS NOT NULL
+       ORDER BY created_at DESC
+       LIMIT 500`
     );
     // attach photos
     let photoMap = {};
@@ -273,13 +301,10 @@ exports.deleteReport = async (req, res) => {
     }
     // hapus file foto fisik jika ada
     const [photos] = await pool.query('SELECT photo_url FROM report_photos WHERE report_id = ?', [id]);
-    const fs = require('fs');
-    const path = require('path');
     const allUrls = [...photos.map(p=>p.photo_url), existing[0].photo_url].filter(Boolean);
     for (const url of allUrls) {
       try {
-        const filePath = path.join(__dirname, '../../uploads', path.basename(url));
-        if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
+        removeStoredUpload(url);
       } catch {}
     }
     await pool.query('DELETE FROM reports WHERE id = ?', [id]);

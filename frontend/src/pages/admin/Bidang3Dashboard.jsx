@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import bidang3Service from "../../services/bidang3Service";
 import AnimatedNumber from "../../components/AnimatedNumber";
-import { Droplets, HandHelping, Building, FileText, CheckCircle, Clock, AlertCircle } from "lucide-react";
+import { Droplets, HandHelping, Building, CheckCircle, Clock, AlertCircle } from "lucide-react";
 
 const STATUS_COLOR = {
   pending: "bg-gray-100 text-gray-600",

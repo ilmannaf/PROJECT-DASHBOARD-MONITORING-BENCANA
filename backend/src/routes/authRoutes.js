@@ -6,6 +6,6 @@ const { verifyToken, requireRole } = require('../middlewares/authMiddleware');
 
 router.post('/register', authLimiter, register);
 router.post('/login', authLimiter, login);
-router.get('/history', verifyToken, getLoginHistory);
+router.get('/history', verifyToken, requireRole('admin'), getLoginHistory);
 
 module.exports = router;

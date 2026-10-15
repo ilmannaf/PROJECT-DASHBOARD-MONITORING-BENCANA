@@ -341,21 +341,30 @@ const ensureDefaultLocations = async () => {
 };
 
 const ensureDefaultUsers = async () => {
+  if (process.env.SEED_DEFAULT_USERS !== 'true') return;
+
+  const adminEmail = process.env.SEED_ADMIN_EMAIL;
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD;
+  const petugasEmail = process.env.SEED_PETUGAS_EMAIL;
+  const petugasPassword = process.env.SEED_PETUGAS_PASSWORD;
+
+  if (!adminEmail || !adminPassword || !petugasEmail || !petugasPassword) {
+    throw new Error('SEED_DEFAULT_USERS membutuhkan email dan password seed yang lengkap');
+  }
+
   const conn = await pool.getConnection();
   try {
-    const adminPasswordHash = await bcrypt.hash('admin123', 10);
-    const petugasPasswordHash = await bcrypt.hash('admin123', 10);
+    const adminPasswordHash = await bcrypt.hash(adminPassword, 12);
+    const petugasPasswordHash = await bcrypt.hash(petugasPassword, 12);
 
     await conn.query(
       `INSERT IGNORE INTO users (name, email, password, role, wilayah)
        VALUES (?, ?, ?, 'admin', ?),
-              (?, ?, ?, 'petugas', ?),
-              (?, ?, ?, 'admin', ?)
+              (?, ?, ?, 'petugas', ?)
       `,
       [
-        'Admin BPBD', 'admin@bpbdsemarang.go.id', adminPasswordHash, 'Semarang',
-        'Petugas BPBD', 'petugas@bpbdsemarang.go.id', petugasPasswordHash, 'Semarang',
-        'Admin BPBD Legacy', 'admin@ilmannafia.go.id', adminPasswordHash, 'Semarang',
+        'Admin BPBD', adminEmail, adminPasswordHash, 'Semarang',
+        'Petugas BPBD', petugasEmail, petugasPasswordHash, 'Semarang',
       ],
     );
   } finally {

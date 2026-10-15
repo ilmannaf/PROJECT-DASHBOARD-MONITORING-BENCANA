@@ -42,8 +42,11 @@ export default function VehicleManagement() {
   };
 
   useEffect(() => {
-    loadVehicles();
-    getPosko().then(setPoskoList).catch(console.error);
+    const timer = setTimeout(() => {
+      loadVehicles();
+      getPosko().then(setPoskoList).catch(console.error);
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleChange = (e) =>

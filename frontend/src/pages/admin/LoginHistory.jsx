@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getLoginHistory } from '../../services/authService';
-import { showToast } from '../../components/Toast';
+import { showToast } from '../../services/toastService';
 import { SkeletonPulse } from '../../components/Skeleton';
 import { CheckCircle, XCircle } from 'lucide-react';
 

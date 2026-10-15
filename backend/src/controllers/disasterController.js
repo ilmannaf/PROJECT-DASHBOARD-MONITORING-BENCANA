@@ -11,7 +11,7 @@ exports.createDisasterRecord = async (req, res) => {
     }
 
     // Handle photo uploads
-    const photos = req.files ? req.files.map(f => `/uploads/${f.filename}`) : [];
+    const photos = req.files ? req.files.map(f => `/api/files/${f.filename}`) : [];
     const photosJson = JSON.stringify(photos);
 
     const num = (v) => (v === '' || v === null || v === undefined ? null : Number(v));
@@ -99,7 +99,7 @@ exports.updateDisasterRecord = async (req, res) => {
     existingPhotos = existingPhotos.filter(p => !photosToRemove.includes(p));
     
     // Add new uploaded photos
-    const newPhotos = req.files ? req.files.map(f => `/uploads/${f.filename}`) : [];
+    const newPhotos = req.files ? req.files.map(f => `/api/files/${f.filename}`) : [];
     const allPhotos = [...existingPhotos, ...newPhotos].slice(0, 5); // max 5
     const photosJson = JSON.stringify(allPhotos);
 

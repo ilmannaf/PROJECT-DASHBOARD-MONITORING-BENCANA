@@ -118,8 +118,9 @@ exports.exportDistributionsExcel = async (req, res) => {
       excelRow.getCell('status').alignment = { vertical: 'middle', horizontal: 'center' };
 
       if (row.documentation_photo) {
-        const photoPath = path.join(__dirname, '../../uploads', path.basename(row.documentation_photo));
-        if (fs.existsSync(photoPath)) {
+        const photoFileName = path.basename(row.documentation_photo);
+        const photoPath = ['../../uploads/private', '../../uploads'].map((directory) => path.join(__dirname, directory, photoFileName)).find((candidate) => fs.existsSync(candidate));
+        if (photoPath) {
           const imageId = workbook.addImage({ filename: photoPath, extension: 'jpeg' });
           worksheet.addImage(imageId, {
             tl: { col: 6, row: excelRow.number - 1 },
@@ -163,7 +164,7 @@ exports.createDistribution = async (req, res) => {
       return res.status(400).json({ message: 'Jumlah truk tangki minimal 1' });
     }
 
-    const documentationPhoto = req.file ? `/uploads/${req.file.filename}` : null;
+    const documentationPhoto = req.file ? `/api/files/${req.file.filename}` : null;
 
     const [result] = await pool.query(
       `INSERT INTO water_distributions (distribution_date, kelurahan, kecamatan, location_address, latitude, longitude, amount_liters, tank_truck_count, documentation_photo, total_supply, notes, status, created_by)
@@ -206,7 +207,7 @@ exports.updateDistribution = async (req, res) => {
         total_supply = COALESCE(?, total_supply),
         notes = COALESCE(?, notes)
        WHERE id = ?`,
-      [distribution_date, kelurahan, kecamatan, location_address, latitude, longitude, amount_liters, tank_truck_count, req.file ? `/uploads/${req.file.filename}` : null, total_supply, notes, id]
+      [distribution_date, kelurahan, kecamatan, location_address, latitude, longitude, amount_liters, tank_truck_count, req.file ? `/api/files/${req.file.filename}` : null, total_supply, notes, id]
     );
 
     res.json({ message: 'Data pendistribusian air bersih berhasil diperbarui' });

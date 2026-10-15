@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ThemeProvider } from './context/ThemeContext';
@@ -70,18 +70,6 @@ const pageVariants = {
   },
 };
 
-const childVariants = {
-  initial: { opacity: 0, y: 16 },
-  animate: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.4,
-      ease: [0.22, 1, 0.36, 1],
-    },
-  },
-};
-
 function PageWrapper({ children }) {
   return (
     <motion.div
@@ -95,7 +83,21 @@ function PageWrapper({ children }) {
   );
 }
 
-export { childVariants };
+
+function NotFound() {
+  return (
+    <main className="min-h-screen flex items-center justify-center bg-slate-50 px-6 text-center">
+      <div>
+        <p className="text-sm font-semibold uppercase tracking-widest text-brand-600">404</p>
+        <h1 className="mt-2 text-3xl font-bold text-slate-900">Halaman tidak ditemukan</h1>
+        <p className="mt-2 text-slate-600">Alamat yang kamu buka tidak tersedia.</p>
+        <Link to="/" className="mt-6 inline-flex rounded-lg bg-brand-600 px-4 py-2 font-semibold text-white transition hover:bg-brand-700">
+          Kembali ke Beranda
+        </Link>
+      </div>
+    </main>
+  );
+}
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -143,12 +145,13 @@ function AnimatedRoutes() {
           <Route path="/admin/unexpected-expenditure" element={<PageWrapper><UnexpectedExpenditure /></PageWrapper>} />
           <Route path="/admin/locations" element={<PageWrapper><LocationManagement /></PageWrapper>} />
         </Route>
+        <Route path="*" element={<PageWrapper><NotFound /></PageWrapper>} />
       </Routes>
     </AnimatePresence>
   );
 }
 
-function App() {
+export default function App() {
   return (
     <ThemeProvider>
       <BrowserRouter>
@@ -161,5 +164,3 @@ function App() {
     </ThemeProvider>
   );
 }
-
-export default App;

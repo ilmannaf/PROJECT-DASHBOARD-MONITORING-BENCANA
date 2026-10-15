@@ -7,10 +7,11 @@ export default function LoadingBar() {
   const location = useLocation();
 
   useEffect(() => {
-    setLoading(true);
-    setProgress(0);
+    const startTimer = setTimeout(() => {
+      setLoading(true);
+      setProgress(0);
+    }, 0);
 
-    // Simulate loading progress
     const timer1 = setTimeout(() => setProgress(40), 50);
     const timer2 = setTimeout(() => setProgress(70), 150);
     const timer3 = setTimeout(() => setProgress(90), 300);
@@ -24,6 +25,7 @@ export default function LoadingBar() {
     }, 400);
 
     return () => {
+      clearTimeout(startTimer);
       clearTimeout(timer1);
       clearTimeout(timer2);
       clearTimeout(timer3);

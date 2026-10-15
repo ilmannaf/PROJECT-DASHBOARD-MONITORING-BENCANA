@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  ArrowLeft, BarChart3, FileText, CheckCircle, Loader2, Shield,
+  ArrowLeft, BarChart3, FileText, CheckCircle, Loader2,
   Waves, Mountain, Flame, Tornado, CloudRain, TreePine, AlertTriangle,
   Zap, TrendingUp, Calendar, ChevronDown, RefreshCw, ArrowUpRight,
   PieChart, Activity,
@@ -375,7 +375,8 @@ function StatistikChart() {
   };
 
   useEffect(() => {
-    fetchYearData(selectedYear);
+    const timer = setTimeout(() => fetchYearData(selectedYear), 0);
+    return () => clearTimeout(timer);
   }, [selectedYear]);
 
   const handleBarClick = async (monthIndex) => {
@@ -542,7 +543,7 @@ function StatistikChart() {
               allowDecimals={false}
             />
             <Tooltip
-              content={<CustomTooltip />}
+              content={CustomTooltip}
               cursor={{ fill: "rgba(249,115,22,0.06)", radius: 8 }}
             />
             <Bar

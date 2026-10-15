@@ -26,7 +26,8 @@ export default function PoskoManagement() {
   };
 
   useEffect(() => {
-    loadPosko();
+    const timer = setTimeout(loadPosko, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });

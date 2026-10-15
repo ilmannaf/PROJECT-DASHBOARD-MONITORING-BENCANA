@@ -2,18 +2,24 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-const uploadDir = path.join(__dirname, '../../uploads');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
+const uploadRoot = path.join(__dirname, '../../uploads');
+const publicUploadDir = path.join(uploadRoot, 'public');
+const privateUploadDir = path.join(uploadRoot, 'private');
+
+for (const directory of [uploadRoot, publicUploadDir, privateUploadDir]) {
+  if (!fs.existsSync(directory)) fs.mkdirSync(directory, { recursive: true });
 }
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, uploadDir),
+const createStorage = (directory) => multer.diskStorage({
+  destination: (req, file, cb) => cb(null, directory),
   filename: (req, file, cb) => {
-    const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.originalname)}`;
+    const uniqueName = `${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(file.originalname).toLowerCase()}`;
     cb(null, uniqueName);
   },
 });
+
+const storage = createStorage(privateUploadDir);
+const publicStorage = createStorage(publicUploadDir);
 
 const fileFilter = (req, file, cb) => {
   const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
@@ -35,7 +41,13 @@ const jpgFileFilter = (req, file, cb) => {
 const upload = multer({
   storage,
   fileFilter,
-  limits: { fileSize: 5 * 1024 * 1024 }, // max 5MB per file, max 5 files validated in controller
+  limits: { fileSize: 5 * 1024 * 1024 },
+});
+
+const publicUpload = multer({
+  storage: publicStorage,
+  fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024 },
 });
 
 const uploadJpgUnder2Mb = multer({
@@ -44,5 +56,13 @@ const uploadJpgUnder2Mb = multer({
   limits: { fileSize: 2 * 1024 * 1024 },
 });
 
+const publicUploadJpgUnder2Mb = multer({
+  storage: publicStorage,
+  fileFilter: jpgFileFilter,
+  limits: { fileSize: 2 * 1024 * 1024 },
+});
+
 module.exports = upload;
+module.exports.publicUpload = publicUpload;
 module.exports.uploadJpgUnder2Mb = uploadJpgUnder2Mb;
+module.exports.publicUploadJpgUnder2Mb = publicUploadJpgUnder2Mb;

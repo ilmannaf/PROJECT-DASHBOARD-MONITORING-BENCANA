@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { getCurrentUser, logout } from "../../services/authService";
 import { getMyProfile, updateMyProfile } from "../../services/profileService";
 import { motion, AnimatePresence } from "framer-motion";
+import { getProtectedFileUrl } from "../../services/fileService";
 import {
   Camera,
   User,
@@ -21,7 +22,6 @@ import {
   LogOut,
   Activity,
   Briefcase,
-  AlertTriangle,
 } from "lucide-react";
 
 // ---- Status options ----
@@ -103,8 +103,6 @@ const statusBadgeVariants = {
   },
 };
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
-
 export default function ProfilePage() {
   const navigate = useNavigate();
   const user = getCurrentUser();
@@ -120,45 +118,38 @@ export default function ProfilePage() {
   const [statusDraft, setStatusDraft] = useState("on_duty");
   const [photoPreview, setPhotoPreview] = useState(null);
   const [photoFile, setPhotoFile] = useState(null);
-  const [hasChanges, setHasChanges] = useState(false);
+  const hasChanges = useMemo(() => bioDraft !== (profile.bio || "") || statusDraft !== (profile.status || "on_duty") || photoFile !== null, [bioDraft, statusDraft, photoFile, profile]);
   const [showSavedToast, setShowSavedToast] = useState(false);
   const [showPhotoModal, setShowPhotoModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // ---- Load profile from backend ----
-  useEffect(() => {
-    if (!user?.id) {
-      navigate("/admin/login");
-      return;
-    }
-    loadProfile();
-  }, [user?.id]);
-
-  const loadProfile = async () => {
+  const loadProfile = useCallback(async () => {
     try {
       setLoading(true);
       const data = await getMyProfile();
       setProfile(data);
       setBioDraft(data.bio || "");
       setStatusDraft(data.status || "on_duty");
-      setPhotoPreview(data.photo_url ? `${API_BASE.replace("/api", "")}${data.photo_url}` : null);
+      setPhotoPreview(data.photo_url ? getProtectedFileUrl(data.photo_url) : null);
     } catch (err) {
       console.error("Gagal memuat profil:", err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [setLoading, setProfile, setBioDraft, setStatusDraft, setPhotoPreview]);
+
+  useEffect(() => {
+    if (!user?.id) {
+      navigate("/admin/login");
+      return;
+    }
+    const timer = setTimeout(loadProfile, 0);
+    return () => clearTimeout(timer);
+  }, [user?.id, navigate, loadProfile]);
 
   // ---- Detect changes ----
-  useEffect(() => {
-    const changed =
-      bioDraft !== (profile.bio || "") ||
-      statusDraft !== (profile.status || "on_duty") ||
-      photoFile !== null;
-    setHasChanges(changed);
-  }, [bioDraft, statusDraft, photoFile, profile]);
-
   // ---- Handlers ----
   const handlePhotoSelect = (e) => {
     const file = e.target.files?.[0];
@@ -200,7 +191,7 @@ export default function ProfilePage() {
       const result = await updateMyProfile(formData);
       setProfile(result.user);
       setPhotoFile(null);
-      setHasChanges(false);
+
       setShowSavedToast(true);
       setTimeout(() => setShowSavedToast(false), 2500);
     } catch (err) {
@@ -213,9 +204,8 @@ export default function ProfilePage() {
   const handleDiscard = () => {
     setBioDraft(profile.bio || "");
     setStatusDraft(profile.status || "on_duty");
-    setPhotoPreview(profile.photo_url ? `${API_BASE.replace("/api", "")}${profile.photo_url}` : null);
+    setPhotoPreview(profile.photo_url ? getProtectedFileUrl(profile.photo_url) : null);
     setPhotoFile(null);
-    setHasChanges(false);
   };
 
   const handleLogout = () => {

@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { getCurrentUser } from "../../services/authService";
 import { getAllPetugasProfiles } from "../../services/profileService";
 import { motion, AnimatePresence } from "framer-motion";
+import { getProtectedFileUrl } from "../../services/fileService";
 import {
   Users,
   Search,
@@ -16,11 +17,8 @@ import {
   Clock,
   X,
   FileText,
-  User,
   ChevronDown,
 } from "lucide-react";
-
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 // ---- Status config ----
 const STATUS_CONFIG = {
@@ -110,15 +108,7 @@ export default function PetugasProfiles() {
   const [showFilter, setShowFilter] = useState(false);
   const [selectedPetugas, setSelectedPetugas] = useState(null);
 
-  useEffect(() => {
-    if (!user?.id) {
-      navigate("/admin/login");
-      return;
-    }
-    loadProfiles();
-  }, [user?.id]);
-
-  const loadProfiles = async () => {
+  const loadProfiles = useCallback(async () => {
     try {
       setLoading(true);
       const data = await getAllPetugasProfiles();
@@ -128,7 +118,16 @@ export default function PetugasProfiles() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (!user?.id) {
+      navigate("/admin/login");
+      return;
+    }
+    const timer = setTimeout(loadProfiles, 0);
+    return () => clearTimeout(timer);
+  }, [user?.id, navigate, loadProfiles]);
 
   // ---- Filter & search ----
   const filtered = petugas.filter((p) => {
@@ -150,7 +149,7 @@ export default function PetugasProfiles() {
 
   const getPhotoUrl = (photoUrl) => {
     if (!photoUrl) return null;
-    return `${API_BASE.replace("/api", "")}${photoUrl}`;
+    return getProtectedFileUrl(photoUrl);
   };
 
   const getInitials = (name) => {

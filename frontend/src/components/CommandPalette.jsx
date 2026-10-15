@@ -68,15 +68,19 @@ export default function CommandPalette({ open, onClose, onToggleDarkMode }) {
   // Reset state saat buka
   useEffect(() => {
     if (open) {
-      setQuery('');
-      setSelectedIndex(0);
-      setTimeout(() => inputRef.current?.focus(), 50);
+      const timer = setTimeout(() => {
+        setQuery('');
+        setSelectedIndex(0);
+        inputRef.current?.focus();
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [open]);
 
   // Reset selected index saat filter berubah
   useEffect(() => {
-    setSelectedIndex(0);
+    const timer = setTimeout(() => setSelectedIndex(0), 0);
+    return () => clearTimeout(timer);
   }, [query]);
 
   // Scroll selected item into view

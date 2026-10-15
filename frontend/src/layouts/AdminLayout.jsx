@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { logout, getCurrentUser, isAdmin } from "../services/authService";
 import { getSocket } from "../services/socket";
-import { useTheme } from "../context/ThemeContext";
+import { useTheme } from "../context/ThemeContextValue";
 import CommandPalette from "../components/CommandPalette";
 import {
   LayoutDashboard,
@@ -21,7 +21,6 @@ import {
   Menu,
   X,
   ChevronDown,
-  ChevronRight,
   Search,
   Bell,
   UserCircle,
@@ -30,7 +29,6 @@ import {
   Sun,
   Moon,
   Droplets,
-  HandHelping,
   Building,
   Weight,
   MapPinned,

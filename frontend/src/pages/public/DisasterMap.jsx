@@ -1,13 +1,15 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../../context/ThemeContextValue";
 import { MapContainer, TileLayer, Marker, Popup, Polygon, GeoJSON } from "react-leaflet";
-import { MapPin, AlertTriangle, Camera, X, Check, CloudRain, Mountain, Flame, Tornado, Shield, House, AlertCircle } from "lucide-react";
+import { AlertTriangle, CloudRain, Mountain, Flame, Tornado, Shield, House, AlertCircle } from "lucide-react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import api from "../../services/api";
 import semarangGeojson from "../../assets/kota_semarang.json";
 import { smabData } from "../../data/smabData";
 import { katanaData } from "../../data/katanaData";
+import { getSocket } from "../../services/socket";
 
 // Kota Semarang - center agar seluruh kota terlihat
 const SEMARANG_CENTER = [-7.005, 110.4381];
@@ -62,7 +64,7 @@ const ICON_PATHS = {
   Lainnya: ["M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"],
 };
 
-function createIconSVG(paths, color) {
+function createIconSVG(paths) {
   const d = paths.map(p => `<path d="${p}" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`).join("");
   return `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
 }
@@ -70,7 +72,7 @@ function createIconSVG(paths, color) {
 function createDivIcon(type) {
   const color = getColorForType(type);
   const paths = ICON_PATHS[type] || ICON_PATHS["Lainnya"];
-  const svg = createIconSVG(paths, color);
+  const svg = createIconSVG(paths);
   const html = `
     <div style="
       width:36px;height:36px;
@@ -93,12 +95,6 @@ function createDivIcon(type) {
   });
 }
 
-function getTypeIcon(type) {
-  const paths = ICON_PATHS[type] || ICON_PATHS["Lainnya"];
-  const color = getColorForType(type);
-  const d = paths.map(p => `<path d="${p}" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`).join("");
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
-}
 
 function formatDate(d) {
   if (!d) return "-";
@@ -115,6 +111,7 @@ function formatDate(d) {
 
 export default function DisasterMap() {
   const navigate = useNavigate();
+  const { isDark } = useTheme();
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -156,15 +153,26 @@ export default function DisasterMap() {
     const fetchData = async () => {
       try {
         const { data } = await api.get("/reports/public");
-        if (mounted) setReports(Array.isArray(data) ? data : []);
+        if (mounted) {
+          setReports(Array.isArray(data) ? data : []);
+          setError("");
+        }
       } catch (err) {
         if (mounted) setError(err.response?.data?.message || "Gagal memuat data peta");
       } finally {
         if (mounted) setLoading(false);
       }
     };
+    const refreshReports = () => fetchData();
+    const socket = getSocket();
+    socket.on("new_report", refreshReports);
+    socket.on("report_status_updated", refreshReports);
     fetchData();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+      socket.off("new_report", refreshReports);
+      socket.off("report_status_updated", refreshReports);
+    };
   }, []);
 
   const toggleType = (type) => {
@@ -207,7 +215,7 @@ export default function DisasterMap() {
   }, [filteredReports]);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className={`map-page min-h-screen bg-gray-50 flex flex-col ${isDark ? "is-dark" : ""}`}>
       {/* Header */}
       <header className="sticky top-0 z-[1000] bg-white border-b border-gray-200 shadow-sm">
         <div className="mx-auto max-w-[1600px] px-4 sm:px-6 py-3.5 flex items-center justify-between gap-4">
@@ -494,10 +502,11 @@ export default function DisasterMap() {
                    style={{ height: "100%", width: "100%" }}
                    scrollWheelZoom={true}
                  >
-                   <TileLayer
-                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                   />
+                    <TileLayer
+                      key={isDark ? "dark" : "light"}
+                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
                    {/* Gelapkan area di luar Kota Semarang */}
                    <Polygon
                      positions={[WORLD_RECT, SEMARANG_LATLNG]}

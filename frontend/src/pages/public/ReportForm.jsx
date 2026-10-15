@@ -162,7 +162,7 @@ export default function ReportForm() {
         return parts.join(", ") || data.display_name;
       }
       return data.display_name || "";
-    } catch (err) {
+    } catch {
       return "";
     }
   };
@@ -230,7 +230,9 @@ export default function ReportForm() {
           hist.unshift(data.tracking_code);
           localStorage.setItem(histKey, JSON.stringify(hist.slice(0,5)));
         }
-      } catch {}
+      } catch (err) {
+        console.error(err);
+      }
       setResult(data);
     } catch (err) {
       setError(err.response?.data?.message || "Gagal mengirim laporan");

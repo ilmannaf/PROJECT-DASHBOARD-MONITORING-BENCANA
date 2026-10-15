@@ -52,7 +52,10 @@ export default function DisasterRecordsManagement() {
       .finally(() => { setLoading(false); setTimeout(() => setShowContent(true), 80); });
   };
 
-  useEffect(() => { loadRecords(); }, []);
+  useEffect(() => {
+    const timer = setTimeout(loadRecords, 0);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 

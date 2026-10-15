@@ -9,7 +9,7 @@ exports.createActivity = async (req, res) => {
       return res.status(400).json({ message: 'Judul dan tanggal kegiatan wajib diisi' });
     }
 
-    const documentation_url = req.file ? `/uploads/${req.file.filename}` : null;
+    const documentation_url = req.file ? `/api/files/${req.file.filename}` : null;
 
     const [result] = await pool.query(
       `INSERT INTO activities (title, description, activity_date, activity_time, location, documentation_url, created_by)
@@ -51,7 +51,7 @@ exports.updateActivity = async (req, res) => {
       return res.status(404).json({ message: 'Kegiatan tidak ditemukan' });
     }
 
-    const documentation_url = req.file ? `/uploads/${req.file.filename}` : existing[0].documentation_url;
+    const documentation_url = req.file ? `/api/files/${req.file.filename}` : existing[0].documentation_url;
 
     await pool.query(
       `UPDATE activities SET

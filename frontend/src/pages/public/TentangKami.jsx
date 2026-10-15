@@ -2,8 +2,8 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Zap, Eye, Link as LinkIcon, Monitor, Phone, ArrowLeft, Shield, Users, Heart,
-  ArrowUpRight, Target, Handshake, FileCheck, BookOpen, CheckCircle, Sparkles,
-  MapPin, Clock, Mail,
+  ArrowUpRight, Target, FileCheck, CheckCircle, Sparkles,
+  MapPin, Clock,
 } from "lucide-react";
 
 export default function TentangKami() {

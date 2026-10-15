@@ -4,7 +4,7 @@ import { MapPin, Camera, X } from 'lucide-react';
 import { login, register, isAuthenticated, getCurrentUser, logout } from '../../services/authService';
 import { getMyReports, trackReport } from '../../services/reportService';
 import { getSocket } from '../../services/socket';
-import { showToast } from '../../components/Toast';
+import { showToast } from '../../services/toastService';
 
 const STATUS_COLOR = {
   baru: 'bg-red-100 text-red-700',
@@ -14,7 +14,7 @@ const STATUS_COLOR = {
 };
 
 export default function PublicDashboard() {
-  const [tab, setTab] = useState('login');
+  const [tab, setTab] = useState(() => isAuthenticated() ? 'dashboard' : 'login');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [reports, setReports] = useState([]);
@@ -57,7 +57,9 @@ export default function PublicDashboard() {
           // sort by created_at desc
           merged.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
         }
-      } catch {}
+      } catch (err) {
+        console.error(err);
+      }
       setReports(merged);
     } catch (err) {
       console.error(err);
@@ -66,16 +68,10 @@ export default function PublicDashboard() {
     }
   };
 
-  useEffect(() => {
-    if (isAuthenticated()) {
-      setTab('dashboard');
-    }
-  }, []);
-
   // load whenever tab becomes dashboard + polling + focus refresh + socket
   useEffect(() => {
     if (tab === 'dashboard' && isAuthenticated()) {
-      loadReports();
+      const initialLoad = setTimeout(loadReports, 0);
       const interval = setInterval(loadReports, 15000);
       const onFocus = () => loadReports();
       const onVisibility = () => { if (document.visibilityState === 'visible') loadReports(); };
@@ -90,6 +86,7 @@ export default function PublicDashboard() {
       socket.on('report_status_updated', onStatusUpdate);
 
       return () => {
+        clearTimeout(initialLoad);
         clearInterval(interval);
         window.removeEventListener('focus', onFocus);
         document.removeEventListener('visibilitychange', onVisibility);

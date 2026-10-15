@@ -17,7 +17,7 @@ exports.createUnexpectedExpenditure = async (req, res) => {
       return res.status(404).json({ message: 'Data bencana tidak ditemukan' });
     }
 
-    const bukti_url = req.file ? `/uploads/${req.file.filename}` : null;
+    const bukti_url = req.file ? `/api/files/${req.file.filename}` : null;
 
     const [result] = await pool.query(
       `INSERT INTO unexpected_expenditures (disaster_record_id, kelurahan, kecamatan, nama_pengeluaran, jumlah, keterangan, tanggal_pengeluaran, bukti_url, created_by)

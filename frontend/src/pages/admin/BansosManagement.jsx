@@ -5,6 +5,7 @@ import { isAdmin } from "../../services/authService";
 import { HandHelping, Search, Plus, X, Trash2, Eye, CheckCircle, Clock, FileText } from "lucide-react";
 import AnimatedNumber from "../../components/AnimatedNumber";
 import { SkeletonTable } from "../../components/Skeleton";
+import { getProtectedFileUrl } from "../../services/fileService";
 
 const STATUS_OPTIONS = [
   { value: "pending", label: "Pending", color: "bg-gray-100 text-gray-600" },
@@ -54,8 +55,11 @@ export default function BansosManagement() {
   };
 
   useEffect(() => {
-    loadItems();
-    getDisasterRecords().then(setDisasterRecords).catch(console.error);
+    const timer = setTimeout(() => {
+      loadItems();
+      getDisasterRecords().then(setDisasterRecords).catch(console.error);
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
@@ -397,7 +401,7 @@ export default function BansosManagement() {
               {showDetail.surat_pengajuan_url && (
                 <div>
                   <span className="font-semibold text-gray-700">Surat Pengajuan:</span>
-                  <a href={showDetail.surat_pengajuan_url} target="_blank" rel="noopener noreferrer" className="ml-2 text-blue-600 hover:underline">
+                  <a href={getProtectedFileUrl(showDetail.surat_pengajuan_url)} target="_blank" rel="noopener noreferrer" className="ml-2 text-blue-600 hover:underline">
                     Lihat Surat
                   </a>
                 </div>

@@ -51,8 +51,11 @@ export default function InfrastrukturManagement() {
   };
 
   useEffect(() => {
-    loadItems();
-    getDisasterRecords().then(setDisasterRecords).catch(console.error);
+    const timer = setTimeout(() => {
+      loadItems();
+      getDisasterRecords().then(setDisasterRecords).catch(console.error);
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });

@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { getReports, updateReportStatus, deleteReport, exportReportsExcel, getReportStats } from '../../services/reportService';
 import { getSocket } from '../../services/socket';
-import { showToast } from '../../components/Toast';
+import { showToast } from '../../services/toastService';
 import AnimatedNumber from '../../components/AnimatedNumber';
-import { SkeletonTable, SkeletonPulse } from '../../components/Skeleton';
+import { SkeletonTable } from '../../components/Skeleton';
 
 const STATUS_OPTIONS = ['baru', 'diverifikasi', 'ditindaklanjuti', 'selesai'];
 const DISASTER_TYPES = ['Banjir', 'Longsor', 'Kebakaran', 'Angin Puting Beliung', 'Gempa Bumi', 'Lainnya'];
@@ -82,8 +82,14 @@ export default function ReportsManagement() {
       .finally(() => { setLoading(false); setTimeout(() => setShowContent(true), 80); });
   }, [filter, disasterType, dateFrom, dateTo, debouncedSearch, page]);
 
-  useEffect(() => { setPage(1); }, [filter, disasterType, dateFrom, dateTo, debouncedSearch]);
-  useEffect(() => { loadReports(page); }, [page, filter, disasterType, dateFrom, dateTo, debouncedSearch]);
+  useEffect(() => {
+    const timer = setTimeout(() => setPage(1), 0);
+    return () => clearTimeout(timer);
+  }, [filter, disasterType, dateFrom, dateTo, debouncedSearch]);
+  useEffect(() => {
+    const timer = setTimeout(() => loadReports(page), 0);
+    return () => clearTimeout(timer);
+  }, [loadReports, page]);
 
   useEffect(() => {
     const socket = getSocket();
