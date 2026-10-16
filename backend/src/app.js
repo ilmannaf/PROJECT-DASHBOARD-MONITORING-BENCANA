@@ -7,6 +7,7 @@ const fileRoutes = require('./routes/fileRoutes');
 const { serveUpload } = require('./controllers/fileController');
 
 const app = express();
+app.set('trust proxy', 1);
 
 /* =========================================================
    CORS CONFIGURATION
